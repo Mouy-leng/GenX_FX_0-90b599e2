@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import signal
+import subprocess
 import sys
 import time
 from datetime import datetime, timedelta
@@ -52,6 +53,7 @@ class GenX24_7Backend:
         self.gemini_service = None
         self.trading_service = None
         self.ea_server = None
+        self.monitor_process = None
         self.signal_interval = 30  # Generate signals every 30 seconds
         self.last_signal_time = None
 
@@ -335,6 +337,10 @@ class GenX24_7Backend:
 
         self.running = True
 
+        # Start monitor
+        self.monitor_process = subprocess.Popen([sys.executable, "system_monitor.py"])
+        logger.info(f"📊 Monitoring process started with PID: {self.monitor_process.pid}")
+
         # Start signal generation in background
         signal_task = asyncio.create_task(self.run_signal_generation_loop())
 
@@ -364,6 +370,10 @@ class GenX24_7Backend:
         logger.info("🛑 Stopping GenX 24/7 Backend Service...")
 
         self.running = False
+
+        if self.monitor_process:
+            self.monitor_process.terminate()
+            logger.info("📊 Monitoring process terminated")
 
         if self.ea_server:
             await self.ea_server.stop()

@@ -72,7 +72,7 @@ class TestEdgeCases:
         }
         
         # This should work if the endpoint exists
-        response = client.post("/api/v1/predictions/predict", json=large_data)
+        response = client.post("/api/v1/predictions", json=large_data)
         # We expect either success or a structured error, not a crash
         assert response.status_code in [200, 400, 404, 422, 500]
     
@@ -135,7 +135,7 @@ class TestEdgeCases:
         
         for test_data in edge_cases:
             try:
-                response = client.post("/api/v1/market-data/", json=test_data)
+                response = client.post("/api/v1/predictions", json=test_data)
                 assert response.status_code in [200, 400, 401, 403, 405, 422, 500]
             except (ValueError, TypeError):
                 # JSON serialization might fail for inf/nan, that's acceptable
@@ -151,7 +151,7 @@ class TestEdgeCases:
         ]
         
         for test_data in array_cases:
-            response = client.post("/api/v1/market-data/", json=test_data)
+            response = client.post("/api/v1/predictions", json=test_data)
             assert response.status_code in [200, 400, 401, 403, 405, 422, 500]
     
     def test_deeply_nested_objects(self):
@@ -164,7 +164,7 @@ class TestEdgeCases:
             current = current[f"level_{i}"]
         current["deep_value"] = "reached the bottom"
         
-        response = client.post("/api/v1/market-data/", json=nested_data)
+        response = client.post("/api/v1/predictions", json=nested_data)
         assert response.status_code in [200, 400, 401, 403, 405, 422, 500]
     
     def test_concurrent_requests(self):
@@ -206,7 +206,7 @@ class TestDataValidation:
         
         for malicious_input in malicious_inputs:
             test_data = {"symbol": malicious_input}
-            response = client.post("/api/v1/market-data/", json=test_data)
+            response = client.post("/api/v1/predictions", json=test_data)
             # Should not crash and should handle safely
             assert response.status_code in [200, 400, 401, 403, 405, 422, 500]
             
@@ -266,7 +266,7 @@ class TestPerformanceEdgeCases:
             "metadata": {"large_field": "y" * 10000}
         }
         
-        response = client.post("/api/v1/market-data/", json=large_data)
+        response = client.post("/api/v1/predictions", json=large_data)
         
         # Check memory didn't increase dramatically
         final_memory = process.memory_info().rss

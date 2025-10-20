@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 import sqlite3
 import os
 from datetime import datetime
@@ -32,7 +33,8 @@ async def root():
     return {
         "message": "GenX-FX Trading Platform API",
         "version": "1.0.0",
-        "status": "running",
+        "status": "active",
+        "docs": "/docs",
         "github": "Mouy-leng",
         "repository": "https://github.com/Mouy-leng/GenX_FX.git",
     }
@@ -59,12 +61,20 @@ async def health_check():
             "status": "healthy",
             "database": "connected",
             "timestamp": datetime.now().isoformat(),
+            "services": {
+                "ml_service": "active",
+                "data_service": "active"
+            }
         }
     except Exception as e:
         return {
             "status": "unhealthy",
             "error": str(e),
             "timestamp": datetime.now().isoformat(),
+            "services": {
+                "ml_service": "inactive",
+                "data_service": "inactive"
+            }
         }
 
 @app.get("/api/v1/health")
@@ -83,8 +93,8 @@ async def api_health_check():
         "timestamp": datetime.now().isoformat(),
     }
 
-@app.get("/api/v1/predictions")
-async def get_predictions():
+@app.post("/api/v1/predictions")
+async def get_predictions(request: dict):
     """
     Endpoint to get trading predictions.
 
@@ -166,6 +176,36 @@ async def get_mt5_info():
         dict: A dictionary with static MT5 login and server details.
     """
     return {"login": "279023502", "server": "Exness-MT5Trial8", "status": "configured"}
+
+@app.get("/api/v1/monitor")
+async def get_monitoring_data():
+    """
+    Retrieves the latest system metrics from the monitoring service.
+
+    Reads the metrics from the 'system_metrics.json' file.
+
+    Returns:
+        dict: A dictionary containing the latest system metrics, or an
+              error message if the metrics are not available.
+    """
+    try:
+        with open("system_metrics.json", "r") as f:
+            metrics = json.load(f)
+        return metrics
+    except FileNotFoundError:
+        return {"error": "Monitoring data not available yet."}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/monitor")
+async def serve_monitoring_dashboard():
+    """
+    Serves the monitoring dashboard HTML file.
+
+    Returns:
+        FileResponse: The HTML file for the monitoring dashboard.
+    """
+    return FileResponse("monitoring_dashboard.html")
 
 if __name__ == "__main__":
     import uvicorn
