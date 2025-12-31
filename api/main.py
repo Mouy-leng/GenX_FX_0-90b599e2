@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 import sqlite3
 import os
 from datetime import datetime
+
 app = FastAPI(
     title="GenX-FX Trading Platform API",
     description="Trading platform with ML-powered predictions",
@@ -18,6 +19,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --------------------------------------------------------------------------
+# Dependency Injection for Database Connection
+# --------------------------------------------------------------------------
+# To ensure thread safety with SQLite, we use FastAPI's dependency injection
+# system to manage the database connection. A new connection is created for
+# each request and closed when the request is complete. This is a safe and
+# standard pattern for managing resources in a web application.
+# --------------------------------------------------------------------------
+
+def get_db():
+    """
+    FastAPI dependency to get a database connection for each request.
+    """
+    db = sqlite3.connect("genxdb_fx.db")
+    db.row_factory = sqlite3.Row
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.get("/")
 async def root():
@@ -40,7 +61,7 @@ async def root():
     }
 
 @app.get("/health")
-async def health_check():
+async def health_check(db: sqlite3.Connection = Depends(get_db)):
     """
     Performs a health check on the API and its database connection.
 
@@ -51,11 +72,9 @@ async def health_check():
               database connection is successful, 'unhealthy' otherwise.
     """
     try:
-        # Test database connection
-        conn = sqlite3.connect("genxdb_fx.db")
-        cursor = conn.cursor()
+        # --- Use the DB connection from the dependency ---
+        cursor = db.cursor()
         cursor.execute("SELECT 1")
-        conn.close()
 
         return {
             "status": "healthy",
@@ -110,7 +129,7 @@ async def get_predictions(request: dict):
     }
 
 @app.get("/trading-pairs")
-async def get_trading_pairs():
+async def get_trading_pairs(db: sqlite3.Connection = Depends(get_db)):
     """
     Retrieves a list of active trading pairs from the database.
 
@@ -120,20 +139,19 @@ async def get_trading_pairs():
         dict: A dictionary containing a list of trading pairs or an error message.
     """
     try:
-        conn = sqlite3.connect("genxdb_fx.db")
-        cursor = conn.cursor()
+        # --- Use the DB connection from the dependency ---
+        cursor = db.cursor()
         cursor.execute(
             "SELECT symbol, base_currency, quote_currency FROM trading_pairs WHERE is_active = 1"
         )
         pairs = cursor.fetchall()
-        conn.close()
 
         return {
             "trading_pairs": [
                 {
-                    "symbol": pair[0],
-                    "base_currency": pair[1],
-                    "quote_currency": pair[2],
+                    "symbol": pair["symbol"],
+                    "base_currency": pair["base_currency"],
+                    "quote_currency": pair["quote_currency"],
                 }
                 for pair in pairs
             ]
@@ -142,7 +160,7 @@ async def get_trading_pairs():
         return {"error": str(e)}
 
 @app.get("/users")
-async def get_users():
+async def get_users(db: sqlite3.Connection = Depends(get_db)):
     """
     Retrieves a list of users from the database.
 
@@ -152,15 +170,18 @@ async def get_users():
         dict: A dictionary containing a list of users or an error message.
     """
     try:
-        conn = sqlite3.connect("genxdb_fx.db")
-        cursor = conn.cursor()
+        # --- Use the DB connection from the dependency ---
+        cursor = db.cursor()
         cursor.execute("SELECT username, email, is_active FROM users")
         users = cursor.fetchall()
-        conn.close()
 
         return {
             "users": [
-                {"username": user[0], "email": user[1], "is_active": bool(user[2])}
+                {
+                    "username": user["username"],
+                    "email": user["email"],
+                    "is_active": bool(user["is_active"])
+                }
                 for user in users
             ]
         }
