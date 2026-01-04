@@ -58,20 +58,22 @@
   - websockets: 11.0.0 → 14.0.0
 
 - **Database & Security:**
-  - redis: 4.6.0 → 5.2.0
+  - redis: 4.6.0 → 5.0.0+ (compatible range to avoid breaking changes)
   - alembic: 1.12.0 → 1.14.0
   - pydantic: 2.0.0 → 2.10.0
   - pydantic-settings: 2.0.0 → 2.6.0
 
 - **Testing & Code Quality:**
   - pytest: 7.4.0 → 8.3.0
-  - pytest-cov: 4.1.0 → 6.0.0
+  - pytest-cov: 4.1.0 → 5.0.0+ (inclusive range for better compatibility)
   - pytest-asyncio: 0.21.0 → 0.24.0
   - black: 23.0.0 → 24.0.0
   - flake8: 6.0.0 → 7.1.0
   - isort: 5.12.0 → 5.13.0
   - bandit: 1.7.0 → 1.8.0
   - safety: 2.3.0 → 3.3.0
+
+**Note:** Redis 5.x may introduce API changes. Test existing Redis code thoroughly before deploying.
 
 #### GitHub Actions Workflows ✅
 - Updated action versions for better performance and security:
@@ -106,6 +108,7 @@
 - **Dockerfile:**
   - Updated Node.js: 16.x → 22.x
   - Maintained Debian bookworm-slim base
+  - **Security Note:** NodeSource installation uses curl piped execution. Consider using official Node.js Docker images for production deployments.
 
 - **Dockerfile.production:**
   - Updated Python: 3.11-slim → 3.13-slim
@@ -217,6 +220,11 @@
    - Keep deployment guides current
    - Update version requirements
    - Maintain changelog
+
+4. **Testing Considerations:**
+   - **Redis 5.x:** Test all Redis operations for API compatibility
+   - **Docker Security:** Consider migrating to official Docker base images for production
+   - Run full integration tests before production deployment
 
 ---
 
