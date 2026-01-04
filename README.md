@@ -21,6 +21,7 @@ GenX FX is a comprehensive, AI-powered trading system that combines machine lear
 -   ⚡ **Real-Time Integration**: Features live data feeds through WebSocket and REST APIs for instant trade execution and real-time analysis.
 -   🔗 **Multi-Broker Support**: Integrates with various brokers via ForexConnect, FXCM, and Exness, providing flexibility and choice.
 -   📈 **Advanced Signal Generation**: Generates ML-based trading signals and exports them to Excel, CSV, or JSON formats for consumption by EAs or other tools.
+-   📱 **Multi-Channel Notifications**: Send trading signals and alerts to Telegram, Discord, and WhatsApp groups for real-time team updates.
 -   🛠️ **Unified CLI**: A powerful and unified command-line interface (`genx`) for all major operations, from system status checks to automated deployments and AI model training.
 
 ---
@@ -133,6 +134,7 @@ For more detailed information, please refer to the following guides in the repos
 -   **[GOLD_MASTER_EA_GUIDE.md](GOLD_MASTER_EA_GUIDE.md)**: A comprehensive guide for the specialized gold trading EA.
 -   **[SYSTEM_ARCHITECTURE_GUIDE.md](SYSTEM_ARCHITECTURE_GUIDE.md)**: An in-depth look at the system's design and architecture.
 -   **[API_KEY_SETUP.md](API_KEY_SETUP.md)**: Instructions for configuring the necessary API keys for all services.
+-   **[WHATSAPP_INTEGRATION_GUIDE.md](WHATSAPP_INTEGRATION_GUIDE.md)**: Guide for setting up WhatsApp notifications and group integration.
 -   **[AWS_DEPLOYMENT_GUIDE.md](AWS_DEPLOYMENT_GUIDE.md)**: A step-by-step guide to deploying the platform on AWS.
 
 ---

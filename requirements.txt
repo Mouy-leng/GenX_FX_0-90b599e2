@@ -84,6 +84,7 @@ safety>=2.3.0,<3.0.0
 # Notification Support (Optional)
 # python-telegram-bot>=20.0
 # slack-sdk>=3.21.0
+# For WhatsApp: Use WhatsApp Business API or third-party services in production
 
 # Web server support for health checks
 # No additional web framework needed, using built-in http.server
