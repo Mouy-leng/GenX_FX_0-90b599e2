@@ -4,6 +4,8 @@ from fastapi.responses import FileResponse
 import sqlite3
 import os
 from datetime import datetime
+import time
+import json
 
 app = FastAPI(
     title="GenX-FX Trading Platform API",
@@ -19,6 +21,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- Performance Optimization: In-Memory Cache for Monitoring Endpoint ---
+# To avoid frequent and slow disk I/O on the monitoring endpoint, we use a
+# simple in-memory cache. The cache stores the contents of system_metrics.json
+# for a short duration, reducing latency and system load.
+_monitor_cache = None
+_monitor_cache_timestamp = 0
+CACHE_DURATION_SECONDS = 1  # Cache metrics for 1 second
+
 
 # --------------------------------------------------------------------------
 # Dependency Injection for Database Connection
@@ -203,15 +214,30 @@ async def get_monitoring_data():
     """
     Retrieves the latest system metrics from the monitoring service.
 
-    Reads the metrics from the 'system_metrics.json' file.
+    This endpoint is optimized with an in-memory cache to reduce disk I/O
+    and improve response time. It serves a cached version of the metrics if
+    the cache is less than CACHE_DURATION_SECONDS old.
 
     Returns:
         dict: A dictionary containing the latest system metrics, or an
               error message if the metrics are not available.
     """
+    global _monitor_cache, _monitor_cache_timestamp
+
+    # --- Check if the cache is still valid ---
+    current_time = time.time()
+    if _monitor_cache and (current_time - _monitor_cache_timestamp < CACHE_DURATION_SECONDS):
+        return _monitor_cache
+
+    # --- If cache is invalid, read from disk and update cache ---
     try:
         with open("system_metrics.json", "r") as f:
             metrics = json.load(f)
+
+        # --- Update cache and timestamp ---
+        _monitor_cache = metrics
+        _monitor_cache_timestamp = current_time
+
         return metrics
     except FileNotFoundError:
         return {"error": "Monitoring data not available yet."}
