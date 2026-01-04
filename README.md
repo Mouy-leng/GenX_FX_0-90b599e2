@@ -2,10 +2,10 @@
 
 **An advanced, AI-powered platform for Forex, Cryptocurrency, and Gold trading.**
 
-[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/Mouy-leng/GenX_FX)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/A6-9V/A6..9V-GenX_FX.main)
 
 ---
 
@@ -56,8 +56,8 @@ This option allows you to run the entire backend, API, and AI models for develop
 
 1.  **Clone the Repository**:
     ```bash
-    git clone https://github.com/Mouy-leng/GenX_FX.git
-    cd GenX_FX
+    git clone https://github.com/A6-9V/A6..9V-GenX_FX.main.git
+    cd A6..9V-GenX_FX.main
     ```
 
 2.  **Install Dependencies**:

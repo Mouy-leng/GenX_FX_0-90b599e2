@@ -24,7 +24,7 @@ RUN sudo apt-get update && \
     && sudo rm -rf /var/lib/apt/lists/*
 
 # Install Node.js and Firebase Tools
-RUN curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash - && \
     sudo apt-get install -y nodejs && \
     sudo npm install -g firebase-tools
 
