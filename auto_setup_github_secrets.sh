@@ -42,14 +42,29 @@ check_gh_auth() {
     fi
 }
 
-# Setup AMP Token (already provided)
+# Setup AMP Token (provide via environment variable)
 setup_amp_secret() {
     print_status "Setting up AMP Token secret..."
     
-    AMP_TOKEN="sgamp_user_01K1B28JVS8XWZQ3CEWJP8E5GN_97969aa27077d9e44e82ad554b337f2bda14a5e3eccf15165b1a09c24872495e"
-    
+    if [ -z "${AMP_TOKEN:-}" ]; then
+        print_error "AMP_TOKEN is not set. Export AMP_TOKEN before running."
+        return 1
+    fi
+
     gh secret set AMP_TOKEN --body "$AMP_TOKEN"
-    print_success "AMP Token secret configured"
+    print_success "AMP Token secret configured (from environment)"
+}
+
+# Setup GenX container digests (GitHub Packages / GHCR)
+setup_genx_container_digests() {
+    print_status "Setting up GenX container digest secrets..."
+
+    gh secret set GENX_GHCR_IMAGE --body "ghcr.io/mouy-leng/genx"
+    gh secret set GENX_CONTAINER_DIGEST_MAIN --body "sha256:cbdd7132acf1cc3000d1965ac9ac0f7c8e425f0f2ac5e0080764e87279233f21"
+    gh secret set GENX_CONTAINER_DIGEST_2 --body "sha256:3d8a19989bb281c070cc8b478317f904741a52e9ac18a4c3e9d15965715c9372"
+    gh secret set GENX_CONTAINER_DIGEST_3 --body "sha256:c253aa7ab5d40949ff74f6aa00925087b212168efe8b7c4b60976c599ed11a76"
+
+    print_success "GenX container digest secrets configured"
 }
 
 # Setup Docker Hub secrets (using provided username)
@@ -183,6 +198,7 @@ main() {
     
     # Setup all available secrets
     setup_amp_secret
+    setup_genx_container_digests
     setup_docker_secrets
     setup_database_secrets
     setup_github_variables

@@ -21,29 +21,50 @@ Value: [Get from https://hub.docker.com/settings/security]
 #### **AWS Credentials**
 ```
 Name: AWS_ACCESS_KEY_ID
-Value: [Get from AWS Console: genxapitrading@gmail.com / Leng12345@#$01]
+Value: [Get from AWS Console / IAM access keys]
 ```
 
 ```
 Name: AWS_SECRET_ACCESS_KEY
-Value: [Get from AWS Console: genxapitrading@gmail.com / Leng12345@#$01]
+Value: [Get from AWS Console / IAM access keys]
 ```
 
-#### **AMP Token (Already Provided)**
+#### **AMP Token**
 ```
 Name: AMP_TOKEN
-Value: sgamp_user_01K1B28JVS8XWZQ3CEWJP8E5GN_97969aa27077d9e44e82ad554b337f2bda14a5e3eccf15165b1a09c24872495e
+Value: [your AMP session token]
 ```
 
-#### **Database Passwords (Generated)**
+#### **Database Passwords**
 ```
 Name: POSTGRES_PASSWORD
-Value: Hz67QFj6P5RSxB6EZv7xT+S/3EXLDksUo1X/EVOAu3M=
+Value: [generate with: openssl rand -base64 32]
 ```
 
 ```
 Name: REDIS_PASSWORD
-Value: w1W7BMXPYbG5lsH2/aND6VvNxxU1aAgA/sFWDyU/5bQ=
+Value: [generate with: openssl rand -base64 32]
+```
+
+#### **GenX (GitHub Packages / GHCR) Container Digests**
+```
+Name: GENX_GHCR_IMAGE
+Value: ghcr.io/mouy-leng/genx
+```
+
+```
+Name: GENX_CONTAINER_DIGEST_MAIN
+Value: sha256:cbdd7132acf1cc3000d1965ac9ac0f7c8e425f0f2ac5e0080764e87279233f21
+```
+
+```
+Name: GENX_CONTAINER_DIGEST_2
+Value: sha256:3d8a19989bb281c070cc8b478317f904741a52e9ac18a4c3e9d15965715c9372
+```
+
+```
+Name: GENX_CONTAINER_DIGEST_3
+Value: sha256:c253aa7ab5d40949ff74f6aa00925087b212168efe8b7c4b60976c599ed11a76
 ```
 
 ### **⚠️ Optional Secrets**
@@ -120,13 +141,8 @@ Value: t2.micro
 
 ### **AWS Credentials**
 1. Go to: https://console.aws.amazon.com
-2. Login: `genxapitrading@gmail.com` / `Leng12345@#$01`
-3. Click **"keamouyleng"** (top right)
-4. Click **"Security credentials"**
-5. Scroll to **"Access keys"**
-6. Click **"Create access key"**
-7. Choose **"Command Line Interface (CLI)"**
-8. Copy both keys
+2. In IAM, create an access key for your deployment user
+3. Copy both keys into GitHub Secrets
 
 ## ✅ **Available GitHub Actions Workflows**
 

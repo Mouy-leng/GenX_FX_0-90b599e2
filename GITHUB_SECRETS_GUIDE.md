@@ -16,13 +16,23 @@ DOCKER_PASSWORD = [Your Docker Hub Access Token]
 AWS_ACCESS_KEY_ID = [Your AWS Access Key ID]
 AWS_SECRET_ACCESS_KEY = [Your AWS Secret Access Key]
 ```
-**How to get**: Go to https://console.aws.amazon.com → Login with genxapitrading@gmail.com → Security credentials → Create access key
+**How to get**: Go to https://console.aws.amazon.com → IAM → Security credentials → Create access key
 
 #### **AMP System Secret**
 ```
-AMP_TOKEN = sgamp_user_01K1B28JVS8XWZQ3CEWJP8E5GN_97969aa27077d9e44e82ad554b337f2bda14a5e3eccf15165b1a09c24872495e
+AMP_TOKEN = [your AMP session token]
 ```
-**Status**: ✅ Already provided
+**Status**: Set this in GitHub Secrets (do not commit it)
+
+#### **GenX (GitHub Packages / GHCR) Container Digests**
+Store your published `genx` image digests so deployments can pin an immutable version:
+
+```
+GENX_GHCR_IMAGE = ghcr.io/mouy-leng/genx
+GENX_CONTAINER_DIGEST_MAIN = sha256:cbdd7132acf1cc3000d1965ac9ac0f7c8e425f0f2ac5e0080764e87279233f21
+GENX_CONTAINER_DIGEST_2 = sha256:3d8a19989bb281c070cc8b478317f904741a52e9ac18a4c3e9d15965715c9372
+GENX_CONTAINER_DIGEST_3 = sha256:c253aa7ab5d40949ff74f6aa00925087b212168efe8b7c4b60976c599ed11a76
+```
 
 #### **Trading Platform Secrets (FXCM)**
 ```
@@ -79,13 +89,8 @@ EC2_INSTANCE_TYPE = t2.micro
 
 ### **Step 2: Get AWS Credentials**
 1. Go to https://console.aws.amazon.com
-2. Login: `genxapitrading@gmail.com` / `Leng12345@#$01`
-3. Click **"keamouyleng"** (top right)
-4. Click **"Security credentials"**
-5. Scroll to **"Access keys"**
-6. Click **"Create access key"**
-7. Choose **"Command Line Interface (CLI)"**
-8. Copy both keys
+2. In IAM, create an access key for your deployment user
+3. Copy both keys into GitHub Secrets as `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 
 ### **Step 3: Get FXCM API Credentials**
 1. Go to https://www.fxcm.com/markets/forex-trading-demo/

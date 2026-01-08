@@ -88,11 +88,34 @@ setup_docker_secrets() {
 # Setup AMP Token secret
 setup_amp_secret() {
     print_status "Setting up AMP Token secret..."
-    
-    AMP_TOKEN="sgamp_user_01K1B28JVS8XWZQ3CEWJP8E5GN_97969aa27077d9e44e82ad554b337f2bda14a5e3eccf15165b1a09c24872495e"
-    
-    gh secret set AMP_TOKEN --body "$AMP_TOKEN"
-    print_success "AMP Token secret configured"
+
+    if [ -n "${AMP_TOKEN:-}" ]; then
+        gh secret set AMP_TOKEN --body "$AMP_TOKEN"
+        print_success "AMP Token secret configured (from environment)"
+        return 0
+    fi
+
+    read -s -p "AMP Token (will not echo): " AMP_TOKEN_INPUT
+    echo ""
+
+    if [ -n "$AMP_TOKEN_INPUT" ]; then
+        gh secret set AMP_TOKEN --body "$AMP_TOKEN_INPUT"
+        print_success "AMP Token secret configured"
+    else
+        print_warning "AMP Token not configured (skipped)"
+    fi
+}
+
+# Setup GenX container digests (GitHub Packages / GHCR)
+setup_genx_container_digests() {
+    print_status "Setting up GenX container digest secrets..."
+
+    gh secret set GENX_GHCR_IMAGE --body "ghcr.io/mouy-leng/genx"
+    gh secret set GENX_CONTAINER_DIGEST_MAIN --body "sha256:cbdd7132acf1cc3000d1965ac9ac0f7c8e425f0f2ac5e0080764e87279233f21"
+    gh secret set GENX_CONTAINER_DIGEST_2 --body "sha256:3d8a19989bb281c070cc8b478317f904741a52e9ac18a4c3e9d15965715c9372"
+    gh secret set GENX_CONTAINER_DIGEST_3 --body "sha256:c253aa7ab5d40949ff74f6aa00925087b212168efe8b7c4b60976c599ed11a76"
+
+    print_success "GenX container digest secrets configured"
 }
 
 # Setup AWS secrets
@@ -105,9 +128,8 @@ setup_aws_secrets() {
     echo "Please provide your AWS credentials:"
     echo ""
     echo "1. Go to: https://console.aws.amazon.com"
-    echo "2. Login: genxapitrading@gmail.com / Leng12345@#$01"
-    echo "3. Click 'keamouyleng' → 'Security credentials'"
-    echo "4. Create access key for CLI"
+    echo "2. In IAM, create an access key for your deployment user"
+    echo "3. Paste the keys below"
     echo ""
     
     read -p "AWS Access Key ID: " AWS_ACCESS_KEY_ID
@@ -238,6 +260,12 @@ create_secrets_summary() {
 ### AMP System
 - `AMP_TOKEN` - Your AMP authentication token
 
+### GenX Container (GHCR / GitHub Packages)
+- `GENX_GHCR_IMAGE` - Image name (e.g. ghcr.io/mouy-leng/genx)
+- `GENX_CONTAINER_DIGEST_MAIN` - Main image digest
+- `GENX_CONTAINER_DIGEST_2` - Additional image digest
+- `GENX_CONTAINER_DIGEST_3` - Additional image digest
+
 ### Trading Platform (FXCM)
 - `FXCM_API_KEY` - FXCM API key for trading
 - `FXCM_SECRET_KEY` - FXCM secret key for trading
@@ -301,6 +329,7 @@ main() {
     
     # Setup all secrets
     setup_amp_secret
+    setup_genx_container_digests
     setup_docker_secrets
     setup_aws_secrets
     setup_trading_secrets

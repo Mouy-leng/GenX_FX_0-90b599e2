@@ -1,8 +1,13 @@
 import requests
 import os
 
-GITHUB_TOKEN = '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'
 USERNAME = 'Mouy-leng'
+
+# Never hardcode tokens in git. Provide via environment variable instead:
+#   export GITHUB_TOKEN=...
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+if not GITHUB_TOKEN:
+    raise SystemExit("Missing GITHUB_TOKEN env var (do not hardcode tokens in this file).")
 
 # Update user profile
 profile_data = {

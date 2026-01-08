@@ -10,7 +10,7 @@ Your GitHub token doesn't have admin permissions for repository secrets, so you'
 
 #### **✅ Already Available**
 ```
-AMP_TOKEN = sgamp_user_01K1B28JVS8XWZQ3CEWJP8E5GN_97969aa27077d9e44e82ad554b337f2bda14a5e3eccf15165b1a09c24872495e
+AMP_TOKEN = [your AMP session token]
 ```
 
 #### **🔑 Critical Secrets (Must Configure)**
@@ -31,6 +31,14 @@ AWS_SECRET_ACCESS_KEY = [Get from AWS Console]
 ```
 POSTGRES_PASSWORD = [Use: openssl rand -base64 32]
 REDIS_PASSWORD = [Use: openssl rand -base64 32]
+```
+
+**GenX (GitHub Packages / GHCR) Container Digests:**
+```
+GENX_GHCR_IMAGE = ghcr.io/mouy-leng/genx
+GENX_CONTAINER_DIGEST_MAIN = sha256:cbdd7132acf1cc3000d1965ac9ac0f7c8e425f0f2ac5e0080764e87279233f21
+GENX_CONTAINER_DIGEST_2 = sha256:3d8a19989bb281c070cc8b478317f904741a52e9ac18a4c3e9d15965715c9372
+GENX_CONTAINER_DIGEST_3 = sha256:c253aa7ab5d40949ff74f6aa00925087b212168efe8b7c4b60976c599ed11a76
 ```
 
 #### **⚠️ Optional Secrets**
@@ -90,12 +98,12 @@ Value: [Your AWS Access Key ID]
 Name: AWS_SECRET_ACCESS_KEY
 Value: [Your AWS Secret Access Key]
 ```
-**Get from**: https://console.aws.amazon.com → Login with genxapitrading@gmail.com → Security credentials
+**Get from**: https://console.aws.amazon.com → IAM → Security credentials → Create access key
 
 #### **AMP Token (Already Provided)**
 ```
 Name: AMP_TOKEN
-Value: sgamp_user_01K1B28JVS8XWZQ3CEWJP8E5GN_97969aa27077d9e44e82ad554b337f2bda14a5e3eccf15165b1a09c24872495e
+Value: [your AMP session token]
 ```
 
 #### **Database Secrets (Generate Secure Passwords)**
@@ -165,13 +173,8 @@ Value: t2.micro
 
 ### **2. AWS Credentials**
 1. Go to: https://console.aws.amazon.com
-2. Login: `genxapitrading@gmail.com` / `Leng12345@#$01`
-3. Click **"keamouyleng"** (top right)
-4. Click **"Security credentials"**
-5. Scroll to **"Access keys"**
-6. Click **"Create access key"**
-7. Choose **"Command Line Interface (CLI)"**
-8. Copy both keys
+2. In IAM, create an access key for your deployment user
+3. Copy both keys into GitHub Secrets
 
 ### **3. Generate Database Passwords**
 Run these commands to generate secure passwords:
@@ -207,7 +210,7 @@ python3 aws_deploy_status.py
 ## 🎯 **Priority Order**
 
 ### **Critical (Must Have)**
-1. ✅ `AMP_TOKEN` (Already provided)
+1. ✅ `AMP_TOKEN`
 2. 🔑 `DOCKER_USERNAME` + `DOCKER_PASSWORD`
 3. 🔑 `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`
 4. 🔑 `POSTGRES_PASSWORD` + `REDIS_PASSWORD`
