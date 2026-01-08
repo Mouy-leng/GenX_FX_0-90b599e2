@@ -8,8 +8,8 @@ set -e
 echo "🚀 Direct AWS Deployment for AMP System"
 echo "======================================="
 
-# AMP Token from user
-AMP_TOKEN="sgamp_user_01K1B28JVS8XWZQ3CEWJP8E5GN_97969aa27077d9e44e82ad554b337f2bda14a5e3eccf15165b1a09c24872495e"
+# AMP Token (provide via environment variable)
+: "${AMP_TOKEN:?Set AMP_TOKEN in your environment before running.}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -116,8 +116,7 @@ show_deployment_instructions() {
     echo ""
     echo "1. 🔑 Get AWS Credentials:"
     echo "   - Go to: https://console.aws.amazon.com"
-    echo "   - Login: genxapitrading@gmail.com / Leng12345@#$01"
-    echo "   - Click 'keamouyleng' → 'Security credentials'"
+    echo "   - In IAM, create an access key for your deployment user"
     echo "   - Create access key for CLI"
     echo ""
     echo "2. ⚙️ Configure Credentials:"

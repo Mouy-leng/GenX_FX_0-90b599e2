@@ -38,9 +38,9 @@ The AMP (Automated Model Pipeline) system has been successfully configured and i
 ### AMP Authentication
 ```json
 {
-  "user_id": "01K1XBP8C5SZXYP88QD166AX1W",
-  "session_hash": "72c12a40546c130db17817dc9c92cb3770ecbe93e34a9fd23c8e9a2daa8e942c",
-  "session_token": "sgamp_user_01K1XBP8C5SZXYP88QD166AX1W_72c12a40546c130db17817dc9c92cb3770ecbe93e34a9fd23c8e9a2daa8e942c",
+  "user_id": "<redacted>",
+  "session_hash": "<redacted>",
+  "session_token": "<redacted>",
   "authenticated_at": "2025-08-05T15:34:38.206367",
   "expires_at": "2025-08-06T15:34:38.206387"
 }
@@ -48,13 +48,13 @@ The AMP (Automated Model Pipeline) system has been successfully configured and i
 
 ### GitHub API Token
 ```
-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
+<redacted>
 ```
 
 ### Google Cloud Service Account
 - **Project ID:** `fortress-notes-omrjz`
 - **Service Account:** `723463751699-compute@developer.gserviceaccount.com`
-- **Private Key:** Embedded in deployment scripts
+- **Private Key:** Store only outside git (e.g. in `GOOGLE_APPLICATION_CREDENTIALS`)
 - **Region:** `us-central1`
 
 ## 🛠️ AMP System Components

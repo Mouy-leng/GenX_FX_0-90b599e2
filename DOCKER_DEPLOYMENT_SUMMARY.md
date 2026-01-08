@@ -130,7 +130,7 @@ cp .env.example .env
 docker-compose -f docker-compose.amp.yml up -d
 
 # 4. Authenticate with your token
-docker exec -it amp-trading-system amp auth --token "sgamp_user_01K0R2TFXNAWZES7ATM3D84JZW_3830bea90574918ae6e55ff15a540488d7bf6da0d39c79d1d21cbd873a6d30ab"
+   docker exec -it amp-trading-system amp auth --token "<YOUR_AMP_TOKEN>"
 
 # 5. Start the system
 docker exec -it amp-trading-system amp schedule --start

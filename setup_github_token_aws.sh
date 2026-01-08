@@ -31,8 +31,9 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# GitHub token
-GITHUB_TOKEN="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"
+# GitHub token MUST be provided via environment variable.
+#   export GITHUB_TOKEN=...
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
 
 # Function to check if command exists
 command_exists() {
@@ -201,6 +202,11 @@ install_python_deps() {
 setup_github_auth() {
     print_status "Setting up GitHub authentication..."
     
+    if [ -z "$GITHUB_TOKEN" ]; then
+        print_error "GITHUB_TOKEN is not set. Export GITHUB_TOKEN before running."
+        return 1
+    fi
+
     # Set GitHub token as environment variable
     export GITHUB_TOKEN
     
@@ -299,7 +305,8 @@ echo "🚀 Deploying with GitHub Token to AWS"
 echo "====================================="
 
 # Set GitHub token
-export GITHUB_TOKEN="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"
+: "${GITHUB_TOKEN:?Set GITHUB_TOKEN in your environment before running.}"
+export GITHUB_TOKEN
 
 # Default values
 ENVIRONMENT=${1:-"production"}

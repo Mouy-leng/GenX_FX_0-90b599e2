@@ -8,7 +8,7 @@ Your session token has been successfully integrated into the AMP CLI system.
 
 ### **Token Parsed Successfully:**
 ```
-Original Token: sgamp_user_01K0R2TFXNAWZES7ATM3D84JZW_3830bea90574918ae6e55ff15a540488d7bf6da0d39c79d1d21cbd873a6d30ab
+Original Token: <redacted>
 ```
 
 ### **Components Extracted:**
@@ -21,7 +21,7 @@ Original Token: sgamp_user_01K0R2TFXNAWZES7ATM3D84JZW_3830bea90574918ae6e55ff15a
 
 ### **Authenticate with Token:**
 ```bash
-amp auth --token "sgamp_user_01K0R2TFXNAWZES7ATM3D84JZW_3830bea90574918ae6e55ff15a540488d7bf6da0d39c79d1d21cbd873a6d30ab"
+amp auth --token "<YOUR_AMP_TOKEN>"
 ```
 
 ### **Check Authentication Status:**
@@ -39,9 +39,9 @@ amp auth --logout
 ### **amp_auth.json** (Generated)
 ```json
 {
-  "user_id": "01K0R2TFXNAWZES7ATM3D84JZW",
-  "session_hash": "3830bea90574918ae6e55ff15a540488d7bf6da0d39c79d1d21cbd873a6d30ab",
-  "session_token": "sgamp_user_01K0R2TFXNAWZES7ATM3D84JZW_3830bea90574918ae6e55ff15a540488d7bf6da0d39c79d1d21cbd873a6d30ab",
+  "user_id": "<redacted>",
+  "session_hash": "<redacted>",
+  "session_token": "<redacted>",
   "authenticated_at": "2025-07-26T04:38:19.747057",
   "expires_at": "2025-07-27T04:38:19.747078"
 }
@@ -63,9 +63,9 @@ amp auth --logout
 ### **✅ API Headers Generation**
 ```python
 headers = {
-    "Authorization": "Bearer sgamp_user_01K0R2TFXNAWZES7ATM3D84JZW_3830bea90574918ae6e55ff15a540488d7bf6da0d39c79d1d21cbd873a6d30ab",
-    "X-User-ID": "01K0R2TFXNAWZES7ATM3D84JZW",
-    "X-Session-Hash": "3830bea90574918ae6e55ff15a540488d7bf6da0d39c79d1d21cbd873a6d30ab"
+    "Authorization": "Bearer <redacted>",
+    "X-User-ID": "<redacted>",
+    "X-Session-Hash": "<redacted>"
 }
 ```
 
@@ -79,7 +79,7 @@ headers = {
 ### **1. Authenticate and Run Job:**
 ```bash
 # Authenticate
-amp auth --token "sgamp_user_01K0R2TFXNAWZES7ATM3D84JZW_3830bea90574918ae6e55ff15a540488d7bf6da0d39c79d1d21cbd873a6d30ab"
+amp auth --token "<YOUR_AMP_TOKEN>"
 
 # Check status
 amp auth --status

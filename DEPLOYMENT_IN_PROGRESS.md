@@ -33,8 +33,8 @@
 ## 🎯 Deployment Configuration
 
 ### AMP System Details
-- **AMP Token:** `sgamp_user_01K1XBP8C5SZXYP88QD166AX1W_72c12a40546c130db17817dc9c92cb3770ecbe93e34a9fd23c8e9a2daa8e942c`
-- **GitHub Token:** `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`
+- **AMP Token:** `<redacted>`
+- **GitHub Token:** `<redacted>`
 - **Project ID:** `fortress-notes-omrjz`
 - **Region:** `us-central1`
 - **Service Name:** `amp-trading-system`

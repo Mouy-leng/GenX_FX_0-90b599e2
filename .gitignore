@@ -190,6 +190,8 @@ config/*_credentials.json
 !amp_config.json
 secrets/
 credentials/
+service-account-key.json
+**/service-account-key.json
 
 # Docker
 .dockerignore
