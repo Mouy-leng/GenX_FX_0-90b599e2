@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import SystemTestResults from './components/SystemTestResults'
 
 /**
  * The main application component.
@@ -99,20 +100,7 @@ function App() {
           </div>
         </div>
 
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-            System Test Results
-          </h2>
-          <div className="space-y-2 text-sm">
-            <div>✅ Configuration system fixed (Pydantic settings)</div>
-            <div>✅ Python API tests: 27/27 passed</div>
-            <div>✅ Node.js server tests: 15/17 passed (2 minor issues)</div>
-            <div>✅ Edge case testing completed</div>
-            <div>✅ Security validation (XSS, SQL injection prevention)</div>
-            <div>✅ Performance testing passed</div>
-            <div>✅ Build system configured</div>
-          </div>
-        </div>
+        <SystemTestResults />
       </div>
     </div>
   )
