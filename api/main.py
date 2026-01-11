@@ -121,17 +121,28 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
     Performs a health check on the API and its database connection.
 
     Attempts to connect to the SQLite database and execute a simple query.
+    This endpoint is optimized with a short-lived Redis cache to reduce
+    database load from frequent health checks.
 
     Returns:
         dict: A dictionary indicating the health status. 'healthy' if the
               database connection is successful, 'unhealthy' otherwise.
     """
+    # --- Performance: Use Redis cache if available ---
+    if redis_client:
+        try:
+            cached_health = redis_client.get("health_check_status")
+            if cached_health:
+                return json.loads(cached_health)
+        except redis.exceptions.ConnectionError as e:
+            logging.error(f"Redis connection error: {e}. Performing live check.")
+
     try:
         # --- Use the DB connection from the dependency ---
         cursor = db.cursor()
         cursor.execute("SELECT 1")
 
-        return {
+        healthy_response = {
             "status": "healthy",
             "database": "connected",
             "timestamp": datetime.now().isoformat(),
@@ -140,6 +151,16 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
                 "data_service": "active"
             }
         }
+
+        # --- Update Redis cache if available ---
+        if redis_client:
+            try:
+                redis_client.setex("health_check_status", 10, json.dumps(healthy_response))
+            except redis.exceptions.ConnectionError as e:
+                logging.error(f"Could not write to Redis cache: {e}.")
+
+        return healthy_response
+
     except Exception as e:
         return {
             "status": "unhealthy",
