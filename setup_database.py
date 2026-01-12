@@ -94,6 +94,11 @@ def create_tables(cursor):
         """,
         
         """
+        -- Performance Optimization: Index for faster queries on active trading pairs
+        CREATE INDEX IF NOT EXISTS idx_trading_pairs_is_active ON trading_pairs (is_active)
+        """,
+
+        """
         CREATE TABLE IF NOT EXISTS market_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             symbol TEXT NOT NULL,
