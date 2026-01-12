@@ -277,40 +277,31 @@ async def get_mt5_info():
 @app.get("/api/v1/monitor")
 async def get_monitoring_data():
     """
-    Retrieves the latest system metrics from the monitoring service.
-    This endpoint is optimized with a Redis cache to reduce disk I/O
-    and improve response time. It serves a cached version of the metrics if
-    available, otherwise it reads from the file and updates the cache.
+    Retrieves the latest system metrics directly from the Redis cache.
+
+    This endpoint is optimized to serve metrics from an in-memory Redis cache,
+    which is populated by the `system_monitor.py` service. This approach
+    avoids any disk I/O in the API, making it highly performant.
+
     Returns:
         dict: A dictionary containing the latest system metrics, or an
-              error message if the metrics are not available.
+              error message if the metrics are not available in the cache.
     """
-    # --- Performance: Use Redis cache if available ---
-    if redis_client:
-        try:
-            cached_metrics = redis_client.get("system_metrics")
-            if cached_metrics:
-                return json.loads(cached_metrics)
-        except redis.exceptions.ConnectionError as e:
-            logging.error(f"Redis connection error: {e}. Reading from file instead.")
+    if not redis_client:
+        return {"error": "Redis is not connected; monitoring data is unavailable."}
 
-    # --- If cache is empty or Redis is unavailable, read from disk ---
     try:
-        with open("system_metrics.json", "r") as f:
-            metrics = json.load(f)
-
-        # --- Update Redis cache if available ---
-        if redis_client:
-            try:
-                redis_client.setex("system_metrics", CACHE_DURATION_SECONDS, json.dumps(metrics))
-            except redis.exceptions.ConnectionError as e:
-                logging.error(f"Could not write to Redis cache: {e}.")
-
-        return metrics
-    except FileNotFoundError:
-        return {"error": "Monitoring data not available yet."}
+        cached_metrics = redis_client.get("system_metrics")
+        if cached_metrics:
+            return json.loads(cached_metrics)
+        else:
+            return {"error": "Monitoring data not available yet."}
+    except redis.exceptions.ConnectionError as e:
+        logging.error(f"Redis connection error: {e}")
+        return {"error": "Could not connect to Redis for monitoring data."}
     except Exception as e:
-        return {"error": str(e)}
+        logging.error(f"An unexpected error occurred: {e}")
+        return {"error": "An internal error occurred."}
 
 @app.get("/monitor")
 async def serve_monitoring_dashboard():
