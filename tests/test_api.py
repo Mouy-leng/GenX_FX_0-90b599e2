@@ -2,11 +2,12 @@ import pytest
 import asyncio
 from unittest.mock import Mock, patch
 import os
+import sqlite3
 
 # Skip tests if FastAPI is not available
 try:
     from fastapi.testclient import TestClient
-    from api.main import app
+    from api.main import app, get_db
     FASTAPI_AVAILABLE = True
 except ImportError:
     FASTAPI_AVAILABLE = False
@@ -130,3 +131,56 @@ def test_config_loading():
     assert isinstance(config, dict)
     assert "database_url" in config
     assert "symbols" in config
+
+
+def test_v2_users_pagination():
+    """Test pagination for the /api/v2/users endpoint"""
+    # Create an in-memory SQLite database for this test
+    conn = sqlite3.connect(":memory:", check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("""
+    CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        email TEXT NOT NULL,
+        is_active INTEGER NOT NULL
+    );
+    """)
+    # Insert 20 users
+    for i in range(20):
+        cursor.execute(
+            "INSERT INTO users (username, email, is_active) VALUES (?, ?, ?)",
+            (f"user{i+1}", f"user{i+1}@test.com", 1)
+        )
+    conn.commit()
+
+    def get_test_db():
+        yield conn
+
+    # Override the dependency
+    app.dependency_overrides[get_db] = get_test_db
+
+    # Test with default limit
+    response = client.get("/api/v2/users")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["users"]) == 10
+    assert data["users"][0]["username"] == "user1"
+
+    # Test with custom limit
+    response = client.get("/api/v2/users?limit=5")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["users"]) == 5
+
+    # Test with skip and limit
+    response = client.get("/api/v2/users?skip=10&limit=5")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["users"]) == 5
+    assert data["users"][0]["username"] == "user11"
+
+    # Clean up the dependency override
+    app.dependency_overrides.clear()
+    conn.close()

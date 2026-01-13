@@ -235,20 +235,57 @@ async def get_trading_pairs(db: sqlite3.Connection = Depends(get_db)):
     except Exception as e:
         return {"error": str(e)}
 
-@app.get("/users")
-async def get_users(db: sqlite3.Connection = Depends(get_db)):
+@app.get("/users", deprecated=True)
+async def get_users_deprecated(db: sqlite3.Connection = Depends(get_db)):
     """
     Retrieves a list of users from the database.
+
+    **Deprecated:** This endpoint is not recommended for new use.
+    Please use the paginated `/api/v2/users` endpoint instead.
 
     Connects to the SQLite database and fetches user information.
 
     Returns:
         dict: A dictionary containing a list of users or an error message.
     """
+    # --- Performance Warning: This endpoint is not paginated ---
     try:
         # --- Use the DB connection from the dependency ---
         cursor = db.cursor()
         cursor.execute("SELECT username, email, is_active FROM users")
+        users = cursor.fetchall()
+
+        return {
+            "users": [
+                {
+                    "username": user["username"],
+                    "email": user["email"],
+                    "is_active": bool(user["is_active"])
+                }
+                for user in users
+            ]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/v2/users")
+async def get_users(db: sqlite3.Connection = Depends(get_db), skip: int = 0, limit: int = 10):
+    """
+    Retrieves a list of users from the database with pagination.
+
+    Connects to the SQLite database and fetches user information.
+
+    - **skip**: The number of records to skip (for pagination).
+    - **limit**: The maximum number of records to return.
+
+    Returns:
+        dict: A dictionary containing a list of users or an error message.
+    """
+    # --- Performance: Add pagination to prevent fetching all users at once ---
+    try:
+        # --- Use the DB connection from the dependency ---
+        cursor = db.cursor()
+        cursor.execute("SELECT username, email, is_active FROM users LIMIT ? OFFSET ?", (limit, skip))
         users = cursor.fetchall()
 
         return {
