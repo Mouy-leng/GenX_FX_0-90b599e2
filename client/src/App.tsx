@@ -9,6 +9,7 @@ import SystemTestResults from './components/SystemTestResults'
 function App() {
   const [health, setHealth] = useState<any>(null)
   const [apiHealth, setApiHealth] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const API = 'http://localhost:8081';
@@ -23,25 +24,32 @@ function App() {
      * Estimated impact: Reduces load time by up to 50% (depending on network latency).
      */
     const fetchHealthData = async () => {
-      const results = await Promise.allSettled([
-        fetch(`${API}/health`),
-        fetch(`${API}/api/v1/health`)
-      ]);
+      setIsLoading(true);
+      try {
+        const results = await Promise.allSettled([
+          fetch(`${API}/health`),
+          fetch(`${API}/api/v1/health`)
+        ]);
 
-      // Handle Node.js server health response
-      if (results[0].status === 'fulfilled') {
-        const healthData = await results[0].value.json();
-        setHealth(healthData);
-      } else {
-        console.error('Node.js server error:', results[0].reason);
-      }
+        // Handle Node.js server health response
+        if (results[0].status === 'fulfilled') {
+          const healthData = await results[0].value.json();
+          setHealth(healthData);
+        } else {
+          console.error('Node.js server error:', results[0].reason);
+        }
 
-      // Handle Python API health response
-      if (results[1].status === 'fulfilled') {
-        const apiHealthData = await results[1].value.json();
-        setApiHealth(apiHealthData);
-      } else {
-        console.error('Python API error:', results[1].reason);
+        // Handle Python API health response
+        if (results[1].status === 'fulfilled') {
+          const apiHealthData = await results[1].value.json();
+          setApiHealth(apiHealthData);
+        } else {
+          console.error('Python API error:', results[1].reason);
+        }
+      } catch (error) {
+        console.error('Error fetching health data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -60,18 +68,24 @@ function App() {
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">
               Node.js Server Status
             </h2>
-            {health ? (
-              <div className="space-y-2">
+            {isLoading ? (
+              <div className="space-y-2 animate-pulse" role="status" aria-label="Loading Node.js server status">
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              </div>
+            ) : health ? (
+              <div className="space-y-2" role="status">
                 <div className="flex items-center">
-                  <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                  <span className="w-3 h-3 bg-green-500 rounded-full mr-2" aria-hidden="true"></span>
                   <span>Status: {health.status}</span>
                 </div>
                 <div>Environment: {health.environment}</div>
                 <div>Timestamp: {health.timestamp}</div>
               </div>
             ) : (
-              <div className="flex items-center">
-                <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+              <div className="flex items-center" role="alert">
+                <span className="w-3 h-3 bg-red-500 rounded-full mr-2" aria-hidden="true"></span>
                 <span>Server not responding</span>
               </div>
             )}
@@ -81,10 +95,16 @@ function App() {
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">
               Python API Status
             </h2>
-            {apiHealth ? (
-              <div className="space-y-2">
+            {isLoading ? (
+              <div className="space-y-2 animate-pulse" role="status" aria-label="Loading Python API status">
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              </div>
+            ) : apiHealth ? (
+              <div className="space-y-2" role="status">
                 <div className="flex items-center">
-                  <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                  <span className="w-3 h-3 bg-green-500 rounded-full mr-2" aria-hidden="true"></span>
                   <span>Status: {apiHealth.status}</span>
                 </div>
                 <div>ML Service: {apiHealth.services?.ml_service}</div>
@@ -92,8 +112,8 @@ function App() {
                 <div>Timestamp: {apiHealth.timestamp}</div>
               </div>
             ) : (
-              <div className="flex items-center">
-                <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+              <div className="flex items-center" role="alert">
+                <span className="w-3 h-3 bg-red-500 rounded-full mr-2" aria-hidden="true"></span>
                 <span>API not responding</span>
               </div>
             )}
