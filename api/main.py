@@ -1,10 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 import sqlite3
 import os
 from datetime import datetime
-import time
 import json
 import redis
 import logging
@@ -12,7 +11,7 @@ import logging
 app = FastAPI(
     title="GenX-FX Trading Platform API",
     description="Trading platform with ML-powered predictions",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Add CORS middleware
@@ -38,14 +37,20 @@ REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 CACHE_DURATION_SECONDS = 5  # Cache metrics for 5 seconds
 
 # --- Set up basic logging ---
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 try:
-    redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, socket_connect_timeout=1)
+    redis_client = redis.Redis(
+        host=REDIS_HOST, port=REDIS_PORT, db=0, socket_connect_timeout=1
+    )
     redis_client.ping()
     logging.info("Successfully connected to Redis.")
 except redis.exceptions.ConnectionError as e:
-    logging.error(f"Could not connect to Redis: {e}. Caching will be disabled.")
+    logging.error(
+        f"Could not connect to Redis: {e}. Caching will be disabled."
+    )
     redis_client = None
 
 
@@ -58,6 +63,7 @@ except redis.exceptions.ConnectionError as e:
 # --------------------------------------------------------------------------
 MONITORING_DASHBOARD_CACHE = None
 
+
 @app.on_event("startup")
 def cache_monitoring_dashboard():
     """
@@ -69,11 +75,19 @@ def cache_monitoring_dashboard():
             MONITORING_DASHBOARD_CACHE = f.read()
         logging.info("Successfully cached monitoring_dashboard.html.")
     except FileNotFoundError:
-        logging.error("monitoring_dashboard.html not found. The /monitor endpoint will be disabled.")
-        MONITORING_DASHBOARD_CACHE = "<h1>Error: Monitoring dashboard not found.</h1>"
+        logging.error(
+            "monitoring_dashboard.html not found. "
+            "The /monitor endpoint will be disabled."
+        )
+        MONITORING_DASHBOARD_CACHE = (
+            "<h1>Error: Monitoring dashboard not found.</h1>"
+        )
     except Exception as e:
         logging.error(f"An error occurred while caching the dashboard: {e}")
-        MONITORING_DASHBOARD_CACHE = "<h1>Error: Could not load monitoring dashboard.</h1>"
+        MONITORING_DASHBOARD_CACHE = (
+            "<h1>Error: Could not load monitoring dashboard.</h1>"
+        )
+
 
 # --------------------------------------------------------------------------
 # Dependency Injection for Database Connection
@@ -83,6 +97,7 @@ def cache_monitoring_dashboard():
 # each request and closed when the request is complete. This is a safe and
 # standard pattern for managing resources in a web application.
 # --------------------------------------------------------------------------
+
 
 def get_db():
     """
@@ -94,6 +109,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 @app.get("/")
 async def root():
@@ -115,6 +131,7 @@ async def root():
         "repository": "https://github.com/Mouy-leng/GenX_FX.git",
     }
 
+
 @app.get("/health")
 async def health_check(db: sqlite3.Connection = Depends(get_db)):
     """
@@ -135,7 +152,9 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
             if cached_health:
                 return json.loads(cached_health)
         except redis.exceptions.ConnectionError as e:
-            logging.error(f"Redis connection error: {e}. Performing live check.")
+            logging.error(
+                f"Redis connection error: {e}. Performing live check."
+            )
 
     try:
         # --- Use the DB connection from the dependency ---
@@ -146,16 +165,15 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
             "status": "healthy",
             "database": "connected",
             "timestamp": datetime.now().isoformat(),
-            "services": {
-                "ml_service": "active",
-                "data_service": "active"
-            }
+            "services": {"ml_service": "active", "data_service": "active"},
         }
 
         # --- Update Redis cache if available ---
         if redis_client:
             try:
-                redis_client.setex("health_check_status", 10, json.dumps(healthy_response))
+                redis_client.setex(
+                    "health_check_status", 10, json.dumps(healthy_response)
+                )
             except redis.exceptions.ConnectionError as e:
                 logging.error(f"Could not write to Redis cache: {e}.")
 
@@ -166,11 +184,9 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
             "status": "unhealthy",
             "error": str(e),
             "timestamp": datetime.now().isoformat(),
-            "services": {
-                "ml_service": "inactive",
-                "data_service": "inactive"
-            }
+            "services": {"ml_service": "inactive", "data_service": "inactive"},
         }
+
 
 @app.get("/api/v1/health")
 async def api_health_check():
@@ -188,6 +204,7 @@ async def api_health_check():
         "timestamp": datetime.now().isoformat(),
     }
 
+
 @app.post("/api/v1/predictions")
 async def get_predictions(request: dict):
     """
@@ -204,25 +221,41 @@ async def get_predictions(request: dict):
         "timestamp": datetime.now().isoformat(),
     }
 
+
 @app.get("/trading-pairs")
 async def get_trading_pairs(db: sqlite3.Connection = Depends(get_db)):
     """
     Retrieves a list of active trading pairs from the database.
 
-    Connects to the SQLite database and fetches all pairs marked as active.
+    This endpoint is optimized with a Redis cache to reduce database load, as
+    the list of trading pairs does not change frequently. The cache expires
+    every hour.
 
     Returns:
-        dict: A dictionary containing a list of trading pairs or an error message.
+        dict: A dictionary containing a list of trading pairs or an error
+              message.
     """
+    # --- Performance: Use Redis cache if available ---
+    if redis_client:
+        try:
+            cached_pairs = redis_client.get("trading_pairs_cache")
+            if cached_pairs:
+                return json.loads(cached_pairs)
+        except redis.exceptions.ConnectionError as e:
+            logging.error(
+                f"Redis connection error: {e}. Performing live query."
+            )
+
     try:
         # --- Use the DB connection from the dependency ---
         cursor = db.cursor()
         cursor.execute(
-            "SELECT symbol, base_currency, quote_currency FROM trading_pairs WHERE is_active = 1"
+            "SELECT symbol, base_currency, quote_currency "
+            "FROM trading_pairs WHERE is_active = 1"
         )
         pairs = cursor.fetchall()
 
-        return {
+        response = {
             "trading_pairs": [
                 {
                     "symbol": pair["symbol"],
@@ -232,16 +265,29 @@ async def get_trading_pairs(db: sqlite3.Connection = Depends(get_db)):
                 for pair in pairs
             ]
         }
+
+        # --- Update Redis cache if available ---
+        if redis_client:
+            try:
+                # Cache for 1 hour (3600 seconds)
+                redis_client.setex(
+                    "trading_pairs_cache", 3600, json.dumps(response)
+                )
+            except redis.exceptions.ConnectionError as e:
+                logging.error(f"Could not write to Redis cache: {e}.")
+
+        return response
     except Exception as e:
         return {"error": str(e)}
+
 
 @app.get("/users", deprecated=True)
 async def get_users_deprecated(db: sqlite3.Connection = Depends(get_db)):
     """
     Retrieves a list of users from the database.
 
-    **Deprecated:** This endpoint is not recommended for new use.
-    Please use the paginated `/api/v2/users` endpoint instead.
+    **Deprecated:** This endpoint is not recommended for new use. Please use
+    the paginated `/api/v2/users` endpoint instead.
 
     Connects to the SQLite database and fetches user information.
 
@@ -260,7 +306,7 @@ async def get_users_deprecated(db: sqlite3.Connection = Depends(get_db)):
                 {
                     "username": user["username"],
                     "email": user["email"],
-                    "is_active": bool(user["is_active"])
+                    "is_active": bool(user["is_active"]),
                 }
                 for user in users
             ]
@@ -268,8 +314,11 @@ async def get_users_deprecated(db: sqlite3.Connection = Depends(get_db)):
     except Exception as e:
         return {"error": str(e)}
 
+
 @app.get("/api/v2/users")
-async def get_users(db: sqlite3.Connection = Depends(get_db), skip: int = 0, limit: int = 10):
+async def get_users(
+    db: sqlite3.Connection = Depends(get_db), skip: int = 0, limit: int = 10
+):
     """
     Retrieves a list of users from the database with pagination.
 
@@ -281,11 +330,14 @@ async def get_users(db: sqlite3.Connection = Depends(get_db), skip: int = 0, lim
     Returns:
         dict: A dictionary containing a list of users or an error message.
     """
-    # --- Performance: Add pagination to prevent fetching all users at once ---
+    # --- Performance: Add pagination ---
     try:
         # --- Use the DB connection from the dependency ---
         cursor = db.cursor()
-        cursor.execute("SELECT username, email, is_active FROM users LIMIT ? OFFSET ?", (limit, skip))
+        cursor.execute(
+            "SELECT username, email, is_active FROM users LIMIT ? OFFSET ?",
+            (limit, skip),
+        )
         users = cursor.fetchall()
 
         return {
@@ -293,13 +345,14 @@ async def get_users(db: sqlite3.Connection = Depends(get_db), skip: int = 0, lim
                 {
                     "username": user["username"],
                     "email": user["email"],
-                    "is_active": bool(user["is_active"])
+                    "is_active": bool(user["is_active"]),
                 }
                 for user in users
             ]
         }
     except Exception as e:
         return {"error": str(e)}
+
 
 @app.get("/mt5-info")
 async def get_mt5_info():
@@ -309,7 +362,12 @@ async def get_mt5_info():
     Returns:
         dict: A dictionary with static MT5 login and server details.
     """
-    return {"login": "279023502", "server": "Exness-MT5Trial8", "status": "configured"}
+    return {
+        "login": "279023502",
+        "server": "Exness-MT5Trial8",
+        "status": "configured",
+    }
+
 
 @app.get("/api/v1/monitor")
 async def get_monitoring_data():
@@ -325,7 +383,9 @@ async def get_monitoring_data():
               error message if the metrics are not available in the cache.
     """
     if not redis_client:
-        return {"error": "Redis is not connected; monitoring data is unavailable."}
+        return {
+            "error": "Redis is not connected; monitoring data is unavailable."
+        }
 
     try:
         cached_metrics = redis_client.get("system_metrics")
@@ -340,6 +400,7 @@ async def get_monitoring_data():
         logging.error(f"An unexpected error occurred: {e}")
         return {"error": "An internal error occurred."}
 
+
 @app.get("/monitor")
 async def serve_monitoring_dashboard():
     """
@@ -353,6 +414,8 @@ async def serve_monitoring_dashboard():
     """
     return HTMLResponse(content=MONITORING_DASHBOARD_CACHE)
 
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+
+    uvicorn.run(app, host="0.0.0.0", port="8080")
