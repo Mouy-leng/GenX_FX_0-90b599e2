@@ -1,5 +1,3 @@
-# Palette's Journal
-
-## 2025-02-14 - Dashboard Refresh Pattern
-**Learning:** Users often need to manually trigger data updates on dashboards without reloading the entire application, especially for system status checks.
-**Action:** Always consider adding a manual "Refresh" trigger for status dashboards, even if auto-refresh or initial-load-only is the default. Ensure it has a loading state.
+## 2024-05-23 - Status Indicators
+**Learning:** Pure color (red/green) status indicators are inaccessible to color-blind users. Adding shape-based indicators (icons) significantly improves clarity.
+**Action:** Always pair status colors with semantic icons (Check/Alert/X) or text labels.
