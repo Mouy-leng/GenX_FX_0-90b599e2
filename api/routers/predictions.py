@@ -4,6 +4,9 @@ import joblib
 import asyncio
 from datetime import datetime
 import logging
+import json
+
+from ..main import redis_client
 
 from ..models.schemas import PredictionRequest, PredictionResponse, SignalType, ModelMetrics
 from ..config import settings
@@ -161,6 +164,9 @@ async def get_model_metrics(current_user: dict = Depends(get_current_user)):
     """
     Retrieves the performance metrics of the current prediction model.
 
+    This endpoint is optimized with a Redis cache to avoid re-calculating
+    metrics on every request. The cache is invalidated when the model is retrained.
+
     Args:
         current_user (dict): The authenticated user.
 
@@ -170,8 +176,26 @@ async def get_model_metrics(current_user: dict = Depends(get_current_user)):
     Raises:
         HTTPException: If the metrics cannot be retrieved.
     """
+    # --- Performance: Check for cached metrics first ---
+    if redis_client:
+        try:
+            cached_metrics = redis_client.get("model_metrics")
+            if cached_metrics:
+                return ModelMetrics(**json.loads(cached_metrics))
+        except Exception as e:
+            logger.error(f"Redis cache read error: {e}")
+
     try:
         metrics = await ml_service.get_model_metrics()
+
+        # --- Performance: Cache the new metrics ---
+        if redis_client:
+            try:
+                # Cache for 1 hour
+                redis_client.setex("model_metrics", 3600, json.dumps(metrics))
+            except Exception as e:
+                logger.error(f"Redis cache write error: {e}")
+
         return ModelMetrics(**metrics)
     except Exception as e:
         logger.error(f"Failed to get model metrics: {str(e)}")
@@ -186,6 +210,9 @@ async def retrain_model(
     """
     Triggers a background task to retrain the prediction model.
 
+    This endpoint also invalidates the model metrics cache to ensure that
+    fresh metrics are served after the model is updated.
+
     Args:
         background_tasks (BackgroundTasks): FastAPI's background task runner.
         symbols (List[str]): A list of symbols to use for retraining the model.
@@ -198,6 +225,13 @@ async def retrain_model(
         HTTPException: If the retraining task fails to start.
     """
     try:
+        # --- Performance: Invalidate cache before retraining ---
+        if redis_client:
+            try:
+                redis_client.delete("model_metrics")
+            except Exception as e:
+                logger.error(f"Redis cache delete error: {e}")
+
         background_tasks.add_task(ml_service.retrain_model, symbols)
         return {"message": "Model retraining started", "symbols": symbols}
     except Exception as e:
