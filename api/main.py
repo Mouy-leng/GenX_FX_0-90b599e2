@@ -5,7 +5,7 @@ import sqlite3
 import os
 from datetime import datetime
 import json
-import redis
+import redis.asyncio as redis
 import logging
 
 app = FastAPI(
@@ -41,17 +41,27 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-try:
-    redis_client = redis.Redis(
-        host=REDIS_HOST, port=REDIS_PORT, db=0, socket_connect_timeout=1
-    )
-    redis_client.ping()
-    logging.info("Successfully connected to Redis.")
-except redis.exceptions.ConnectionError as e:
-    logging.error(
-        f"Could not connect to Redis: {e}. Caching will be disabled."
-    )
-    redis_client = None
+redis_client = None
+
+@app.on_event("startup")
+async def startup_event():
+    global redis_client
+    try:
+        redis_client = await redis.from_url(
+            f"redis://{REDIS_HOST}:{REDIS_PORT}", encoding="utf-8", decode_responses=True
+        )
+        await redis_client.ping()
+        logging.info("Successfully connected to Redis.")
+    except Exception as e:
+        logging.error(
+            f"Could not connect to Redis: {e}. Caching will be disabled."
+        )
+        redis_client = None
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    if redis_client:
+        await redis_client.close()
 
 
 # --------------------------------------------------------------------------
@@ -122,7 +132,18 @@ async def root():
     Returns:
         dict: A dictionary containing API information.
     """
-    return {
+    # --- Performance: Use Redis cache if available ---
+    # This endpoint returns a static JSON response. Caching it reduces
+    # processing time for frequent requests, such as from health checkers.
+    if redis_client:
+        try:
+            cached_root = await redis_client.get("root_cache")
+            if cached_root:
+                return json.loads(cached_root)
+        except Exception as e:
+            logging.error(f"Redis connection error: {e}. Performing live query.")
+
+    response = {
         "message": "GenX-FX Trading Platform API",
         "version": "1.0.0",
         "status": "active",
@@ -130,6 +151,16 @@ async def root():
         "github": "Mouy-leng",
         "repository": "https://github.com/Mouy-leng/GenX_FX.git",
     }
+
+    # --- Update Redis cache if available ---
+    if redis_client:
+        try:
+            # Cache for 1 minute (60 seconds)
+            await redis_client.setex("root_cache", 60, json.dumps(response))
+        except Exception as e:
+            logging.error(f"Could not write to Redis cache: {e}.")
+
+    return response
 
 
 @app.get("/health")
@@ -148,10 +179,10 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
     # --- Performance: Use Redis cache if available ---
     if redis_client:
         try:
-            cached_health = redis_client.get("health_check_status")
+            cached_health = await redis_client.get("health_check_status")
             if cached_health:
                 return json.loads(cached_health)
-        except redis.exceptions.ConnectionError as e:
+        except Exception as e:
             logging.error(
                 f"Redis connection error: {e}. Performing live check."
             )
@@ -171,10 +202,10 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
         # --- Update Redis cache if available ---
         if redis_client:
             try:
-                redis_client.setex(
+                await redis_client.setex(
                     "health_check_status", 10, json.dumps(healthy_response)
                 )
-            except redis.exceptions.ConnectionError as e:
+            except Exception as e:
                 logging.error(f"Could not write to Redis cache: {e}.")
 
         return healthy_response
@@ -238,10 +269,10 @@ async def get_trading_pairs(db: sqlite3.Connection = Depends(get_db)):
     # --- Performance: Use Redis cache if available ---
     if redis_client:
         try:
-            cached_pairs = redis_client.get("trading_pairs_cache")
+            cached_pairs = await redis_client.get("trading_pairs_cache")
             if cached_pairs:
                 return json.loads(cached_pairs)
-        except redis.exceptions.ConnectionError as e:
+        except Exception as e:
             logging.error(
                 f"Redis connection error: {e}. Performing live query."
             )
@@ -270,10 +301,10 @@ async def get_trading_pairs(db: sqlite3.Connection = Depends(get_db)):
         if redis_client:
             try:
                 # Cache for 1 hour (3600 seconds)
-                redis_client.setex(
+                await redis_client.setex(
                     "trading_pairs_cache", 3600, json.dumps(response)
                 )
-            except redis.exceptions.ConnectionError as e:
+            except Exception as e:
                 logging.error(f"Could not write to Redis cache: {e}.")
 
         return response
@@ -388,17 +419,14 @@ async def get_monitoring_data():
         }
 
     try:
-        cached_metrics = redis_client.get("system_metrics")
+        cached_metrics = await redis_client.get("system_metrics")
         if cached_metrics:
             return json.loads(cached_metrics)
         else:
             return {"error": "Monitoring data not available yet."}
-    except redis.exceptions.ConnectionError as e:
+    except Exception as e:
         logging.error(f"Redis connection error: {e}")
         return {"error": "Could not connect to Redis for monitoring data."}
-    except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
-        return {"error": "An internal error occurred."}
 
 
 @app.get("/monitor")
