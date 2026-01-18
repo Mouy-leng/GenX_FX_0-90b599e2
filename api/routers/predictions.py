@@ -179,33 +179,35 @@ async def get_model_metrics(current_user: dict = Depends(get_current_user)):
     if redis_client:
         try:
             # 1. Check cache first
-            cached_metrics = redis_client.get("model_metrics")
+            cached_metrics = await redis_client.get("model_metrics")
             if cached_metrics:
                 return ModelMetrics(**json.loads(cached_metrics))
 
             # 2. If no cache, try to acquire a lock to prevent a stampede
             lock_key = "lock:model_metrics"
-            lock_acquired = redis_client.set(lock_key, "1", nx=True, ex=10)
+            lock_acquired = await redis_client.set(lock_key, "1", nx=True, ex=10)
 
             if lock_acquired:
                 try:
                     # 3. Double-check cache after getting lock, in case another
                     # process populated it while we were waiting.
-                    cached_metrics = redis_client.get("model_metrics")
+                    cached_metrics = await redis_client.get("model_metrics")
                     if cached_metrics:
                         return ModelMetrics(**json.loads(cached_metrics))
 
                     # 4. If still no cache, calculate, cache, and return
                     metrics = await ml_service.get_model_metrics()
-                    redis_client.setex("model_metrics", 3600, json.dumps(metrics))
+                    await redis_client.setex(
+                        "model_metrics", 3600, json.dumps(metrics)
+                    )
                     return ModelMetrics(**metrics)
                 finally:
                     # 5. Always release the lock
-                    redis_client.delete(lock_key)
+                    await redis_client.delete(lock_key)
             else:
                 # 6. If lock not acquired, wait briefly and retry the cache
-                time.sleep(1)
-                cached_metrics = redis_client.get("model_metrics")
+                await asyncio.sleep(0.1)  # Use asyncio.sleep in an async function
+                cached_metrics = await redis_client.get("model_metrics")
                 if cached_metrics:
                     return ModelMetrics(**json.loads(cached_metrics))
 
@@ -253,7 +255,7 @@ async def retrain_model(
         # --- Performance: Invalidate cache before retraining ---
         if redis_client:
             try:
-                redis_client.delete("model_metrics")
+                await redis_client.delete("model_metrics")
             except Exception as e:
                 logger.error(f"Redis cache delete error: {e}")
 
