@@ -393,11 +393,32 @@ async def get_mt5_info():
     Returns:
         dict: A dictionary with static MT5 login and server details.
     """
-    return {
+    # --- Performance: Use Redis cache for static data ---
+    # This endpoint returns static data. Caching it reduces the overhead of
+    # JSON serialization and request processing on every call.
+    if redis_client:
+        try:
+            cached_info = await redis_client.get("mt5_info_cache")
+            if cached_info:
+                return json.loads(cached_info)
+        except Exception as e:
+            logging.error(f"Redis connection error: {e}. Serving live data.")
+
+    response = {
         "login": "279023502",
         "server": "Exness-MT5Trial8",
         "status": "configured",
     }
+
+    # --- Update Redis cache if available ---
+    if redis_client:
+        try:
+            # Cache for 1 hour (3600 seconds)
+            await redis_client.setex("mt5_info_cache", 3600, json.dumps(response))
+        except Exception as e:
+            logging.error(f"Could not write to Redis cache: {e}.")
+
+    return response
 
 
 @app.get("/api/v1/monitor")
