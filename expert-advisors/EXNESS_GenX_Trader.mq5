@@ -13,8 +13,8 @@
 
 //--- Input parameters
 input group "=== API Configuration ==="
-input bool   UseAI = false;                    // Use AI Server for signals
-input string API_URL = "http://localhost:8000/api/v1";
+input bool   UseAI = true;                    // Use AI Server for signals
+input string API_URL = "http://203.147.134.90";
 input string API_KEY = "";
 input int    API_TIMEOUT = 5000;
 
