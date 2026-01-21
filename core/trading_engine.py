@@ -382,16 +382,31 @@ class TradingEngine:
         return True
     
     def _analyze_market_condition(self, market_data: Dict[str, pd.DataFrame]) -> str:
-        """Analyze overall market condition"""
+        """
+        Analyze overall market condition using pre-calculated indicators.
+
+        ---
+        ⚡ Bolt Optimization:
+        - Replaced redundant calculations for volatility, SMA20, and SMA50.
+        - The function now uses the `volatility_20`, `volatility_100`, `sma_20`,
+          and `sma_50` columns that are already pre-calculated in the
+          technical indicators utility.
+        - Impact: Reduces CPU load by avoiding re-computation of several
+          rolling window functions on every signal analysis, making the
+          trading loop more efficient.
+        ---
+        """
         primary_data = market_data[self.config['primary_timeframe']]
         
-        # Calculate volatility
-        volatility = primary_data['close'].rolling(20).std().iloc[-1]
-        avg_volatility = primary_data['close'].rolling(100).std().mean()
+        # --- Use pre-calculated volatility ---
+        # The 'volatility_20' and 'volatility_100' indicators are already calculated.
+        volatility = primary_data['volatility_20'].iloc[-1]
+        avg_volatility = primary_data['volatility_100'].mean()
         
-        # Calculate trend strength
-        sma_20 = primary_data['close'].rolling(20).mean().iloc[-1]
-        sma_50 = primary_data['close'].rolling(50).mean().iloc[-1]
+        # --- Use pre-calculated trend strength ---
+        # The 'sma_20' and 'sma_50' indicators are already calculated.
+        sma_20 = primary_data['sma_20'].iloc[-1]
+        sma_50 = primary_data['sma_50'].iloc[-1]
         current_price = primary_data['close'].iloc[-1]
         
         if volatility > avg_volatility * 1.5:

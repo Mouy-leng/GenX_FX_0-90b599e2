@@ -148,7 +148,7 @@ class TechnicalIndicators:
                 df['bb_position'] = (df['close'] - df['bb_lower']) / df['bb_width']
             
             # Volatility indicators
-            periods = [10, 20, 50]
+            periods = [10, 20, 50, 100]
             for period in periods:
                 if len(df) >= period:
                     df[f'volatility_{period}'] = df['close'].rolling(window=period).std()
