@@ -38,12 +38,12 @@ const SystemTestResultsComponent = () => {
           <li key={index} className="flex items-start gap-3">
             {result.status === 'success' ? (
               <CheckCircle
-                className="w-5 h-5 text-green-500 mt-0.5 shrink-0"
+                className="w-5 h-5 text-green-700 mt-0.5 shrink-0"
                 aria-hidden="true"
               />
             ) : (
               <AlertCircle
-                className="w-5 h-5 text-amber-500 mt-0.5 shrink-0"
+                className="w-5 h-5 text-amber-700 mt-0.5 shrink-0"
                 aria-hidden="true"
               />
             )}

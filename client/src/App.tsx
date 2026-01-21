@@ -89,7 +89,7 @@ function App() {
             ) : health ? (
               <div className="space-y-2" role="status">
                 <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" aria-hidden="true" />
+                  <CheckCircle className="w-5 h-5 text-green-700 mr-2" aria-hidden="true" />
                   <span>Status: {health.status}</span>
                 </div>
                 <div>Environment: {health.environment}</div>
@@ -97,7 +97,7 @@ function App() {
               </div>
             ) : (
               <div className="flex items-center" role="alert">
-                <AlertCircle className="w-5 h-5 text-red-500 mr-2" aria-hidden="true" />
+                <AlertCircle className="w-5 h-5 text-red-600 mr-2" aria-hidden="true" />
                 <span>Server not responding</span>
               </div>
             )}
@@ -116,7 +116,7 @@ function App() {
             ) : apiHealth ? (
               <div className="space-y-2" role="status">
                 <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" aria-hidden="true" />
+                  <CheckCircle className="w-5 h-5 text-green-700 mr-2" aria-hidden="true" />
                   <span>Status: {apiHealth.status}</span>
                 </div>
                 <div>ML Service: {apiHealth.services?.ml_service}</div>
@@ -125,7 +125,7 @@ function App() {
               </div>
             ) : (
               <div className="flex items-center" role="alert">
-                <AlertCircle className="w-5 h-5 text-red-500 mr-2" aria-hidden="true" />
+                <AlertCircle className="w-5 h-5 text-red-600 mr-2" aria-hidden="true" />
                 <span>API not responding</span>
               </div>
             )}
