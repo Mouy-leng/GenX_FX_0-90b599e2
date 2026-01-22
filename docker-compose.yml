@@ -9,8 +9,33 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      - POSTGRES_SERVER=postgres
+      - REDIS_HOST=redis
+      - POSTGRES_USER=${POSTGRES_USER:-genx}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_DB=${POSTGRES_DB:-genx_trading}
     volumes:
       - .:/app
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-genx}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-genx_trading}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
 
   discord_bot:
     build:
@@ -61,3 +86,6 @@ services:
       - .env
     volumes:
       - .:/app
+
+volumes:
+  postgres_data:

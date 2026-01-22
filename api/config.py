@@ -68,8 +68,18 @@ class Settings(BaseSettings):
     EA_SERVER_PORT: int = 5000
     
     # Database Configuration
-    DATABASE_URL: str = "postgresql://genx:password@localhost:5432/genx_trading"
-    REDIS_URL: str = "redis://localhost:6379/0"
+    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str = "genx"
+    POSTGRES_PASSWORD: str = "password"
+    POSTGRES_DB: str = "genx_trading"
+    DATABASE_URL: Optional[str] = None
+
+    # Redis Configuration
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_URL: Optional[str] = None
     
     # Security
     SECRET_KEY: str = Field(..., description="Secret key for JWT tokens")
@@ -190,24 +200,45 @@ class Settings(BaseSettings):
         if v <= 0 or v > 0.1:  # Max 10% risk per trade
             raise ValueError("Risk per trade must be between 0.01 and 0.1 (1-10%)")
         return v
-    
-    def get_database_url(self) -> str:
+
+    @validator("DATABASE_URL", pre=True)
+    def assemble_db_connection(cls, v: Optional[str], values: dict) -> str:
         """
-        Returns the properly formatted database connection URL.
+        Assembles the database connection string from individual components
+        if it's not already provided.
+
+        Args:
+            v (Optional[str]): The existing DATABASE_URL value.
+            values (dict): A dictionary of other setting values.
 
         Returns:
-            str: The PostgreSQL database URL.
+            str: The assembled database connection string.
         """
-        return self.DATABASE_URL
-    
-    def get_redis_url(self) -> str:
+        if isinstance(v, str):
+            return v
+        return (
+            f"postgresql://{values.get('POSTGRES_USER')}:{values.get('POSTGRES_PASSWORD')}"
+            f"@{values.get('POSTGRES_SERVER')}:{values.get('POSTGRES_PORT')}/{values.get('POSTGRES_DB')}"
+        )
+
+    @validator("REDIS_URL", pre=True)
+    def assemble_redis_connection(cls, v: Optional[str], values: dict) -> str:
         """
-        Returns the properly formatted Redis connection URL.
+        Assembles the Redis connection string from individual components
+        if it's not already provided.
+
+        Args:
+            v (Optional[str]): The existing REDIS_URL value.
+            values (dict): A dictionary of other setting values.
 
         Returns:
-            str: The Redis URL.
+            str: The assembled Redis connection string.
         """
-        return self.REDIS_URL
+        if isinstance(v, str):
+            return v
+        return (
+            f"redis://{values.get('REDIS_HOST')}:{values.get('REDIS_PORT')}/{values.get('REDIS_DB')}"
+        )
     
     def is_demo_account(self) -> bool:
         """
