@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { Loader2, Lock } from 'lucide-react';
 
 interface IFormInput {
   cardholderName: string;
@@ -10,7 +11,7 @@ interface IFormInput {
 
 const Billing: React.FC = () => {
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const { register, handleSubmit, formState: { errors } } = useForm<IFormInput>();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<IFormInput>();
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     try {
       const response = await fetch('/api/v1/billing', {
@@ -75,8 +76,23 @@ const Billing: React.FC = () => {
               {errors.cvc && <p className="text-red-500 text-sm mt-1">{errors.cvc.message}</p>}
             </div>
           </div>
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
-            Add Payment Method
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full disabled:opacity-70 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-live="polite"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+                <span>Processing...</span>
+              </>
+            ) : (
+              <>
+                <Lock className="w-4 h-4" aria-hidden="true" />
+                <span>Add Payment Method</span>
+              </>
+            )}
           </button>
         </form>
         {status && (

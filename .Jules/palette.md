@@ -9,3 +9,7 @@
 ## 2024-05-25 - Screen Reader Context for Status Icons
 **Learning:** Visual status icons (Check/Alert) paired with text descriptions often lack explicit status announcement for screen readers (e.g., reading "Configuration fixed" instead of "Success: Configuration fixed").
 **Action:** Use `sr-only` prefix text (Success/Warning) alongside status icons to ensure the state is explicitly conveyed to non-visual users.
+
+## 2024-05-26 - Action Feedback Latency
+**Learning:** In critical financial actions (like payments), lack of immediate visual feedback during network latency causes anxiety and double-submissions. A simple spinner transforms "did it work?" into "it's working."
+**Action:** Always include a disabled loading state with a spinner for primary form actions.
