@@ -13,6 +13,7 @@ import logging
 import re
 import pandas as pd
 from pydantic import BaseModel
+from contextlib import asynccontextmanager
 
 # Check if ai_models module exists and can be imported
 try:
@@ -22,10 +23,82 @@ except ImportError:
     logging.warning("Could not import ai_models. Predictions will be disabled.")
     has_ai_models = False
 
+redis_client = None
+predictor = None
+MONITORING_DASHBOARD_CACHE = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global redis_client, predictor, MONITORING_DASHBOARD_CACHE
+
+    # --- Redis Setup ---
+    try:
+        redis_client = await redis.from_url(
+            f"redis://{REDIS_HOST}:{REDIS_PORT}", encoding="utf-8", decode_responses=True
+        )
+        await redis_client.ping()
+        logging.info("Successfully connected to Redis.")
+    except Exception as e:
+        logging.error(
+            f"Could not connect to Redis: {e}. Caching will be disabled."
+        )
+        redis_client = None
+
+    # --- AI Predictor Setup ---
+    if has_ai_models:
+        try:
+            predictor = EnsemblePredictor()
+            logging.info("EnsemblePredictor initialized.")
+        except Exception as e:
+            logging.error(f"Failed to initialize EnsemblePredictor: {e}")
+            predictor = None
+
+    # --- Database Setup (Billing) ---
+    try:
+        conn = sqlite3.connect("genxdb_fx.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS payment_methods (
+                id INTEGER PRIMARY KEY,
+                cardholder_name TEXT,
+                masked_card_number TEXT
+            )
+        """)
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logging.error(f"Failed to setup database: {e}")
+
+    # --- Dashboard Cache Setup ---
+    try:
+        with open("monitoring_dashboard.html", "r") as f:
+            MONITORING_DASHBOARD_CACHE = f.read()
+        logging.info("Successfully cached monitoring_dashboard.html.")
+    except FileNotFoundError:
+        logging.error(
+            "monitoring_dashboard.html not found. "
+            "The /monitor endpoint will be disabled."
+        )
+        MONITORING_DASHBOARD_CACHE = (
+            "<h1>Error: Monitoring dashboard not found.</h1>"
+        )
+    except Exception as e:
+        logging.error(f"An error occurred while caching the dashboard: {e}")
+        MONITORING_DASHBOARD_CACHE = (
+            "<h1>Error: Could not load monitoring dashboard.</h1>"
+        )
+
+    yield
+
+    # --- Shutdown Logic ---
+    if redis_client:
+        await redis_client.close()
+
 app = FastAPI(
     title="GenX-FX Trading Platform API",
     description="Trading platform with ML-powered predictions",
     version="1.0.0",
+    lifespan=lifespan
 )
 
 # Add Trusted Host middleware
@@ -72,54 +145,6 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-redis_client = None
-predictor = None
-
-@app.on_event("startup")
-async def startup_event():
-    global redis_client, predictor
-    try:
-        redis_client = await redis.from_url(
-            f"redis://{REDIS_HOST}:{REDIS_PORT}", encoding="utf-8", decode_responses=True
-        )
-        await redis_client.ping()
-        logging.info("Successfully connected to Redis.")
-    except Exception as e:
-        logging.error(
-            f"Could not connect to Redis: {e}. Caching will be disabled."
-        )
-        redis_client = None
-
-    if has_ai_models:
-        try:
-            predictor = EnsemblePredictor()
-            logging.info("EnsemblePredictor initialized.")
-        except Exception as e:
-            logging.error(f"Failed to initialize EnsemblePredictor: {e}")
-            predictor = None
-
-    # Billing table setup
-    try:
-        conn = sqlite3.connect("genxdb_fx.db")
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS payment_methods (
-                id INTEGER PRIMARY KEY,
-                cardholder_name TEXT,
-                masked_card_number TEXT
-            )
-        """)
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        logging.error(f"Failed to setup database: {e}")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    if redis_client:
-        await redis_client.close()
-
-
 # --------------------------------------------------------------------------
 # Performance Optimization: In-Memory Cache for Static HTML
 # --------------------------------------------------------------------------
@@ -127,32 +152,6 @@ async def shutdown_event():
 # we cache its content in a global variable on application startup. This
 # reduces disk I/O and improves the response time for the monitoring dashboard.
 # --------------------------------------------------------------------------
-MONITORING_DASHBOARD_CACHE = None
-
-
-@app.on_event("startup")
-def cache_monitoring_dashboard():
-    """
-    Loads the monitoring dashboard HTML into an in-memory cache at startup.
-    """
-    global MONITORING_DASHBOARD_CACHE
-    try:
-        with open("monitoring_dashboard.html", "r") as f:
-            MONITORING_DASHBOARD_CACHE = f.read()
-        logging.info("Successfully cached monitoring_dashboard.html.")
-    except FileNotFoundError:
-        logging.error(
-            "monitoring_dashboard.html not found. "
-            "The /monitor endpoint will be disabled."
-        )
-        MONITORING_DASHBOARD_CACHE = (
-            "<h1>Error: Monitoring dashboard not found.</h1>"
-        )
-    except Exception as e:
-        logging.error(f"An error occurred while caching the dashboard: {e}")
-        MONITORING_DASHBOARD_CACHE = (
-            "<h1>Error: Could not load monitoring dashboard.</h1>"
-        )
 
 
 # --------------------------------------------------------------------------

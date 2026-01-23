@@ -142,7 +142,7 @@ class FeatureEngineer:
             try:
                 pattern = pattern_func(df['open'], df['high'], df['low'], df['close'])
                 patterns.append(pattern)
-            except:
+            except Exception:
                 # Some patterns might fail, add zeros
                 patterns.append(np.zeros(len(df)))
 

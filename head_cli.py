@@ -147,7 +147,7 @@ class HeadCLI:
                 console.print("🔐 AMP Authentication: ✅ [green]Active[/green]")
             else:
                 console.print("🔐 AMP Authentication: ❌ [red]Not authenticated[/red]")
-        except:
+        except Exception:
             console.print("🔐 AMP Authentication: ⚠️ [yellow]Unknown[/yellow]")
         
         # Check key files
