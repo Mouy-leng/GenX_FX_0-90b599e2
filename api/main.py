@@ -7,6 +7,7 @@ import sqlite3
 import os
 from datetime import datetime
 import json
+import asyncio
 import redis.asyncio as redis
 import logging
 import re
@@ -325,7 +326,12 @@ async def get_predictions(request: Request):
                 if not all(col in df.columns for col in required_columns):
                     raise HTTPException(status_code=400, detail="Missing required columns in historical data.")
 
-                prediction = predictor.predict(df)
+                # --- Performance: Run CPU-bound prediction in a separate thread ---
+                # The prediction model is CPU-intensive and would block the main
+                # asyncio event loop. By using asyncio.to_thread, we run it in a
+                # separate thread, allowing the server to remain responsive to
+                # other requests.
+                prediction = await asyncio.to_thread(predictor.predict, df)
                 return prediction
             else:
                  return {
