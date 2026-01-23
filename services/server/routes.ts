@@ -90,7 +90,7 @@ export function registerRoutes(app: Express) {
       const { page = '1', limit = '10', search = '', skillLevel, category } = req.query;
       const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
 
-      let whereConditions = [];
+      const whereConditions = [];
 
       if (search) {
         whereConditions.push(

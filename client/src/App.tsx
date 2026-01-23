@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
 import { RefreshCw, CheckCircle, AlertCircle } from 'lucide-react'
 import SystemTestResults from './components/SystemTestResults'
 import Billing from './pages/Billing';
@@ -144,8 +144,31 @@ function App() {
       <div className="min-h-screen bg-gray-100 p-8">
         <nav className="bg-white rounded-lg shadow-md p-4 mb-8">
           <ul className="flex space-x-4">
-            <li><Link to="/" className="text-blue-500 hover:underline">Home</Link></li>
-            <li><Link to="/billing" className="text-blue-500 hover:underline">Billing</Link></li>
+            <li>
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  isActive
+                    ? 'text-blue-700 font-bold underline decoration-2 underline-offset-4'
+                    : 'text-gray-600 hover:text-blue-700 hover:underline transition-colors'
+                }
+              >
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/billing"
+                className={({ isActive }) =>
+                  isActive
+                    ? 'text-blue-700 font-bold underline decoration-2 underline-offset-4'
+                    : 'text-gray-600 hover:text-blue-700 hover:underline transition-colors'
+                }
+              >
+                Billing
+              </NavLink>
+            </li>
           </ul>
         </nav>
         <Routes>
