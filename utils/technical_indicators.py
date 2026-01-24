@@ -115,11 +115,32 @@ class TechnicalIndicators:
             
             # Commodity Channel Index (CCI)
             if len(df) >= 20:
+                window = 20
                 typical_price = (df['high'] + df['low'] + df['close']) / 3
-                sma_tp = typical_price.rolling(window=20).mean()
-                mean_dev = typical_price.rolling(window=20).apply(
-                    lambda x: np.mean(np.abs(x - x.mean())), raw=True
+                sma_tp = typical_price.rolling(window=window).mean()
+
+                # ---
+                # ⚡ Bolt Optimization: Vectorized Mean Deviation
+                # The original `rolling().apply()` is notoriously slow. This
+                # implementation uses a vectorized approach by creating a
+                # rolling view of the data with numpy strides. This avoids
+                # Python-level loops and is significantly faster.
+                # ---
+                typical_price_np = typical_price.to_numpy()
+                shape = (typical_price_np.shape[0] - window + 1, window)
+                strides = (typical_price_np.strides[0], typical_price_np.strides[0])
+                rolling_windows = np.lib.stride_tricks.as_strided(
+                    typical_price_np, shape=shape, strides=strides
                 )
+
+                # Calculate rolling mean absolute deviation
+                rolling_mean = np.mean(rolling_windows, axis=1)
+                rolling_mad_values = np.mean(
+                    np.abs(rolling_windows - rolling_mean[:, np.newaxis]), axis=1
+                )
+
+                mean_dev = pd.Series(rolling_mad_values, index=df.index[window - 1:])
+
                 df['cci'] = (typical_price - sma_tp) / (0.015 * mean_dev)
             
             return df
