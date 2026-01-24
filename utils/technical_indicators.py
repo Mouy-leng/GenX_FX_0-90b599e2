@@ -255,10 +255,8 @@ class TechnicalIndicators:
             periods = [10, 20, 50]
             for period in periods:
                 if len(df) >= period:
-                    # Linear regression slope
-                    df[f'trend_strength_{period}'] = df['close'].rolling(window=period).apply(
-                        lambda x: np.polyfit(range(len(x)), x, 1)[0], raw=True
-                    )
+                    # Linear regression slope (Vectorized for performance)
+                    df[f'trend_strength_{period}'] = self._calculate_rolling_slope(df['close'], period)
             
             return df
             
@@ -353,6 +351,43 @@ class TechnicalIndicators:
             logger.error(f"Error calculating Parabolic SAR: {e}")
             return pd.Series(np.nan, index=df.index)
     
+    def _calculate_rolling_slope(self, series: pd.Series, window: int) -> pd.Series:
+        """
+        Calculate the slope of a linear regression over a rolling window.
+
+        ---
+        ⚡ Bolt Optimization: Vectorized Linear Regression Slope
+        Replaced the slow `rolling().apply(np.polyfit)` with a vectorized
+        implementation using numpy convolution and rolling sums. This avoids
+        Python-level loops and the overhead of calling polyfit thousands of times.
+        ---
+        """
+        try:
+            n = window
+            if len(series) < n:
+                return pd.Series(np.nan, index=series.index)
+
+            x_mean = (n - 1) / 2
+            # sum((i - x_mean)^2) for i = 0 to n-1
+            sum_x2 = n * (n**2 - 1) / 12
+
+            y_sum = series.rolling(window=n).sum()
+
+            # Use convolution for sum(i * y_i)
+            # To get sum_{i=0}^{n-1} i * y_{t-n+1+i}, we use weights [n-1, n-2, ..., 0]
+            weights = np.arange(n - 1, -1, -1)
+            sum_iy = np.convolve(series.values, weights, mode='valid')
+
+            # Align the result with the original series index
+            sum_iy_series = pd.Series(sum_iy, index=series.index[n - 1:])
+
+            slope = (sum_iy_series - x_mean * y_sum) / sum_x2
+            return slope
+
+        except Exception as e:
+            logger.error(f"Error calculating rolling slope: {e}")
+            return pd.Series(np.nan, index=series.index)
+
     def _calculate_adx(self, df: pd.DataFrame, period: int = 14) -> pd.DataFrame:
         """Calculate Average Directional Index (ADX)"""
         try:
