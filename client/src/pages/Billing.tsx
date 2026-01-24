@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Loader2, Lock } from 'lucide-react';
+import { Loader2, Lock, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface IFormInput {
   cardholderName: string;
@@ -39,41 +39,73 @@ const Billing: React.FC = () => {
         <h2 className="text-xl font-semibold mb-4">Add a Payment Method</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label htmlFor="cardholderName" className="block text-gray-700 font-medium mb-2">Cardholder Name</label>
+            <label htmlFor="cardholderName" className="block text-gray-700 font-medium mb-2">
+              Cardholder Name <span className="text-red-500" aria-hidden="true">*</span>
+            </label>
             <input
               id="cardholderName"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cardholderName ? 'border-red-500' : 'border-gray-300'}`}
+              aria-invalid={!!errors.cardholderName}
+              aria-describedby={errors.cardholderName ? "cardholderName-error" : undefined}
               {...register("cardholderName", { required: "Cardholder name is required" })}
             />
-            {errors.cardholderName && <p className="text-red-500 text-sm mt-1">{errors.cardholderName.message}</p>}
+            {errors.cardholderName && (
+              <p id="cardholderName-error" className="text-red-500 text-sm mt-1" role="alert">
+                {errors.cardholderName.message}
+              </p>
+            )}
           </div>
           <div className="mb-4">
-            <label htmlFor="cardNumber" className="block text-gray-700 font-medium mb-2">Card Number</label>
+            <label htmlFor="cardNumber" className="block text-gray-700 font-medium mb-2">
+              Card Number <span className="text-red-500" aria-hidden="true">*</span>
+            </label>
             <input
               id="cardNumber"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cardNumber ? 'border-red-500' : 'border-gray-300'}`}
+              aria-invalid={!!errors.cardNumber}
+              aria-describedby={errors.cardNumber ? "cardNumber-error" : undefined}
               {...register("cardNumber", { required: "Card number is required" })}
             />
-            {errors.cardNumber && <p className="text-red-500 text-sm mt-1">{errors.cardNumber.message}</p>}
+            {errors.cardNumber && (
+              <p id="cardNumber-error" className="text-red-500 text-sm mt-1" role="alert">
+                {errors.cardNumber.message}
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label htmlFor="expiryDate" className="block text-gray-700 font-medium mb-2">Expiry Date (MM/YY)</label>
+              <label htmlFor="expiryDate" className="block text-gray-700 font-medium mb-2">
+                Expiry Date (MM/YY) <span className="text-red-500" aria-hidden="true">*</span>
+              </label>
               <input
                 id="expiryDate"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.expiryDate ? 'border-red-500' : 'border-gray-300'}`}
+                aria-invalid={!!errors.expiryDate}
+                aria-describedby={errors.expiryDate ? "expiryDate-error" : undefined}
                 {...register("expiryDate", { required: "Expiry date is required" })}
               />
-              {errors.expiryDate && <p className="text-red-500 text-sm mt-1">{errors.expiryDate.message}</p>}
+              {errors.expiryDate && (
+                <p id="expiryDate-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.expiryDate.message}
+                </p>
+              )}
             </div>
             <div>
-              <label htmlFor="cvc" className="block text-gray-700 font-medium mb-2">CVC</label>
+              <label htmlFor="cvc" className="block text-gray-700 font-medium mb-2">
+                CVC <span className="text-red-500" aria-hidden="true">*</span>
+              </label>
               <input
                 id="cvc"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cvc ? 'border-red-500' : 'border-gray-300'}`}
+                aria-invalid={!!errors.cvc}
+                aria-describedby={errors.cvc ? "cvc-error" : undefined}
                 {...register("cvc", { required: "CVC is required" })}
               />
-              {errors.cvc && <p className="text-red-500 text-sm mt-1">{errors.cvc.message}</p>}
+              {errors.cvc && (
+                <p id="cvc-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.cvc.message}
+                </p>
+              )}
             </div>
           </div>
           <button
@@ -96,8 +128,20 @@ const Billing: React.FC = () => {
           </button>
         </form>
         {status && (
-          <div className={`mt-4 p-4 rounded-lg ${status.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {status.message}
+          <div
+            className={`mt-4 p-4 rounded-lg flex items-start gap-3 ${status.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
+            role={status.type === 'error' ? 'alert' : 'status'}
+            aria-live="polite"
+          >
+            {status.type === 'success' ? (
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" aria-hidden="true" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" aria-hidden="true" />
+            )}
+            <div>
+              <span className="sr-only">{status.type === 'success' ? 'Success: ' : 'Error: '}</span>
+              {status.message}
+            </div>
           </div>
         )}
       </div>
