@@ -58,6 +58,7 @@ This document contains the retained memory and context for the AI assistant Jule
 - **Drive Link (User Request)**: https://1drv.ms/f/c/8F247B1B46E82304/IgDpUzdplXkDTpiyCkdNDZpXASUMJEccVuNGxAaY3MxB1sA
 - **Proton Drive**: [Link](https://drive.proton.me/urls/2D7WAV1B70#C5LasdZntV7P)
 - **NotebookLM**: [Link](https://notebooklm.google.com/notebook/35d7301f-8fa7-4bd0-b7b8-e492060404de)
+- **Samsung Cloud Note (Leng Kundee 01/24)**: [Link](https://groupshare.samsungcloud.com/invitation/notecoedit/hpXmILJ1xT)
 - **OneDrive Vault**: Password = 369369
 - **Github API**: https://docs.github.com/api/article/body?pathname=/en/enterprise-server@3.19/admin/all-releases
 - **OpenAI Codex**: https://github.com/openai/codex
