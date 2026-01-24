@@ -111,6 +111,22 @@ class Settings(BaseSettings):
     REDDIT_PASSWORD: Optional[str] = None
     REDDIT_USER_AGENT: str = "GenX-Trading-Bot/1.0"
 
+    # GitHub Configuration
+    GITHUB_TOKEN: Optional[str] = None
+    GITHUB_APP_CLIENT_ID: Optional[str] = None
+    GITHUB_APP_CLIENT_SECRET: Optional[str] = None
+
+    # Mail Configuration
+    MAIL_USERNAME: Optional[str] = None
+    MAIL_PASSWORD: Optional[str] = None
+    MAIL_SERVER: str = "smtp.gmail.com"
+    MAIL_PORT: int = 587
+    MAIL_FROM: Optional[str] = None
+
+    # Messaging Configuration
+    TELEGRAM_TOKEN: Optional[str] = None
+    DISCORD_TOKEN: Optional[str] = None
+
     # Bybit Configuration
     BYBIT_API_KEY: Optional[str] = None
     BYBIT_API_SECRET: Optional[str] = None
