@@ -379,6 +379,13 @@ class TradingEngine:
         if datetime.now() - latest_timestamp > timedelta(hours=1):
             return False
         
+        # ⚡ Bolt Addition: Ensure critical 'atr' column is present
+        # This check prevents runtime errors in `_calculate_levels` and
+        # ensures data integrity before processing.
+        if 'atr' not in primary_data.columns:
+            logger.warning(f"Data for {self.config['primary_timeframe']} is missing 'atr' column.")
+            return False
+
         return True
     
     def _analyze_market_condition(self, market_data: Dict[str, pd.DataFrame]) -> str:
@@ -518,8 +525,15 @@ class TradingEngine:
     ) -> Tuple[float, float]:
         """Calculate stop loss and take profit levels"""
         
-        # Calculate ATR for dynamic levels
-        atr = data['atr'].iloc[-1] if 'atr' in data.columns else (data['high'] - data['low']).rolling(14).mean().iloc[-1]
+        # ---
+        # ⚡ Bolt Optimization:
+        # - Removed the fallback ATR calculation. The 'atr' column is now
+        #   guaranteed to exist by the `_is_data_valid` check.
+        # - Impact: Prevents a redundant, CPU-intensive rolling window
+        #   calculation in the hot path of signal generation, improving
+        #   efficiency.
+        # ---
+        atr = data['atr'].iloc[-1]
         
         # Adjust multipliers based on market condition
         if market_condition == "HIGH_VOLATILITY":
