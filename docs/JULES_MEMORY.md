@@ -52,6 +52,17 @@ This document contains the retained memory and context for the AI assistant Jule
 - **Docker**: Daemon often restricted in environment; rely on build/test scripts.
 - **CI/CD**: `my-drive-projects` repo has workflows. `powershell-ci.yml` needs `pwsh`.
 
+## VPS Deployment Details
+- **Singapore VPS**:
+    - Path: `.../MQL5/Shared Projects/EXNESS_GenX_Trading/DEPLOY/VPS_6773048_DEPLOYMENT_STATUS.md`
+    - Network:
+        - SSID: LengA6-9V
+        - Protocol: Wi-Fi 4 (802.11n)
+        - IP: 192.168.18.6
+        - MAC: 78:20:51:54:60:5C
+    - Certificate: `secops.group` (Let's Encrypt), Exp: Feb 15, 2026.
+    - Docker: `https://github.com/dockur/windows` (Windows in Docker context).
+
 ## Links & Resources
 - **Dropbox (Memory)**: [Link 1](https://www.dropbox.com/scl/fo/wmsuv2bpkgosp1jli5tc5/AOKGX65h1csk9PcFapBwpJk?rlkey=1h8e0od7q2ijbwdvkvg5qsvrs&st=1d4kjv2w&dl=0)
 - **Dropbox (Memory 2)**: [Link 2](https://www.dropbox.com/scl/fo/wmsuv2bpkgosp1jli5tc5/AOKGX65h1csk9PcFapBwpJk?rlkey=1h8e0od7q2ijbwdvkvg5qsvrs&st=wi1idcs3&dl=0)
