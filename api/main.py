@@ -594,17 +594,21 @@ async def serve_monitoring_dashboard():
 
 
 @app.post("/api/v1/billing")
-async def add_payment_method(payment_method: PaymentMethod):
+async def add_payment_method(
+    payment_method: PaymentMethod, db: sqlite3.Connection = Depends(get_db)
+):
     """
     Adds a new payment method to the database.
 
     Returns:
         dict: A dictionary with a success message.
     """
+    # --- Performance Optimization ---
+    # Using FastAPI's dependency injection for the DB connection avoids creating
+    # a new connection on every request, improving performance and reliability.
     try:
         masked_card_number = f"**** **** **** {payment_method.cardNumber[-4:]}"
-        conn = sqlite3.connect("genxdb_fx.db")
-        cursor = conn.cursor()
+        cursor = db.cursor()
         cursor.execute(
             "INSERT INTO payment_methods (cardholder_name, masked_card_number) VALUES (?, ?)",
             (
@@ -612,8 +616,7 @@ async def add_payment_method(payment_method: PaymentMethod):
                 masked_card_number,
             ),
         )
-        conn.commit()
-        conn.close()
+        db.commit()
         return {"status": "success", "message": "Payment method added successfully"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
