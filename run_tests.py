@@ -25,6 +25,11 @@ def run_tests() -> bool:
     os.environ["MONGODB_URL"] = "mongodb://localhost:27017/test"
     os.environ["REDIS_URL"] = "redis://localhost:6379"
     
+    # Mock required Exness credentials for config validation
+    os.environ["EXNESS_LOGIN"] = "12345678"
+    os.environ["EXNESS_PASSWORD"] = "mock_password_123"
+    os.environ["EXNESS_SERVER"] = "Exness-MT5Trial"
+
     print("Running GenX Trading Platform Tests...")
     print("=" * 50)
     

@@ -131,6 +131,11 @@ class Settings(BaseSettings):
     BYBIT_API_KEY: Optional[str] = None
     BYBIT_API_SECRET: Optional[str] = None
 
+    # OneDrive Configuration
+    ONEDRIVE_CLIENT_ID: Optional[str] = None
+    ONEDRIVE_TENANT_ID: Optional[str] = "common"
+    ONEDRIVE_FOLDER_NAME: str = "GenX_Signals"
+
     # WebSocket Configuration
     WEBSOCKET_RECONNECT_INTERVAL: int = 5
     MAX_WEBSOCKET_RETRIES: int = 10

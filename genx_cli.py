@@ -607,5 +607,22 @@ def tree():
     
     console.print(tree)
 
+@app.command("onedrive-sync")
+def onedrive_sync():
+    """Sync signals to OneDrive"""
+    console.print("[bold green]☁️ Syncing signals to OneDrive...[/bold green]")
+
+    try:
+        import onedrive_uploader
+
+        # Call the sync function directly
+        # This ensures stdout (like auth code) is visible to the user
+        onedrive_uploader.sync_signals()
+
+        console.print("[bold green]✅ OneDrive sync process finished.[/bold green]")
+
+    except Exception as e:
+        console.print(f"[bold red]❌ Error: {e}[/bold red]")
+
 if __name__ == "__main__":
     app()
