@@ -99,21 +99,25 @@ if exist "D:\GenX_FX\service-account-key.json" (
 
 echo.
 echo ========================================
-echo Step 4: Setting up E: drive backup
+echo Step 4: Setting up USB backups (E: and F:)
 echo ========================================
 
 REM Check if E: drive is available
 if exist "E:\" (
-    echo E: drive found, setting up backup structure...
-    
+    echo E: drive (TOSHIBA) found, setting up backup structure...
     if not exist "E:\GenX_FX_Backup" mkdir "E:\GenX_FX_Backup"
-    if not exist "E:\GenX_FX_Backup\credentials" mkdir "E:\GenX_FX_Backup\credentials"
-    if not exist "E:\GenX_FX_Backup\configs" mkdir "E:\GenX_FX_Backup\configs"
-    if not exist "E:\GenX_FX_Backup\project" mkdir "E:\GenX_FX_Backup\project"
-    
-    echo E: drive backup structure created
-) else (
-    echo WARNING: E: drive not found. USB backup not available.
+    echo E: drive backup structure ready
+)
+
+REM Check if F: drive is available
+if exist "F:\" (
+    echo F: drive (SSK) found, setting up backup structure...
+    if not exist "F:\GenX_FX_Backup" mkdir "F:\GenX_FX_Backup"
+    echo F: drive backup structure ready
+)
+
+if not exist "E:\" if not exist "F:\" (
+    echo WARNING: No USB backup drives (E: or F:) found.
 )
 
 echo.
@@ -187,7 +191,7 @@ echo.
 echo Summary:
 echo - Main project: D:\GenX_FX
 echo - Backup folder: D:\GenX_FX\backup
-echo - USB backup: E:\GenX_FX_Backup (if E: drive available)
+echo - USB backups: E:\GenX_FX_Backup and F:\GenX_FX_Backup (if available)
 echo - Desktop shortcuts created for easy access
 echo - Duplicate folders cleaned up
 echo - Configuration files updated with new paths

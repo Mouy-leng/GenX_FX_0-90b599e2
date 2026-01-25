@@ -15,8 +15,9 @@ if errorlevel 1 (
 
 echo [1/8] Checking drive space...
 echo C: Drive - Current project location
-echo D: Drive - Target location (225GB free)
-echo E: Drive - Backup location (62GB free)
+echo D: Drive - Target location
+echo E: Drive - TOSHIBA Backup (466GB)
+echo F: Drive - SSK Backup (477GB)
 echo.
 
 echo [2/8] Creating directory structure on D: drive...
@@ -35,21 +36,16 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [4/8] Creating backup on USB (E:) drive...
+echo [4/8] Creating initial backup on USB drives...
 if exist "E:\" (
+    echo Creating backup on E: drive (TOSHIBA)...
     if not exist "E:\GenX_FX_Backup" mkdir "E:\GenX_FX_Backup"
-    if not exist "E:\GenX_FX_Backup\credentials" mkdir "E:\GenX_FX_Backup\credentials"
-    if not exist "E:\GenX_FX_Backup\vps" mkdir "E:\GenX_FX_Backup\vps"
-    
-    echo Creating credentials backup...
-    copy "D:\GenX_FX\credentials\*" "E:\GenX_FX_Backup\credentials\" /Y 2>nul
-    copy "D:\GenX_FX\vps\*" "E:\GenX_FX_Backup\vps\" /Y 2>nul
-    
-    echo Creating full project backup...
-    xcopy "D:\GenX_FX\*" "E:\GenX_FX_Backup\project\" /E /H /Y /I
-    echo Backup created on USB drive E:
-) else (
-    echo WARNING: USB drive E: not found, skipping backup
+    xcopy "D:\GenX_FX\*" "E:\GenX_FX_Backup\project\" /E /H /Y /I /Q
+)
+if exist "F:\" (
+    echo Creating backup on F: drive (SSK)...
+    if not exist "F:\GenX_FX_Backup" mkdir "F:\GenX_FX_Backup"
+    xcopy "D:\GenX_FX\*" "F:\GenX_FX_Backup\project\" /E /H /Y /I /Q
 )
 
 echo [5/8] Updating file paths in scripts...
@@ -68,16 +64,11 @@ echo start "GenX Signal Generator" cmd /k "echo GenX FX Gold Signal Generator ^&
 echo echo GenX FX 24/7 System started from D: Drive! >> "D:\GenX_FX\start-genx-d.bat"
 echo pause >> "D:\GenX_FX\start-genx-d.bat"
 
-echo [7/8] Creating backup script...
+echo [7/8] Setting up unified backup script...
+if not exist "D:\GenX_FX\scripts" mkdir "D:\GenX_FX\scripts"
+copy "scripts\backup_to_usb.bat" "D:\GenX_FX\scripts\" /Y
 echo @echo off > "D:\GenX_FX\backup-to-usb.bat"
-echo echo Creating backup to USB drive... >> "D:\GenX_FX\backup-to-usb.bat"
-echo if exist "E:\" ( >> "D:\GenX_FX\backup-to-usb.bat"
-echo     xcopy "D:\GenX_FX\*" "E:\GenX_FX_Backup\project\" /E /H /Y /I >> "D:\GenX_FX\backup-to-usb.bat"
-echo     echo Backup completed to E:\GenX_FX_Backup\ >> "D:\GenX_FX\backup-to-usb.bat"
-echo ^) else ( >> "D:\GenX_FX\backup-to-usb.bat"
-echo     echo ERROR: USB drive E: not found >> "D:\GenX_FX\backup-to-usb.bat"
-echo ^) >> "D:\GenX_FX\backup-to-usb.bat"
-echo pause >> "D:\GenX_FX\backup-to-usb.bat"
+echo call "D:\GenX_FX\scripts\backup_to_usb.bat" >> "D:\GenX_FX\backup-to-usb.bat"
 
 echo [8/8] Testing new setup...
 cd /d "D:\GenX_FX"
