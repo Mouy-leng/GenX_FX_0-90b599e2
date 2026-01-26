@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, Query, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -106,6 +107,18 @@ app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=["localhost", "127.0.0.1", "0.0.0.0", "genx-fx.com", "testserver"]
 )
+
+# --------------------------------------------------------------------------
+# Performance Optimization: Add GZip Compression Middleware
+# --------------------------------------------------------------------------
+# To reduce the size of the response bodies and improve network performance,
+# we add GZipMiddleware. This middleware automatically compresses responses
+# for clients that support gzip encoding, which is a standard feature in
+# modern browsers and HTTP clients. A minimum size of 1000 bytes is set to
+# avoid the overhead of compressing very small responses where compression
+# might not be beneficial.
+# --------------------------------------------------------------------------
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 class PaymentMethod(BaseModel):
     cardholderName: str
