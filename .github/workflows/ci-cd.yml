@@ -11,7 +11,7 @@ name: GenX FX CI/CD Pipeline
   workflow_dispatch: null
 env:
   PYTHON_VERSION: '3.13'
-  NODE_VERSION: '22'
+  NODE_VERSION: '18'
   DOCKER_REGISTRY: ghcr.io
   IMAGE_NAME: genx-fx
 jobs:
@@ -29,7 +29,7 @@ jobs:
         format: sarif
         output: trivy-results.sarif
     - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: trivy-results.sarif
   test:
@@ -45,11 +45,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Cache pip dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -71,7 +71,7 @@ jobs:
 
         '
     - name: Upload coverage reports
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
         flags: unittests
@@ -83,7 +83,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
     - name: Install linting tools
