@@ -141,6 +141,12 @@ const Home = () => {
 function App() {
   return (
     <Router>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Skip to main content
+      </a>
       <div className="min-h-screen bg-gray-100 p-8">
         <nav className="bg-white rounded-lg shadow-md p-4 mb-8">
           <ul className="flex space-x-4">
@@ -171,10 +177,12 @@ function App() {
             </li>
           </ul>
         </nav>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/billing" element={<Billing />} />
-        </Routes>
+        <main id="main-content" tabIndex={-1} className="focus:outline-none">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/billing" element={<Billing />} />
+          </Routes>
+        </main>
       </div>
     </Router>
   )

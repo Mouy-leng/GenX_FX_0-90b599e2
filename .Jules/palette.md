@@ -17,3 +17,7 @@
 ## 2024-05-27 - Mobile Form Usability
 **Learning:** Standard text inputs for credit card details are frustrating on mobile devices and password managers. Users struggle with keyboard switching and lack of autofill.
 **Action:** Use `inputMode="numeric"` for numerical data (card numbers, dates, CVC) and explicit `autoComplete` attributes (cc-number, cc-exp, cc-csc) to enable browser assistance and correct mobile keypads.
+
+## 2024-05-28 - Skip Links for Keyboard Navigation
+**Learning:** High-level navigation structures often block keyboard users from reaching main content quickly. A hidden "Skip to main content" link is essential for accessibility but often forgotten because it's invisible to mouse users.
+**Action:** Always include a skip link as the first focusable element in the application root, pointing to a `<main>` landmark wrapping the primary route content.
