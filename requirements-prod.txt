@@ -35,7 +35,7 @@ psutil==7.0.0
 # API and WebSocket Support
 websockets==15.0.1
 requests==2.32.4
-fastapi==0.116.1
+fastapi==0.120.0
 uvicorn==0.24.0
 
 # Time Series Analysis (essential only)
