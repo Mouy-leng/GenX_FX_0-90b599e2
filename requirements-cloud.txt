@@ -25,7 +25,7 @@ fastapi==0.116.1
 uvicorn==0.24.0
 
 # Basic logging
-loguru==0.7.2
+loguru==0.7.3
 
 # WebSocket support
 websockets==15.0.1
