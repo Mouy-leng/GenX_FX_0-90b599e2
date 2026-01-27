@@ -21,3 +21,7 @@
 ## 2024-05-28 - Skip Links for Keyboard Navigation
 **Learning:** High-level navigation structures often block keyboard users from reaching main content quickly. A hidden "Skip to main content" link is essential for accessibility but often forgotten because it's invisible to mouse users.
 **Action:** Always include a skip link as the first focusable element in the application root, pointing to a `<main>` landmark wrapping the primary route content.
+
+## 2024-05-29 - Navigation Focus Visibility
+**Learning:** Default browser focus outlines on navigation links are often suppressed or visually inconsistent with the design system, leading to a "lost" feeling for keyboard users navigating main menus.
+**Action:** Explicitly implement `focus-visible` styles on navigation links that match the button focus styles (ring, offset) to create a cohesive and accessible keyboard navigation experience.

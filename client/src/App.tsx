@@ -155,9 +155,11 @@ function App() {
                 to="/"
                 end
                 className={({ isActive }) =>
-                  isActive
-                    ? 'text-blue-700 font-bold underline decoration-2 underline-offset-4'
-                    : 'text-gray-600 hover:text-blue-700 hover:underline transition-colors'
+                  `px-3 py-2 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors ${
+                    isActive
+                      ? 'text-blue-700 font-bold underline decoration-2 underline-offset-4'
+                      : 'text-gray-600 hover:text-blue-700 hover:underline'
+                  }`
                 }
               >
                 Home
@@ -167,9 +169,11 @@ function App() {
               <NavLink
                 to="/billing"
                 className={({ isActive }) =>
-                  isActive
-                    ? 'text-blue-700 font-bold underline decoration-2 underline-offset-4'
-                    : 'text-gray-600 hover:text-blue-700 hover:underline transition-colors'
+                  `px-3 py-2 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors ${
+                    isActive
+                      ? 'text-blue-700 font-bold underline decoration-2 underline-offset-4'
+                      : 'text-gray-600 hover:text-blue-700 hover:underline'
+                  }`
                 }
               >
                 Billing
