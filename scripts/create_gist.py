@@ -22,6 +22,7 @@ console = Console()
 
 GITHUB_API_URL = "https://api.github.com"
 
+
 def get_github_token() -> str:
     """
     Retrieve GITHUB_TOKEN from environment variables.
@@ -30,10 +31,15 @@ def get_github_token() -> str:
 
     if not token:
         console.print("[red]Error: GITHUB_TOKEN environment variable not set.[/red]")
-        console.print("Please set GITHUB_TOKEN in your .env file or export it in your shell.")
-        console.print("You can generate a token at: https://github.com/settings/tokens (scope: gist)")
+        console.print(
+            "Please set GITHUB_TOKEN in your .env file or export it in your shell."
+        )
+        console.print(
+            "You can generate a token at: https://github.com/settings/tokens (scope: gist)"
+        )
         raise typer.Exit(code=1)
     return token
+
 
 def main(
     file_path: Path = typer.Argument(
@@ -42,23 +48,20 @@ def main(
         exists=True,
         file_okay=True,
         dir_okay=False,
-        readable=True
+        readable=True,
     ),
     description: str = typer.Option(
-        None,
-        "--description", "-d",
-        help="Description of the gist."
+        None, "--description", "-d", help="Description of the gist."
     ),
     public: bool = typer.Option(
-        False,
-        "--public",
-        help="Create a public gist (default is secret)."
+        False, "--public", help="Create a public gist (default is secret)."
     ),
     filename: Optional[str] = typer.Option(
         None,
-        "--filename", "-f",
-        help="Custom filename for the gist file (defaults to the local filename)."
-    )
+        "--filename",
+        "-f",
+        help="Custom filename for the gist file (defaults to the local filename).",
+    ),
 ):
     """
     Create a new GitHub Gist from the specified file.
@@ -70,7 +73,7 @@ def main(
     gist_description = description or f"Gist created from {file_path.name}"
 
     try:
-        content = file_path.read_text(encoding='utf-8')
+        content = file_path.read_text(encoding="utf-8")
     except Exception as e:
         console.print(f"[bold red]Failed to read file:[/bold red] {e}")
         raise typer.Exit(code=1)
@@ -82,40 +85,44 @@ def main(
     payload = {
         "description": gist_description,
         "public": public,
-        "files": {
-            gist_filename: {
-                "content": content
-            }
-        }
+        "files": {gist_filename: {"content": content}},
     }
 
     headers = {
         "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json"
+        "Accept": "application/vnd.github.v3+json",
     }
 
-    with console.status(f"[bold green]Creating gist from {file_path.name}...[/bold green]"):
+    with console.status(
+        f"[bold green]Creating gist from {file_path.name}...[/bold green]"
+    ):
         try:
-            response = requests.post(f"{GITHUB_API_URL}/gists", json=payload, headers=headers)
+            response = requests.post(
+                f"{GITHUB_API_URL}/gists", json=payload, headers=headers
+            )
             response.raise_for_status()
             data = response.json()
 
             html_url = data.get("html_url")
-            console.print(Panel(
-                f"[bold green]Gist created successfully![/bold green]\n\n"
-                f"URL: [link={html_url}]{html_url}[/link]\n"
-                f"Visibility: {'Public' if public else 'Secret'}",
-                title="Success",
-                border_style="green"
-            ))
+            console.print(
+                Panel(
+                    f"[bold green]Gist created successfully![/bold green]\n\n"
+                    f"URL: [link={html_url}]{html_url}[/link]\n"
+                    f"Visibility: {'Public' if public else 'Secret'}",
+                    title="Success",
+                    border_style="green",
+                )
+            )
 
         except requests.exceptions.HTTPError as e:
             console.print(f"[bold red]HTTP Error:[/bold red] {e}")
             if e.response is not None:
                 try:
                     error_data = e.response.json()
-                    console.print(f"[red]API Message: {error_data.get('message', 'No message')}[/red]")
-                    if 'errors' in error_data:
+                    console.print(
+                        f"[red]API Message: {error_data.get('message', 'No message')}[/red]"
+                    )
+                    if "errors" in error_data:
                         console.print(f"[red]Errors: {error_data['errors']}[/red]")
                 except ValueError:
                     console.print(f"[red]Response Text: {e.response.text}[/red]")
@@ -123,6 +130,7 @@ def main(
         except Exception as e:
             console.print(f"[bold red]Unexpected Error:[/bold red] {e}")
             raise typer.Exit(code=1)
+
 
 if __name__ == "__main__":
     typer.run(main)

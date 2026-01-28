@@ -6,6 +6,7 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
+
 class DataService:
     """
     Manages fetching and providing market data.

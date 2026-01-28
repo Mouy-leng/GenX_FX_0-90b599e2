@@ -4,13 +4,35 @@ from ..indicators.rsi import calculate_rsi
 from ..indicators.macd import calculate_macd
 from ..indicators.moving_average import calculate_sma, calculate_ema
 
+
 class TestIndicators(unittest.TestCase):
 
     def setUp(self):
-        self.prices = np.array([
-            10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-            19, 18, 17, 16, 15, 14, 13, 12, 11, 10
-        ])
+        self.prices = np.array(
+            [
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                19,
+                18,
+                17,
+                16,
+                15,
+                14,
+                13,
+                12,
+                11,
+                10,
+            ]
+        )
 
     def test_calculate_rsi(self):
         rsi = calculate_rsi(self.prices)
@@ -34,5 +56,6 @@ class TestIndicators(unittest.TestCase):
         self.assertEqual(len(ema), len(self.prices) - 4)
         # Add more specific assertions based on expected EMA values
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

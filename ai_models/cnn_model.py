@@ -1,4 +1,3 @@
-
 import numpy as np
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropout
@@ -6,6 +5,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
+
 
 class CNNModel:
     """
@@ -21,51 +21,67 @@ class CNNModel:
         """Builds the CNN model architecture."""
         if params is None:
             params = {
-                'filters_1': 64,
-                'kernel_size_1': 3,
-                'pool_size_1': 2,
-                'filters_2': 32,
-                'kernel_size_2': 3,
-                'pool_size_2': 2,
-                'dense_units': 50,
-                'dropout': 0.3,
-                'learning_rate': 0.001
+                "filters_1": 64,
+                "kernel_size_1": 3,
+                "pool_size_1": 2,
+                "filters_2": 32,
+                "kernel_size_2": 3,
+                "pool_size_2": 2,
+                "dense_units": 50,
+                "dropout": 0.3,
+                "learning_rate": 0.001,
             }
 
-        model = Sequential([
-            Conv1D(filters=params['filters_1'], kernel_size=params['kernel_size_1'], activation='relu', input_shape=(self.sequence_length, self.n_channels)),
-            MaxPooling1D(pool_size=params['pool_size_1']),
-            Conv1D(filters=params['filters_2'], kernel_size=params['kernel_size_2'], activation='relu'),
-            MaxPooling1D(pool_size=params['pool_size_2']),
-            Flatten(),
-            Dense(params['dense_units'], activation='relu'),
-            Dropout(params['dropout']),
-            Dense(3, activation='softmax')
-        ])
+        model = Sequential(
+            [
+                Conv1D(
+                    filters=params["filters_1"],
+                    kernel_size=params["kernel_size_1"],
+                    activation="relu",
+                    input_shape=(self.sequence_length, self.n_channels),
+                ),
+                MaxPooling1D(pool_size=params["pool_size_1"]),
+                Conv1D(
+                    filters=params["filters_2"],
+                    kernel_size=params["kernel_size_2"],
+                    activation="relu",
+                ),
+                MaxPooling1D(pool_size=params["pool_size_2"]),
+                Flatten(),
+                Dense(params["dense_units"], activation="relu"),
+                Dropout(params["dropout"]),
+                Dense(3, activation="softmax"),
+            ]
+        )
 
-        optimizer = Adam(learning_rate=params['learning_rate'])
-        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+        optimizer = Adam(learning_rate=params["learning_rate"])
+        model.compile(
+            optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"]
+        )
         return model
 
     def train(self, X, y, params=None):
         """Trains the CNN model."""
         y_categorical = to_categorical(y, num_classes=3)
-        X_train, X_val, y_train, y_val = train_test_split(X, y_categorical, test_size=0.2, random_state=42, stratify=y)
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, y_categorical, test_size=0.2, random_state=42, stratify=y
+        )
 
         self.model = self.build_model(params)
 
         callbacks = [
             EarlyStopping(patience=10, restore_best_weights=True),
-            ReduceLROnPlateau(patience=5, factor=0.5)
+            ReduceLROnPlateau(patience=5, factor=0.5),
         ]
 
         self.model.fit(
-            X_train, y_train,
+            X_train,
+            y_train,
             validation_data=(X_val, y_val),
             epochs=100,
             batch_size=32,
             callbacks=callbacks,
-            verbose=0
+            verbose=0,
         )
 
     def predict(self, X, return_probas=False):

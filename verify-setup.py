@@ -14,18 +14,23 @@ print(f"Frontend calls: {frontend_calls}")
 
 # Check environment variables
 print("\n=== Environment Variables ===")
-env_vars = ['GITHUB_TOKEN', 'GITLAB_TOKEN', 'CURSOR_CLI_API_KEY', 'AMP_TOKEN']
+env_vars = ["GITHUB_TOKEN", "GITLAB_TOKEN", "CURSOR_CLI_API_KEY", "AMP_TOKEN"]
 for var in env_vars:
-    value = os.getenv(var, 'NOT SET')
-    masked = '*' * len(value) if value != 'NOT SET' else 'NOT SET'
+    value = os.getenv(var, "NOT SET")
+    masked = "*" * len(value) if value != "NOT SET" else "NOT SET"
     print(f"{var}: {masked}")
 
 # Check GitHub secrets setup
 print("\n=== GitHub Secrets Status ===")
 secrets_to_set = [
-    'BYBIT_API_KEY', 'BYBIT_SECRET', 'FXCM_USERNAME', 
-    'FXCM_PASSWORD', 'GEMINI_API_KEY', 'TELEGRAM_BOT_TOKEN', 
-    'DISCORD_BOT_TOKEN', 'GITHUB_TOKEN'
+    "BYBIT_API_KEY",
+    "BYBIT_SECRET",
+    "FXCM_USERNAME",
+    "FXCM_PASSWORD",
+    "GEMINI_API_KEY",
+    "TELEGRAM_BOT_TOKEN",
+    "DISCORD_BOT_TOKEN",
+    "GITHUB_TOKEN",
 ]
 
 for secret in secrets_to_set:

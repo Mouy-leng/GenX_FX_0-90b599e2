@@ -8,9 +8,11 @@ import numpy as np
 
 try:
     import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
+
 
 class SortinoRatioAnalyzer:
     """
@@ -25,7 +27,7 @@ class SortinoRatioAnalyzer:
         self,
         returns: Union[List[float], "pd.Series"],
         target_return: float = 0.0,
-        annualization_factor: int = 252
+        annualization_factor: int = 252,
     ) -> float:
         """
         Calculates the Sortino Ratio for a given series of returns.
@@ -49,13 +51,17 @@ class SortinoRatioAnalyzer:
 
         # Calculate annualized downside deviation
         downside_returns = returns_arr[returns_arr < target_return]
-        downside_deviation = np.sqrt(np.mean((downside_returns - target_return)**2))
-        annualized_downside_deviation = downside_deviation * np.sqrt(annualization_factor)
+        downside_deviation = np.sqrt(np.mean((downside_returns - target_return) ** 2))
+        annualized_downside_deviation = downside_deviation * np.sqrt(
+            annualization_factor
+        )
 
         # Calculate Sortino Ratio
         if annualized_downside_deviation == 0:
             return np.inf
 
-        sortino_ratio = (annualized_average_return - (target_return * annualization_factor)) / annualized_downside_deviation
+        sortino_ratio = (
+            annualized_average_return - (target_return * annualization_factor)
+        ) / annualized_downside_deviation
 
         return sortino_ratio

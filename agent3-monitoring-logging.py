@@ -4,6 +4,7 @@ Agent 3: Sets up monitoring and logging for the application.
 This script creates configuration files for logging, a health monitor endpoint,
 and a mock monitoring dashboard.
 """
+
 import os
 import json
 
@@ -87,6 +88,7 @@ def get_system_health():
     print(
         "Files created: logging.json, api/health_monitor.py, monitoring-dashboard.json"
     )
+
 
 if __name__ == "__main__":
     setup_monitoring()

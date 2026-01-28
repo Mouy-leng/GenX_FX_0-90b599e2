@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from .moving_average import MovingAverage
 
+
 class MACD:
     """
     Calculates the MACD (Moving Average Convergence Divergence) indicator.
@@ -14,7 +15,9 @@ class MACD:
         ma (MovingAverage): An instance of the MovingAverage calculator.
     """
 
-    def __init__(self, fast_period: int = 12, slow_period: int = 26, signal_period: int = 9):
+    def __init__(
+        self, fast_period: int = 12, slow_period: int = 26, signal_period: int = 9
+    ):
         """
         Initializes the MACD calculator with specified periods.
 
@@ -55,8 +58,12 @@ class MACD:
             "histogram": histogram.iloc[-1] if not histogram.empty else 0,
         }
 
+
 def calculate_macd(
-    prices: pd.Series, fast_period: int = 12, slow_period: int = 26, signal_period: int = 9
+    prices: pd.Series,
+    fast_period: int = 12,
+    slow_period: int = 26,
+    signal_period: int = 9,
 ) -> Tuple[pd.Series, pd.Series, pd.Series]:
     """
     A convenience function to calculate MACD values.

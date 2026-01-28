@@ -1,10 +1,10 @@
-
 import numpy as np
 import pandas as pd
 import talib
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import joblib
 import os
+
 
 class FeatureEngineer:
     """
@@ -31,13 +31,15 @@ class FeatureEngineer:
         labels = self._generate_labels(df)
 
         # Align all data to the same length
-        min_len = min(len(features), len(price_sequences), len(chart_patterns), len(labels))
+        min_len = min(
+            len(features), len(price_sequences), len(chart_patterns), len(labels)
+        )
 
         return self.FeatureSet(
             technical_indicators=features[-min_len:],
             price_sequences=price_sequences[-min_len:],
             chart_patterns=chart_patterns[-min_len:],
-            labels=labels[-min_len:]
+            labels=labels[-min_len:],
         )
 
     def engineer_features_for_prediction(self, df: pd.DataFrame, sequence_length: int):
@@ -55,7 +57,7 @@ class FeatureEngineer:
             technical_indicators=features[-1:],
             price_sequences=price_sequences[-1:],
             chart_patterns=chart_patterns[-1:],
-            labels=None
+            labels=None,
         )
 
     def _calculate_technical_indicators(self, df: pd.DataFrame) -> np.ndarray:
@@ -63,44 +65,50 @@ class FeatureEngineer:
         features = []
 
         # Price-based features
-        features.extend([
-            df['close'].pct_change(),  # Returns
-            df['high'] / df['close'] - 1,  # High-Close ratio
-            df['low'] / df['close'] - 1,   # Low-Close ratio
-            df['volume'].pct_change(),     # Volume change
-        ])
+        features.extend(
+            [
+                df["close"].pct_change(),  # Returns
+                df["high"] / df["close"] - 1,  # High-Close ratio
+                df["low"] / df["close"] - 1,  # Low-Close ratio
+                df["volume"].pct_change(),  # Volume change
+            ]
+        )
 
         # Moving averages
         for period in [5, 10, 20, 50, 100]:
-            ma = df['close'].rolling(period).mean()
-            features.append(df['close'] / ma - 1)  # Price relative to MA
+            ma = df["close"].rolling(period).mean()
+            features.append(df["close"] / ma - 1)  # Price relative to MA
 
         # Technical indicators using TA-Lib
-        features.extend([
-            talib.RSI(df['close'], timeperiod=14) / 100,  # Normalized RSI
-            talib.MACD(df['close'])[0],  # MACD line
-            talib.MACD(df['close'])[1],  # MACD signal
-            talib.MACD(df['close'])[2],  # MACD histogram
-            talib.BBANDS(df['close'])[0],  # Bollinger Upper
-            talib.BBANDS(df['close'])[1],  # Bollinger Middle
-            talib.BBANDS(df['close'])[2],  # Bollinger Lower
-            talib.ATR(df['high'], df['low'], df['close']),  # ATR
-            talib.CCI(df['high'], df['low'], df['close']),  # CCI
-            talib.WILLR(df['high'], df['low'], df['close']),  # Williams %R
-            talib.ADX(df['high'], df['low'], df['close']),  # ADX
-            talib.MOM(df['close']),  # Momentum
-            talib.ROC(df['close']),  # Rate of Change
-        ])
+        features.extend(
+            [
+                talib.RSI(df["close"], timeperiod=14) / 100,  # Normalized RSI
+                talib.MACD(df["close"])[0],  # MACD line
+                talib.MACD(df["close"])[1],  # MACD signal
+                talib.MACD(df["close"])[2],  # MACD histogram
+                talib.BBANDS(df["close"])[0],  # Bollinger Upper
+                talib.BBANDS(df["close"])[1],  # Bollinger Middle
+                talib.BBANDS(df["close"])[2],  # Bollinger Lower
+                talib.ATR(df["high"], df["low"], df["close"]),  # ATR
+                talib.CCI(df["high"], df["low"], df["close"]),  # CCI
+                talib.WILLR(df["high"], df["low"], df["close"]),  # Williams %R
+                talib.ADX(df["high"], df["low"], df["close"]),  # ADX
+                talib.MOM(df["close"]),  # Momentum
+                talib.ROC(df["close"]),  # Rate of Change
+            ]
+        )
 
         # Stochastic Oscillator
-        stoch_k, stoch_d = talib.STOCH(df['high'], df['low'], df['close'])
+        stoch_k, stoch_d = talib.STOCH(df["high"], df["low"], df["close"])
         features.extend([stoch_k, stoch_d])
 
         # Volume indicators
-        features.extend([
-            talib.OBV(df['close'], df['volume']),
-            talib.AD(df['high'], df['low'], df['close'], df['volume']),
-        ])
+        features.extend(
+            [
+                talib.OBV(df["close"], df["volume"]),
+                talib.AD(df["high"], df["low"], df["close"], df["volume"]),
+            ]
+        )
 
         # Combine all features
         feature_matrix = np.column_stack(features)
@@ -116,31 +124,71 @@ class FeatureEngineer:
 
         # Candlestick patterns using TA-Lib
         pattern_functions = [
-            talib.CDL2CROWS, talib.CDL3BLACKCROWS, talib.CDL3INSIDE,
-            talib.CDL3LINESTRIKE, talib.CDL3OUTSIDE, talib.CDL3STARSINSOUTH,
-            talib.CDL3WHITESOLDIERS, talib.CDLABANDONEDBABY, talib.CDLADVANCEBLOCK,
-            talib.CDLBELTHOLD, talib.CDLBREAKAWAY, talib.CDLCLOSINGMARUBOZU,
-            talib.CDLCONCEALBABYSWALL, talib.CDLCOUNTERATTACK, talib.CDLDARKCLOUDCOVER,
-            talib.CDLDOJI, talib.CDLDOJISTAR, talib.CDLDRAGONFLYDOJI,
-            talib.CDLENGULFING, talib.CDLEVENINGDOJISTAR, talib.CDLEVENINGSTAR,
-            talib.CDLGAPSIDESIDEWHITE, talib.CDLGRAVESTONEDOJI, talib.CDLHAMMER,
-            talib.CDLHANGINGMAN, talib.CDLHARAMI, talib.CDLHARAMICROSS,
-            talib.CDLHIGHWAVE, talib.CDLHIKKAKE, talib.CDLHOMINGPIGEON,
-            talib.CDLIDENTICAL3CROWS, talib.CDLINNECK, talib.CDLINVERTEDHAMMER,
-            talib.CDLKICKING, talib.CDLKICKINGBYLENGTH, talib.CDLLADDERBOTTOM,
-            talib.CDLLONGLEGGEDDOJI, talib.CDLLONGLINE, talib.CDLMARUBOZU,
-            talib.CDLMATCHINGLOW, talib.CDLMATHOLD, talib.CDLMORNINGDOJISTAR,
-            talib.CDLMORNINGSTAR, talib.CDLONNECK, talib.CDLPIERCING,
-            talib.CDLRICKSHAWMAN, talib.CDLRISEFALL3METHODS, talib.CDLSEPARATINGLINES,
-            talib.CDLSHOOTINGSTAR, talib.CDLSHORTLINE, talib.CDLSPINNINGTOP,
-            talib.CDLSTALLEDPATTERN, talib.CDLSTICKSANDWICH, talib.CDLTAKURI,
-            talib.CDLTASUKIGAP, talib.CDLTHRUSTING, talib.CDLTRISTAR,
-            talib.CDLUNIQUE3RIVER, talib.CDLUPSIDEGAP2CROWS, talib.CDLXSIDEGAP3METHODS
+            talib.CDL2CROWS,
+            talib.CDL3BLACKCROWS,
+            talib.CDL3INSIDE,
+            talib.CDL3LINESTRIKE,
+            talib.CDL3OUTSIDE,
+            talib.CDL3STARSINSOUTH,
+            talib.CDL3WHITESOLDIERS,
+            talib.CDLABANDONEDBABY,
+            talib.CDLADVANCEBLOCK,
+            talib.CDLBELTHOLD,
+            talib.CDLBREAKAWAY,
+            talib.CDLCLOSINGMARUBOZU,
+            talib.CDLCONCEALBABYSWALL,
+            talib.CDLCOUNTERATTACK,
+            talib.CDLDARKCLOUDCOVER,
+            talib.CDLDOJI,
+            talib.CDLDOJISTAR,
+            talib.CDLDRAGONFLYDOJI,
+            talib.CDLENGULFING,
+            talib.CDLEVENINGDOJISTAR,
+            talib.CDLEVENINGSTAR,
+            talib.CDLGAPSIDESIDEWHITE,
+            talib.CDLGRAVESTONEDOJI,
+            talib.CDLHAMMER,
+            talib.CDLHANGINGMAN,
+            talib.CDLHARAMI,
+            talib.CDLHARAMICROSS,
+            talib.CDLHIGHWAVE,
+            talib.CDLHIKKAKE,
+            talib.CDLHOMINGPIGEON,
+            talib.CDLIDENTICAL3CROWS,
+            talib.CDLINNECK,
+            talib.CDLINVERTEDHAMMER,
+            talib.CDLKICKING,
+            talib.CDLKICKINGBYLENGTH,
+            talib.CDLLADDERBOTTOM,
+            talib.CDLLONGLEGGEDDOJI,
+            talib.CDLLONGLINE,
+            talib.CDLMARUBOZU,
+            talib.CDLMATCHINGLOW,
+            talib.CDLMATHOLD,
+            talib.CDLMORNINGDOJISTAR,
+            talib.CDLMORNINGSTAR,
+            talib.CDLONNECK,
+            talib.CDLPIERCING,
+            talib.CDLRICKSHAWMAN,
+            talib.CDLRISEFALL3METHODS,
+            talib.CDLSEPARATINGLINES,
+            talib.CDLSHOOTINGSTAR,
+            talib.CDLSHORTLINE,
+            talib.CDLSPINNINGTOP,
+            talib.CDLSTALLEDPATTERN,
+            talib.CDLSTICKSANDWICH,
+            talib.CDLTAKURI,
+            talib.CDLTASUKIGAP,
+            talib.CDLTHRUSTING,
+            talib.CDLTRISTAR,
+            talib.CDLUNIQUE3RIVER,
+            talib.CDLUPSIDEGAP2CROWS,
+            talib.CDLXSIDEGAP3METHODS,
         ]
 
         for pattern_func in pattern_functions:
             try:
-                pattern = pattern_func(df['open'], df['high'], df['low'], df['close'])
+                pattern = pattern_func(df["open"], df["high"], df["low"], df["close"])
                 patterns.append(pattern)
             except Exception:
                 # Some patterns might fail, add zeros
@@ -154,40 +202,45 @@ class FeatureEngineer:
 
         return pattern_matrix
 
-    def _create_price_sequences(self, df: pd.DataFrame, sequence_length: int) -> np.ndarray:
+    def _create_price_sequences(
+        self, df: pd.DataFrame, sequence_length: int
+    ) -> np.ndarray:
         """Creates sequences of price data for LSTMs."""
-        price_data = df[['open', 'high', 'low', 'close', 'volume']].values
+        price_data = df[["open", "high", "low", "close", "volume"]].values
         scaled_data = self.price_scaler.fit_transform(price_data)
 
         sequences = []
         for i in range(len(scaled_data) - sequence_length + 1):
-            sequences.append(scaled_data[i:i+sequence_length])
+            sequences.append(scaled_data[i : i + sequence_length])
 
         return np.array(sequences)
 
-    def _create_chart_images(self, df: pd.DataFrame, sequence_length: int) -> np.ndarray:
+    def _create_chart_images(
+        self, df: pd.DataFrame, sequence_length: int
+    ) -> np.ndarray:
         """Create chart-like images for CNN model"""
         # Create technical indicator plots as "images"
         images = []
 
         # Calculate indicators for imaging
-        rsi = talib.RSI(df['close'], timeperiod=14)
-        macd_line, macd_signal, macd_hist = talib.MACD(df['close'])
+        rsi = talib.RSI(df["close"], timeperiod=14)
+        macd_line, macd_signal, macd_hist = talib.MACD(df["close"])
 
         for i in range(sequence_length, len(df)):
             # Create a "chart image" using multiple indicators
-            window_data = df.iloc[i-sequence_length:i]
+            window_data = df.iloc[i - sequence_length : i]
 
             # Normalize price data to 0-1 range for the window
-            price_norm = (window_data['close'] - window_data['close'].min()) / \
-                        (window_data['close'].max() - window_data['close'].min() + 1e-8)
+            price_norm = (window_data["close"] - window_data["close"].min()) / (
+                window_data["close"].max() - window_data["close"].min() + 1e-8
+            )
 
             # Create multi-channel "image"
             channels = [
                 price_norm.values,
-                rsi[i-sequence_length:i].fillna(0.5),
-                macd_line[i-sequence_length:i].fillna(0),
-                macd_hist[i-sequence_length:i].fillna(0)
+                rsi[i - sequence_length : i].fillna(0.5),
+                macd_line[i - sequence_length : i].fillna(0),
+                macd_hist[i - sequence_length : i].fillna(0),
             ]
 
             # Stack channels to create a 2D image-like structure
@@ -196,14 +249,16 @@ class FeatureEngineer:
 
         return np.array(images)
 
-    def _generate_labels(self, df: pd.DataFrame, future_horizon=10, threshold=0.001) -> np.ndarray:
+    def _generate_labels(
+        self, df: pd.DataFrame, future_horizon=10, threshold=0.001
+    ) -> np.ndarray:
         """Generates labels for training."""
-        future_price = df['close'].shift(-future_horizon)
-        price_change = (future_price - df['close']) / df['close']
+        future_price = df["close"].shift(-future_horizon)
+        price_change = (future_price - df["close"]) / df["close"]
 
         labels = np.ones(len(df), dtype=int)  # Hold
         labels[price_change > threshold] = 2  # Buy
-        labels[price_change < -threshold] = 0 # Sell
+        labels[price_change < -threshold] = 0  # Sell
 
         return labels
 
@@ -219,7 +274,10 @@ class FeatureEngineer:
 
     class FeatureSet:
         """A simple container for the different types of features."""
-        def __init__(self, technical_indicators, price_sequences, chart_patterns, labels):
+
+        def __init__(
+            self, technical_indicators, price_sequences, chart_patterns, labels
+        ):
             self.technical_indicators = technical_indicators
             self.price_sequences = price_sequences
             self.chart_patterns = chart_patterns

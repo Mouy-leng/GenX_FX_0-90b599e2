@@ -6,7 +6,10 @@ import pandas as pd
 from typing import List, Dict, Any
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 async def measure_latency(session: aiohttp.ClientSession, url: str) -> float:
     """
@@ -25,11 +28,14 @@ async def measure_latency(session: aiohttp.ClientSession, url: str) -> float:
             await response.text()
             end_time = time.monotonic()
             latency = end_time - start_time
-            logging.info(f"Successfully connected to {url} with latency: {latency:.4f}s")
+            logging.info(
+                f"Successfully connected to {url} with latency: {latency:.4f}s"
+            )
             return latency
     except Exception as e:
         logging.warning(f"Failed to connect to {url}: {e}")
-        return float('inf')
+        return float("inf")
+
 
 async def find_best_server(servers: List[str]) -> str:
     """
@@ -48,7 +54,7 @@ async def find_best_server(servers: List[str]) -> str:
     server_latencies = {servers[i]: latencies[i] for i in range(len(servers))}
 
     # Filter out unreachable servers
-    reachable_servers = {s: l for s, l in server_latencies.items() if l != float('inf')}
+    reachable_servers = {s: l for s, l in server_latencies.items() if l != float("inf")}
 
     if not reachable_servers:
         logging.error("No reachable servers found.")
@@ -57,9 +63,12 @@ async def find_best_server(servers: List[str]) -> str:
     # Find the server with the minimum latency
     best_server = min(reachable_servers, key=reachable_servers.get)
     min_latency = reachable_servers[best_server]
-    logging.info(f"The best server is {best_server} with a latency of {min_latency:.4f}s")
+    logging.info(
+        f"The best server is {best_server} with a latency of {min_latency:.4f}s"
+    )
 
     return best_server
+
 
 async def main():
     """
@@ -93,6 +102,7 @@ async def main():
         print(f"\nBest server for ForexConnect API: {best_server}")
     else:
         print("\nCould not determine the best server for ForexConnect API.")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

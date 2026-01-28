@@ -10,6 +10,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 class Backtester:
     """
     A backtesting engine for evaluating trading strategies.
