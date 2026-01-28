@@ -5,34 +5,27 @@ This script tests the ForexConnect installation and shows basic usage examples.
 """
 
 
-def test_forexconnect_import() -> bool:
+import pytest
+
+def test_forexconnect_import():
     """
     Tests if the ForexConnect module can be imported successfully and prints
     version information if available.
-
-    Returns:
-        bool: True if the import is successful, False otherwise.
     """
     try:
         import forexconnect as fx
+    except ImportError:
+        pytest.skip("ForexConnect not installed")
 
-        print("✓ ForexConnect imported successfully!")
+    print("✓ ForexConnect imported successfully!")
 
-        # Show version info
-        if hasattr(fx, "__version__"):
-            print(f"✓ ForexConnect version: {fx.__version__}")
+    # Show version info
+    if hasattr(fx, "__version__"):
+        print(f"✓ ForexConnect version: {fx.__version__}")
 
-        # Show available attributes (first 10)
-        attributes = [attr for attr in dir(fx) if not attr.startswith("_")]
-        print(f"✓ Available modules/classes: {attributes[:10]}")
-
-        return True
-    except ImportError as e:
-        print(f"✗ Failed to import ForexConnect: {e}")
-        return False
-    except Exception as e:
-        print(f"✗ Error testing ForexConnect: {e}")
-        return False
+    # Show available attributes (first 10)
+    attributes = [attr for attr in dir(fx) if not attr.startswith("_")]
+    print(f"✓ Available modules/classes: {attributes[:10]}")
 
 
 def show_basic_usage():

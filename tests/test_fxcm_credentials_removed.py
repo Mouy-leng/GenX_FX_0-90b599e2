@@ -4,10 +4,15 @@ FXCM Connection Test Script (Credentials Removed)
 This script tests the ForexConnect API connection - credentials should be set via environment variables
 """
 
-import forexconnect as fx
 import time
 import sys
 import os
+import pytest
+
+try:
+    import forexconnect as fx
+except ImportError:
+    fx = None
 
 # FXCM Credentials from environment variables
 FXCM_USERNAME = os.getenv("FXCM_USERNAME", "YOUR_USERNAME_HERE")
@@ -16,6 +21,7 @@ FXCM_CONNECTION_TYPE = os.getenv("FXCM_CONNECTION_TYPE", "Demo")
 FXCM_URL = os.getenv("FXCM_URL", "http://fxcorporate.com/Hosts.jsp")
 
 
+@pytest.mark.skipif(fx is None, reason="forexconnect not installed")
 class FXCMConnectionTest:
     """
     A class to test the connection to the FXCM ForexConnect API.
@@ -165,4 +171,7 @@ def main() -> bool:
 
 
 if __name__ == "__main__":
+    if fx is None:
+        print("ForexConnect not installed. Skipping test.")
+        sys.exit(0)
     main()
