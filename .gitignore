@@ -216,6 +216,8 @@ awscliv2.zip
 *.key
 *.pem
 *.ppk
+*.pub
+amp-trading-key
 deploy_keys/
 
 # MacOS
@@ -262,5 +264,5 @@ $RECYCLE.BIN/
 *.zip
 *.tar.gz
 *.rar
-!ta-lib_*.debawscliv2.zip
+!ta-lib_*.deb
 onedrive_token.json
