@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Loader2, Lock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, Lock, CheckCircle, AlertCircle, CreditCard, Calendar, User } from 'lucide-react';
 
 interface IFormInput {
   cardholderName: string;
@@ -42,14 +42,17 @@ const Billing: React.FC = () => {
             <label htmlFor="cardholderName" className="block text-gray-700 font-medium mb-2">
               Cardholder Name <span className="text-red-500" aria-hidden="true">*</span>
             </label>
-            <input
-              id="cardholderName"
-              autoComplete="cc-name"
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cardholderName ? 'border-red-500' : 'border-gray-300'}`}
-              aria-invalid={!!errors.cardholderName}
-              aria-describedby={errors.cardholderName ? "cardholderName-error" : undefined}
-              {...register("cardholderName", { required: "Cardholder name is required" })}
-            />
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" aria-hidden="true" />
+              <input
+                id="cardholderName"
+                autoComplete="cc-name"
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cardholderName ? 'border-red-500' : 'border-gray-300'}`}
+                aria-invalid={!!errors.cardholderName}
+                aria-describedby={errors.cardholderName ? "cardholderName-error" : undefined}
+                {...register("cardholderName", { required: "Cardholder name is required" })}
+              />
+            </div>
             {errors.cardholderName && (
               <p id="cardholderName-error" className="text-red-500 text-sm mt-1" role="alert">
                 {errors.cardholderName.message}
@@ -60,17 +63,20 @@ const Billing: React.FC = () => {
             <label htmlFor="cardNumber" className="block text-gray-700 font-medium mb-2">
               Card Number <span className="text-red-500" aria-hidden="true">*</span>
             </label>
-            <input
-              id="cardNumber"
-              type="text"
-              inputMode="numeric"
-              autoComplete="cc-number"
-              placeholder="0000 0000 0000 0000"
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cardNumber ? 'border-red-500' : 'border-gray-300'}`}
-              aria-invalid={!!errors.cardNumber}
-              aria-describedby={errors.cardNumber ? "cardNumber-error" : undefined}
-              {...register("cardNumber", { required: "Card number is required" })}
-            />
+            <div className="relative">
+              <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" aria-hidden="true" />
+              <input
+                id="cardNumber"
+                type="text"
+                inputMode="numeric"
+                autoComplete="cc-number"
+                placeholder="0000 0000 0000 0000"
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cardNumber ? 'border-red-500' : 'border-gray-300'}`}
+                aria-invalid={!!errors.cardNumber}
+                aria-describedby={errors.cardNumber ? "cardNumber-error" : undefined}
+                {...register("cardNumber", { required: "Card number is required" })}
+              />
+            </div>
             {errors.cardNumber && (
               <p id="cardNumber-error" className="text-red-500 text-sm mt-1" role="alert">
                 {errors.cardNumber.message}
@@ -82,17 +88,20 @@ const Billing: React.FC = () => {
               <label htmlFor="expiryDate" className="block text-gray-700 font-medium mb-2">
                 Expiry Date (MM/YY) <span className="text-red-500" aria-hidden="true">*</span>
               </label>
-              <input
-                id="expiryDate"
-                type="text"
-                inputMode="numeric"
-                autoComplete="cc-exp"
-                placeholder="MM/YY"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.expiryDate ? 'border-red-500' : 'border-gray-300'}`}
-                aria-invalid={!!errors.expiryDate}
-                aria-describedby={errors.expiryDate ? "expiryDate-error" : undefined}
-                {...register("expiryDate", { required: "Expiry date is required" })}
-              />
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" aria-hidden="true" />
+                <input
+                  id="expiryDate"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="cc-exp"
+                  placeholder="MM/YY"
+                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.expiryDate ? 'border-red-500' : 'border-gray-300'}`}
+                  aria-invalid={!!errors.expiryDate}
+                  aria-describedby={errors.expiryDate ? "expiryDate-error" : undefined}
+                  {...register("expiryDate", { required: "Expiry date is required" })}
+                />
+              </div>
               {errors.expiryDate && (
                 <p id="expiryDate-error" className="text-red-500 text-sm mt-1" role="alert">
                   {errors.expiryDate.message}
@@ -103,18 +112,21 @@ const Billing: React.FC = () => {
               <label htmlFor="cvc" className="block text-gray-700 font-medium mb-2">
                 CVC <span className="text-red-500" aria-hidden="true">*</span>
               </label>
-              <input
-                id="cvc"
-                type="text"
-                inputMode="numeric"
-                autoComplete="cc-csc"
-                maxLength={4}
-                placeholder="123"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cvc ? 'border-red-500' : 'border-gray-300'}`}
-                aria-invalid={!!errors.cvc}
-                aria-describedby={errors.cvc ? "cvc-error" : undefined}
-                {...register("cvc", { required: "CVC is required" })}
-              />
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" aria-hidden="true" />
+                <input
+                  id="cvc"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="cc-csc"
+                  maxLength={4}
+                  placeholder="123"
+                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cvc ? 'border-red-500' : 'border-gray-300'}`}
+                  aria-invalid={!!errors.cvc}
+                  aria-describedby={errors.cvc ? "cvc-error" : undefined}
+                  {...register("cvc", { required: "CVC is required" })}
+                />
+              </div>
               {errors.cvc && (
                 <p id="cvc-error" className="text-red-500 text-sm mt-1" role="alert">
                   {errors.cvc.message}
