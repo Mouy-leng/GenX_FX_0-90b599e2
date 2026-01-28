@@ -150,8 +150,13 @@ async def batch_predictions(
             )
 
     # Report errors for symbols where data could not be fetched
+    # --- Performance Optimization: Use a set for O(1) lookups ---
+    # Converting the list of valid symbols to a set reduces the time
+    # complexity of checking for a symbol's existence from O(N) to O(1)
+    # on average, which is more efficient for large numbers of symbols.
+    valid_symbols_set = set(valid_symbols)
     for symbol in symbol_list:
-        if symbol not in valid_symbols:
+        if symbol not in valid_symbols_set:
             errors.append({"symbol": symbol, "error": "Market data not found"})
 
     return {
