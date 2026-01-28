@@ -13,7 +13,7 @@ import redis.asyncio as redis
 import logging
 import re
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, Field
 from contextlib import asynccontextmanager
 
 # Check if ai_models module exists and can be imported
@@ -143,10 +143,45 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 class PaymentMethod(BaseModel):
+    """
+    Pydantic model for payment method data with built-in validation.
+    This model ensures that the data is well-formed before any business logic
+    is executed, preventing unnecessary processing of invalid requests. This
+    "fail-fast" approach improves API performance and robustness.
+    """
+
     cardholderName: str
     cardNumber: str
     expiryDate: str
     cvc: str
+
+    @field_validator("cardholderName")
+    def validate_cardholder_name(cls, v):
+        """Ensure cardholder name is not empty."""
+        if not v.strip():
+            raise ValueError("Cardholder name must not be empty.")
+        return v
+
+    @field_validator("cardNumber")
+    def validate_card_number(cls, v):
+        """Validate card number format (16 digits, optional separators)."""
+        if not re.match(r"^\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}$", v):
+            raise ValueError("Invalid card number format.")
+        return v
+
+    @field_validator("expiryDate")
+    def validate_expiry_date(cls, v):
+        """Validate expiry date format (MM/YY)."""
+        if not re.match(r"^(0[1-9]|1[0-2])\/\d{2}$", v):
+            raise ValueError("Invalid expiry date format. Must be MM/YY.")
+        return v
+
+    @field_validator("cvc")
+    def validate_cvc(cls, v):
+        """Validate CVC format (3 or 4 digits)."""
+        if not re.match(r"^\d{3,4}$", v):
+            raise ValueError("Invalid CVC format. Must be 3 or 4 digits.")
+        return v
 
 
 # Add CORS middleware
