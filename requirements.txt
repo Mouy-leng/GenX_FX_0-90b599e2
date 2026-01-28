@@ -51,6 +51,7 @@ psutil>=6.1.0,<7.0.0
 # Authentication and Security
 python-jose[cryptography]>=3.3.0,<4.0.0
 passlib[bcrypt]>=1.7.4,<2.0.0
+cryptography>=41.0.0
 
 # Trading and Financial APIs
 ccxt>=4.4.0,<5.0.0

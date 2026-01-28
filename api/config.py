@@ -77,6 +77,7 @@ class Settings(BaseSettings):
 
     # Security
     SECRET_KEY: str = Field(..., description="Secret key for JWT tokens")
+    CRYPTION_KEY: Optional[str] = Field(None, description="Key for encrypting sensitive data")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
