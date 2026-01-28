@@ -37,7 +37,7 @@ def test_signal_formatting():
     print(message)
     print("\n" + "=" * 60 + "\n")
 
-    return True
+    assert True
 
 
 def test_send_signal():
@@ -61,7 +61,7 @@ def test_send_signal():
     print(f"\nSignal send status: {'✅ SUCCESS' if success else '❌ FAILED'}")
     print("\n" + "=" * 60 + "\n")
 
-    return success
+    assert success
 
 
 def test_send_notification():
@@ -77,7 +77,7 @@ def test_send_notification():
     print(f"\nNotification send status: {'✅ SUCCESS' if success else '❌ FAILED'}")
     print("\n" + "=" * 60 + "\n")
 
-    return success
+    assert success
 
 
 def test_send_status_update():
@@ -94,7 +94,7 @@ def test_send_status_update():
     print(f"\nStatus update send status: {'✅ SUCCESS' if success else '❌ FAILED'}")
     print("\n" + "=" * 60 + "\n")
 
-    return success
+    assert success
 
 
 def test_unified_notifier():
@@ -122,7 +122,7 @@ def test_unified_notifier():
     print(f"\nNotification results: {results}")
     print("\n" + "=" * 60 + "\n")
 
-    return any(results.values())
+    assert any(results.values())
 
 
 def main():

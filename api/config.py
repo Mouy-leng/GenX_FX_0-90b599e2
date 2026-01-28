@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from pydantic import ConfigDict, validator, Field
+from pydantic import ConfigDict, field_validator, Field
 from typing import Optional, Literal
 import os
 from pathlib import Path
@@ -145,7 +145,8 @@ class Settings(BaseSettings):
     WEBSOCKET_RECONNECT_INTERVAL: int = 5
     MAX_WEBSOCKET_RETRIES: int = 10
 
-    @validator("EXNESS_LOGIN")
+    @field_validator("EXNESS_LOGIN")
+    @classmethod
     def validate_login(cls, v: str) -> str:
         """
         Validates that the Exness login is at least 6 characters long.
@@ -163,7 +164,8 @@ class Settings(BaseSettings):
             raise ValueError("Login must be at least 6 characters")
         return v
 
-    @validator("EXNESS_PASSWORD")
+    @field_validator("EXNESS_PASSWORD")
+    @classmethod
     def validate_password(cls, v: str) -> str:
         """
         Validates that the Exness password is at least 8 characters long.
@@ -181,7 +183,8 @@ class Settings(BaseSettings):
             raise ValueError("Password must be at least 8 characters")
         return v
 
-    @validator("EA_DEFAULT_LOT_SIZE")
+    @field_validator("EA_DEFAULT_LOT_SIZE")
+    @classmethod
     def validate_lot_size(cls, v: float) -> float:
         """
         Validates that the default lot size is within a reasonable range.
@@ -199,7 +202,8 @@ class Settings(BaseSettings):
             raise ValueError("Lot size must be between 0.01 and 100")
         return v
 
-    @validator("EA_MAX_RISK_PER_TRADE")
+    @field_validator("EA_MAX_RISK_PER_TRADE")
+    @classmethod
     def validate_risk_percentage(cls, v: float) -> float:
         """
         Validates that the maximum risk per trade is within a safe range.
