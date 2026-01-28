@@ -9,7 +9,12 @@ import json
 
 from ..main import redis_client
 
-from ..models.schemas import PredictionRequest, PredictionResponse, SignalType, ModelMetrics
+from ..models.schemas import (
+    PredictionRequest,
+    PredictionResponse,
+    SignalType,
+    ModelMetrics,
+)
 from ..config import settings
 from ..services.ml_service import MLService
 from ..services.data_service import DataService
@@ -21,6 +26,7 @@ logger = logging.getLogger(__name__)
 # Initialize services
 ml_service = MLService()
 data_service = DataService()
+
 
 @router.post("/", response_model=PredictionResponse)
 async def create_prediction(
@@ -80,6 +86,7 @@ async def create_prediction(
         logger.error(f"Prediction error for {request.symbol}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
+
 @router.get("/batch/{symbols}")
 async def batch_predictions(
     symbols: str,
@@ -114,7 +121,9 @@ async def batch_predictions(
 
     # --- Concurrently generate predictions ---
     valid_symbols = [
-        s for s in symbol_list if s in market_data_batch and not market_data_batch[s].empty
+        s
+        for s in symbol_list
+        if s in market_data_batch and not market_data_batch[s].empty
     ]
 
     prediction_tasks = [
@@ -150,8 +159,13 @@ async def batch_predictions(
             )
 
     # Report errors for symbols where data could not be fetched
+    # --- Performance Optimization: Use a set for O(1) lookups ---
+    # Converting the list of valid symbols to a set reduces the time
+    # complexity of checking for a symbol's existence from O(N) to O(1)
+    # on average, which is more efficient for large numbers of symbols.
+    valid_symbols_set = set(valid_symbols)
     for symbol in symbol_list:
-        if symbol not in valid_symbols:
+        if symbol not in valid_symbols_set:
             errors.append({"symbol": symbol, "error": "Market data not found"})
 
     return {
@@ -159,6 +173,7 @@ async def batch_predictions(
         "errors": errors,
         "total_processed": len(symbol_list),
     }
+
 
 @router.get("/model/metrics", response_model=ModelMetrics)
 async def get_model_metrics(current_user: dict = Depends(get_current_user)):
@@ -197,9 +212,7 @@ async def get_model_metrics(current_user: dict = Depends(get_current_user)):
 
                     # 4. If still no cache, calculate, cache, and return
                     metrics = await ml_service.get_model_metrics()
-                    await redis_client.setex(
-                        "model_metrics", 3600, json.dumps(metrics)
-                    )
+                    await redis_client.setex("model_metrics", 3600, json.dumps(metrics))
                     return ModelMetrics(**metrics)
                 finally:
                     # 5. Always release the lock
@@ -217,7 +230,9 @@ async def get_model_metrics(current_user: dict = Depends(get_current_user)):
         except Exception as e:
             # If any Redis operation fails, log the error and fall through
             # to the non-cached calculation.
-            logger.error(f"Redis operation failed: {e}. Falling back to direct calculation.")
+            logger.error(
+                f"Redis operation failed: {e}. Falling back to direct calculation."
+            )
 
     # --- Fallback Logic ---
     # This code runs if Redis is not available OR if any Redis operation failed.
@@ -227,6 +242,7 @@ async def get_model_metrics(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Failed to get model metrics: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to retrieve model metrics")
+
 
 @router.post("/model/retrain")
 async def retrain_model(

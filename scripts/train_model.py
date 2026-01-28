@@ -9,16 +9,19 @@ import joblib
 # Add the project root to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 def train_model(df):
     """
     Trains a machine learning model to predict price movements.
     """
     # Split the data into features (X) and target (y)
-    X = df.drop(columns=['timestamp', 'target'])
-    y = df['target']
+    X = df.drop(columns=["timestamp", "target"])
+    y = df["target"]
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
     # Train a Random Forest Classifier
     model = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -37,6 +40,7 @@ def train_model(df):
     print(f"Recall: {recall:.2f}")
 
     return model
+
 
 if __name__ == "__main__":
     # Load the features

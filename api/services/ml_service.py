@@ -5,6 +5,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 class MLService:
     """
     A service for handling machine learning model predictions and management.

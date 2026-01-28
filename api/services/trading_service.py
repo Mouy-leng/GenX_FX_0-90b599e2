@@ -3,9 +3,18 @@ import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 
-from ..models.schemas import TradeSignal, OrderRequest, OrderResponse, PortfolioStatus, SignalType, OrderType, OrderStatus
+from ..models.schemas import (
+    TradeSignal,
+    OrderRequest,
+    OrderResponse,
+    PortfolioStatus,
+    SignalType,
+    OrderType,
+    OrderStatus,
+)
 
 logger = logging.getLogger(__name__)
+
 
 class TradingService:
     """

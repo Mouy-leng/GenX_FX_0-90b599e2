@@ -5,6 +5,7 @@ This script defines the secrets that need to be uploaded to the GitHub
 repository for the application to function correctly. It is intended to be
 used with the 'github-secrets-api.py' script.
 """
+
 import requests
 import os
 

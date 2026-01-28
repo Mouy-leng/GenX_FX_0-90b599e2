@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+
 def check_aws_cli() -> bool:
     """
     Checks if the AWS CLI is installed and accessible in the system's PATH.
@@ -105,7 +106,7 @@ def show_deployment_status() -> Dict[str, Any]:
     print("🚀 AMP System AWS Deployment Status")
     print("=" * 50)
     print(f"⏰ Check Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
+
     print("\n📋 Prerequisites Check:")
     print("-" * 30)
     aws_cli_installed = check_aws_cli()
@@ -120,7 +121,7 @@ def show_deployment_status() -> Dict[str, Any]:
     )
     ssh_key_exists = check_ssh_key()
     print(f"   SSH Key: {'✅ Found' if ssh_key_exists else '❌ Not found'}")
-    
+
     print("\n🐳 AWS Resources:")
     print("-" * 20)
     instance_info = check_aws_resources()
@@ -131,7 +132,7 @@ def show_deployment_status() -> Dict[str, Any]:
         print(f"   Key Name: {instance_info.get('key_name', 'N/A')}")
     else:
         print("   EC2 Instance: ❌ Not deployed")
-    
+
     print("\n🔧 Configuration Files:")
     print("-" * 25)
     config_files = [
@@ -159,7 +160,7 @@ def show_deployment_options():
     """Displays the available deployment options to the user."""
     print("\n🚀 Deployment Options:")
     print("=" * 25)
-    
+
     print("1. 🎯 Automated Script Deployment (Recommended)")
     print("   - Simple and fast, one-command deployment.")
     print("   - Automatic configuration.")
@@ -184,7 +185,7 @@ def show_next_steps(status: Dict[str, Any]):
     """
     print("\n📋 Next Steps:")
     print("=" * 15)
-    
+
     if not status.get("aws_cli"):
         print("1. 🔧 Install AWS CLI.")
         print(
@@ -208,13 +209,15 @@ def show_free_tier_info():
     """Displays information about the AWS Free Tier."""
     print("\n💰 AWS Free Tier Information:")
     print("=" * 35)
-    
+
     print("   - EC2: 750 hours/month of t2.micro or t3.micro (region dependent).")
     print("   - S3: 5GB of standard storage.")
     print("   - RDS: 750 hours of db.t2.micro instance.")
     print("   - Lambda: 1 million free requests per month.")
     print("\n💡 Cost Optimization Tips:")
-    print("   - Stop your EC2 instance when not in use: `aws ec2 stop-instances --instance-ids YOUR_ID`")
+    print(
+        "   - Stop your EC2 instance when not in use: `aws ec2 stop-instances --instance-ids YOUR_ID`"
+    )
     print("   - Set up AWS Budgets and billing alerts to monitor costs.")
 
 
@@ -247,10 +250,11 @@ def main():
     show_deployment_options()
     show_next_steps(status)
     show_free_tier_info()
-    
+
     print("\n" + "=" * 50)
     print("🎯 Ready to deploy your AMP system to AWS!")
     print("📖 For detailed instructions, see: AWS_DEPLOYMENT_GUIDE.md")
+
 
 if __name__ == "__main__":
     main()

@@ -10,16 +10,18 @@ import forexconnect as fx
 import time
 import sys
 
+
 class ForexConnectExample:
     """
     A class to demonstrate the corrected and modern usage of the ForexConnect API.
     """
+
     def __init__(self):
         """
         Initializes the ForexConnectExample class.
         """
         self.connection = None
-        
+
     def create_connection(self) -> bool:
         """
         Creates a ForexConnect connection instance.
@@ -30,15 +32,21 @@ class ForexConnectExample:
         try:
             # Create ForexConnect instance
             self.connection = fx.ForexConnect()
-            
+
             print("✓ ForexConnect instance created successfully")
             return True
-            
+
         except Exception as e:
             print(f"✗ Error creating ForexConnect instance: {e}")
             return False
-    
-    def configure_connection(self, username: str, password: str, connection_type: str = "Demo", server: str = "Real") -> bool:
+
+    def configure_connection(
+        self,
+        username: str,
+        password: str,
+        connection_type: str = "Demo",
+        server: str = "Real",
+    ) -> bool:
         """
         Configures the connection parameters for the ForexConnect session.
 
@@ -57,19 +65,19 @@ class ForexConnectExample:
             print(f"  Server: {server}")
             print("  (Actual connection requires valid FXCM credentials)")
             return True
-            
+
         except Exception as e:
             print(f"✗ Error configuring connection: {e}")
             return False
-    
+
     def show_connection_example(self):
         """
         Shows an example of how to properly connect to the FXCM server,
         including the use of a context manager.
         """
         print("\n=== Connection Example ===")
-        
-        example_code = '''
+
+        example_code = """
 # To actually connect to FXCM (requires valid credentials):
 
 import forexconnect as fx
@@ -103,17 +111,17 @@ try:
     
 finally:
     fx_conn.logout()  # Always logout when done
-'''
+"""
         print(example_code)
-    
+
     def show_market_data_example(self):
         """
         Shows examples of how to access market data, including instruments,
         current prices, and historical data.
         """
         print("\n=== Market Data Examples ===")
-        
-        example_code = '''
+
+        example_code = """
 # Get market data (requires active connection):
 
 # Get available instruments
@@ -132,17 +140,17 @@ historical_data = fx_conn.get_candles(
     end="2024-01-31"
 )
 print("Historical data shape:", historical_data.shape)
-'''
+"""
         print(example_code)
-    
+
     def show_account_example(self):
         """
         Shows examples of how to retrieve account information, such as
         account summary, open positions, and balance.
         """
         print("\n=== Account Information Examples ===")
-        
-        example_code = '''
+
+        example_code = """
 # Get account information (requires active connection):
 
 # Get account summary
@@ -156,17 +164,17 @@ print("Open positions:", positions)
 # Get account balance
 summary = fx_conn.get_summary()
 print("Account summary:", summary)
-'''
+"""
         print(example_code)
-    
+
     def show_trading_example(self):
         """
         Shows examples of trading operations, including placing market and limit orders,
         and closing positions.
         """
         print("\n=== Trading Examples ===")
-        
-        example_code = '''
+
+        example_code = """
 # Trading operations (requires active connection):
 
 # Place a market buy order
@@ -194,17 +202,17 @@ fx_conn.close_trade(trade_id="12345", amount=1000)
 
 # Close all positions for a symbol
 fx_conn.close_all_for_symbol("EUR/USD")
-'''
+"""
         print(example_code)
-    
+
     def show_order_management_example(self):
         """
         Shows examples of order management, including retrieving, canceling,
         and modifying orders.
         """
         print("\n=== Order Management Examples ===")
-        
-        example_code = '''
+
+        example_code = """
 # Order management (requires active connection):
 
 # Get all orders
@@ -224,60 +232,62 @@ fx_conn.change_order(
 # Get order status
 order_status = fx_conn.get_order("67890")
 print("Order status:", order_status)
-'''
+"""
         print(example_code)
+
 
 def main():
     """
     Main function to run the corrected ForexConnect API example.
     """
     print("=== ForexConnect API Example (Corrected) ===\n")
-    
+
     # Create example instance
     fx_example = ForexConnectExample()
-    
+
     # Demonstrate connection creation
     if not fx_example.create_connection():
         print("Failed to create ForexConnect instance")
         return
-    
+
     # Demo connection configuration
     demo_username = "your_demo_username"  # Replace with your credentials
     demo_password = "your_demo_password"  # Replace with your credentials
-    
+
     if not fx_example.configure_connection(demo_username, demo_password):
         print("Configuration setup failed")
         return
-    
+
     # Show various API capabilities
     fx_example.show_connection_example()
     fx_example.show_market_data_example()
     fx_example.show_account_example()
     fx_example.show_trading_example()
     fx_example.show_order_management_example()
-    
+
     print("\n=== Getting Started ===")
     print("1. Sign up for FXCM demo account: https://www.fxcm.com/")
     print("2. Enable API access in your FXCM account settings")
     print("3. Replace credentials in the connection example")
     print("4. Use the examples above as templates for your trading scripts")
-    
+
     print("\n=== Available ForexConnect Methods ===")
     try:
         conn = fx.ForexConnect()
-        methods = [method for method in dir(conn) if not method.startswith('_')]
+        methods = [method for method in dir(conn) if not method.startswith("_")]
         print("ForexConnect class methods:")
         for method in sorted(methods):
             print(f"  - {method}")
     except Exception as e:
         print(f"Could not list methods: {e}")
-    
+
     print("\n=== Important Notes ===")
     print("- Always test with demo account first")
     print("- Use proper error handling in production code")
     print("- Implement risk management")
     print("- Check FXCM documentation for complete API reference")
     print("- Use context managers (with statement) for automatic cleanup")
+
 
 if __name__ == "__main__":
     main()

@@ -4,6 +4,7 @@ from ..models.schemas import SignalType, OrderRequest
 
 logger = logging.getLogger(__name__)
 
+
 class RiskService:
     """
     A service for managing and assessing trading risk.

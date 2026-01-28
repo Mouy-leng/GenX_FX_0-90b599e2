@@ -4,6 +4,7 @@ Agent 1: Configure production environment variables.
 This script creates .env.production and .env.docker files with the
 necessary environment variables for the production and Docker environments.
 """
+
 import os
 
 # Production environment configuration

@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from pathlib import Path
 
+
 class AMPAuth:
     """
     Handles user authentication and session management for the AMP system.
@@ -169,6 +170,7 @@ class AMPAuth:
             "session_hash": self.session_hash,
             "authenticated": True,
         }
+
 
 # Global auth instance
 amp_auth = AMPAuth()

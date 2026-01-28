@@ -1,4 +1,3 @@
-
 import numpy as np
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import LSTM, Dense, Dropout
@@ -6,6 +5,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
+
 
 class LSTMModel:
     """
@@ -21,46 +21,57 @@ class LSTMModel:
         """Builds the LSTM model architecture."""
         if params is None:
             params = {
-                'lstm_units_1': 50,
-                'dropout_1': 0.2,
-                'lstm_units_2': 50,
-                'dropout_2': 0.2,
-                'dense_units': 25,
-                'learning_rate': 0.001
+                "lstm_units_1": 50,
+                "dropout_1": 0.2,
+                "lstm_units_2": 50,
+                "dropout_2": 0.2,
+                "dense_units": 25,
+                "learning_rate": 0.001,
             }
 
-        model = Sequential([
-            LSTM(params['lstm_units_1'], return_sequences=True, input_shape=(self.sequence_length, self.n_features)),
-            Dropout(params['dropout_1']),
-            LSTM(params['lstm_units_2']),
-            Dropout(params['dropout_2']),
-            Dense(params['dense_units'], activation='relu'),
-            Dense(3, activation='softmax')
-        ])
+        model = Sequential(
+            [
+                LSTM(
+                    params["lstm_units_1"],
+                    return_sequences=True,
+                    input_shape=(self.sequence_length, self.n_features),
+                ),
+                Dropout(params["dropout_1"]),
+                LSTM(params["lstm_units_2"]),
+                Dropout(params["dropout_2"]),
+                Dense(params["dense_units"], activation="relu"),
+                Dense(3, activation="softmax"),
+            ]
+        )
 
-        optimizer = Adam(learning_rate=params['learning_rate'])
-        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+        optimizer = Adam(learning_rate=params["learning_rate"])
+        model.compile(
+            optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"]
+        )
         return model
 
     def train(self, X, y, params=None):
         """Trains the LSTM model."""
         y_categorical = to_categorical(y, num_classes=3)
-        X_train, X_val, y_train, y_val = train_test_split(X, y_categorical, test_size=0.2, random_state=42, stratify=y)
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, y_categorical, test_size=0.2, random_state=42, stratify=y
+        )
 
         self.model = self.build_model(params)
 
         callbacks = [
             EarlyStopping(patience=10, restore_best_weights=True),
-            ReduceLROnPlateau(patience=5, factor=0.5)
+            ReduceLROnPlateau(patience=5, factor=0.5),
         ]
 
         self.model.fit(
-            X_train, y_train,
+            X_train,
+            y_train,
             validation_data=(X_val, y_val),
             epochs=100,
             batch_size=32,
             callbacks=callbacks,
-            verbose=0
+            verbose=0,
         )
 
     def predict(self, X, return_probas=False):

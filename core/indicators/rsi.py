@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 class RSI:
     """
     Calculates the RSI (Relative Strength Index) indicator.
@@ -56,6 +57,7 @@ class RSI:
             rsi[i] = 100.0 - 100.0 / (1.0 + rs)
 
         return rsi
+
 
 def calculate_rsi(prices: pd.Series, period: int = 14) -> np.ndarray:
     """

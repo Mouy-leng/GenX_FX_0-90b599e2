@@ -5,13 +5,15 @@ from datetime import datetime
 import redis
 import os
 import logging
+
+
 def get_system_metrics():
     """
     Gathers system metrics such as CPU usage, memory consumption, and disk space.
     """
     cpu_usage = psutil.cpu_percent(interval=1)
     memory_info = psutil.virtual_memory()
-    disk_info = psutil.disk_usage('/')
+    disk_info = psutil.disk_usage("/")
 
     metrics = {
         "timestamp": datetime.now().isoformat(),
@@ -31,6 +33,7 @@ def get_system_metrics():
     }
     return metrics
 
+
 def main():
     """
     Main function to run the monitoring loop.
@@ -47,22 +50,26 @@ def main():
     CACHE_DURATION_SECONDS = 10  # Set a slightly longer TTL for the metrics
 
     # --- Set up basic logging ---
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
 
     while True:
         try:
-            redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, socket_connect_timeout=1)
+            redis_client = redis.Redis(
+                host=REDIS_HOST, port=REDIS_PORT, db=0, socket_connect_timeout=1
+            )
             redis_client.ping()
-            logging.info(f"Successfully connected to Redis at {REDIS_HOST}:{REDIS_PORT}.")
+            logging.info(
+                f"Successfully connected to Redis at {REDIS_HOST}:{REDIS_PORT}."
+            )
 
             while True:
                 metrics = get_system_metrics()
                 try:
                     # --- Serialize metrics to JSON and write to Redis with an expiration ---
                     redis_client.setex(
-                        "system_metrics",
-                        CACHE_DURATION_SECONDS,
-                        json.dumps(metrics)
+                        "system_metrics", CACHE_DURATION_SECONDS, json.dumps(metrics)
                     )
                     logging.info(f"Successfully wrote metrics to Redis.")
                 except redis.exceptions.ConnectionError as e:
@@ -73,6 +80,7 @@ def main():
         except redis.exceptions.ConnectionError as e:
             logging.error(f"Could not connect to Redis: {e}. Retrying in 5 seconds...")
             time.sleep(5)
+
 
 if __name__ == "__main__":
     main()

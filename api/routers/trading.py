@@ -5,8 +5,13 @@ from datetime import datetime
 import logging
 
 from ..models.schemas import (
-    TradeSignal, OrderRequest, OrderResponse, PortfolioStatus, 
-    OrderType, OrderStatus, SignalType
+    TradeSignal,
+    OrderRequest,
+    OrderResponse,
+    PortfolioStatus,
+    OrderType,
+    OrderStatus,
+    SignalType,
 )
 from ..config import settings
 from ..services.trading_service import TradingService
@@ -19,6 +24,7 @@ logger = logging.getLogger(__name__)
 # Initialize services
 trading_service = TradingService()
 risk_service = RiskService()
+
 
 @router.get("/signals", response_model=List[TradeSignal])
 async def get_active_signals(
@@ -47,6 +53,7 @@ async def get_active_signals(
         raise HTTPException(
             status_code=500, detail="Failed to retrieve trading signals"
         )
+
 
 @router.post("/signals", response_model=TradeSignal)
 async def create_signal(
@@ -95,7 +102,10 @@ async def create_signal(
 
     except Exception as e:
         logger.error(f"Failed to create signal: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to create signal: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to create signal: {str(e)}"
+        )
+
 
 @router.post("/orders", response_model=OrderResponse)
 async def place_order(
@@ -131,6 +141,7 @@ async def place_order(
         logger.error(f"Failed to place order: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to place order: {str(e)}")
 
+
 @router.get("/orders/{order_id}", response_model=OrderResponse)
 async def get_order(order_id: str, current_user: dict = Depends(get_current_user)):
     """
@@ -155,6 +166,7 @@ async def get_order(order_id: str, current_user: dict = Depends(get_current_user
         logger.error(f"Failed to get order {order_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to retrieve order")
 
+
 @router.delete("/orders/{order_id}")
 async def cancel_order(order_id: str, current_user: dict = Depends(get_current_user)):
     """
@@ -176,6 +188,7 @@ async def cancel_order(order_id: str, current_user: dict = Depends(get_current_u
     except Exception as e:
         logger.error(f"Failed to cancel order {order_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to cancel order")
+
 
 @router.get("/portfolio", response_model=PortfolioStatus)
 async def get_portfolio(current_user: dict = Depends(get_current_user)):
@@ -199,6 +212,7 @@ async def get_portfolio(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Failed to get portfolio: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to retrieve portfolio")
+
 
 @router.post("/auto-trade/start")
 async def start_auto_trading(
@@ -226,6 +240,7 @@ async def start_auto_trading(
     except Exception as e:
         logger.error(f"Failed to start auto trading: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to start auto trading")
+
 
 @router.post("/auto-trade/stop")
 async def stop_auto_trading(current_user: dict = Depends(get_current_user)):

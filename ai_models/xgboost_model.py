@@ -1,8 +1,8 @@
-
 import xgboost as xgb
 import joblib
 import numpy as np
 from sklearn.model_selection import train_test_split
+
 
 class XGBoostModel:
     """
@@ -14,18 +14,26 @@ class XGBoostModel:
 
     def train(self, X, y, params=None):
         """Trains the XGBoost model."""
-        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y
+        )
 
         if params is None:
             params = {
-                'objective': 'multi:softmax',
-                'num_class': len(np.unique(y)),
-                'eval_metric': 'mlogloss',
-                'n_estimators': 200,
+                "objective": "multi:softmax",
+                "num_class": len(np.unique(y)),
+                "eval_metric": "mlogloss",
+                "n_estimators": 200,
             }
 
         self.model = xgb.XGBClassifier(**params)
-        self.model.fit(X_train, y_train, eval_set=[(X_val, y_val)], early_stopping_rounds=50, verbose=False)
+        self.model.fit(
+            X_train,
+            y_train,
+            eval_set=[(X_val, y_val)],
+            early_stopping_rounds=50,
+            verbose=False,
+        )
 
     def predict(self, X, return_probas=False):
         """Makes predictions with the trained model."""

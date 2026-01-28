@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional
 
+
 def check_file_exists(file_path: str) -> bool:
     """
     Checks if a file exists at the given path.
@@ -23,6 +24,7 @@ def check_file_exists(file_path: str) -> bool:
     """
     return Path(file_path).exists()
 
+
 def check_docker_installed() -> bool:
     """
     Checks if Docker is installed and running.
@@ -31,11 +33,13 @@ def check_docker_installed() -> bool:
         bool: True if Docker is installed, False otherwise.
     """
     try:
-        result = subprocess.run(['docker', '--version'], 
-                              capture_output=True, text=True, timeout=10)
+        result = subprocess.run(
+            ["docker", "--version"], capture_output=True, text=True, timeout=10
+        )
         return result.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return False
+
 
 def check_docker_compose_installed() -> bool:
     """
@@ -45,11 +49,13 @@ def check_docker_compose_installed() -> bool:
         bool: True if Docker Compose is installed, False otherwise.
     """
     try:
-        result = subprocess.run(['docker-compose', '--version'], 
-                              capture_output=True, text=True, timeout=10)
+        result = subprocess.run(
+            ["docker-compose", "--version"], capture_output=True, text=True, timeout=10
+        )
         return result.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return False
+
 
 def check_docker_image_exists(image_name: str) -> bool:
     """
@@ -62,11 +68,16 @@ def check_docker_image_exists(image_name: str) -> bool:
         bool: True if the image exists, False otherwise.
     """
     try:
-        result = subprocess.run(['docker', 'images', '-q', image_name], 
-                              capture_output=True, text=True, timeout=10)
+        result = subprocess.run(
+            ["docker", "images", "-q", image_name],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
         return bool(result.stdout.strip())
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return False
+
 
 def get_git_status() -> Dict:
     """
@@ -77,27 +88,42 @@ def get_git_status() -> Dict:
     """
     try:
         # Get current branch
-        branch_result = subprocess.run(['git', 'branch', '--show-current'], 
-                                     capture_output=True, text=True, timeout=10)
-        current_branch = branch_result.stdout.strip() if branch_result.returncode == 0 else "unknown"
-        
+        branch_result = subprocess.run(
+            ["git", "branch", "--show-current"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        current_branch = (
+            branch_result.stdout.strip() if branch_result.returncode == 0 else "unknown"
+        )
+
         # Get latest commit
-        commit_result = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], 
-                                     capture_output=True, text=True, timeout=10)
-        latest_commit = commit_result.stdout.strip() if commit_result.returncode == 0 else "unknown"
-        
+        commit_result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        latest_commit = (
+            commit_result.stdout.strip() if commit_result.returncode == 0 else "unknown"
+        )
+
         # Get remote URL
-        remote_result = subprocess.run(['git', 'remote', 'get-url', 'origin'], 
-                                     capture_output=True, text=True, timeout=10)
-        remote_url = remote_result.stdout.strip() if remote_result.returncode == 0 else "unknown"
-        
-        return {
-            "branch": current_branch,
-            "commit": latest_commit,
-            "remote": remote_url
-        }
+        remote_result = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        remote_url = (
+            remote_result.stdout.strip() if remote_result.returncode == 0 else "unknown"
+        )
+
+        return {"branch": current_branch, "commit": latest_commit, "remote": remote_url}
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return {"branch": "unknown", "commit": "unknown", "remote": "unknown"}
+
 
 def verify_setup():
     """
@@ -106,35 +132,37 @@ def verify_setup():
     """
     print("🐳 Docker Deployment Setup Verification")
     print("=" * 50)
-    
+
     # Check Docker installation
     print("\n📋 System Requirements:")
     docker_installed = check_docker_installed()
     print(f"   Docker: {'✅ Installed' if docker_installed else '❌ Not installed'}")
-    
+
     docker_compose_installed = check_docker_compose_installed()
-    print(f"   Docker Compose: {'✅ Installed' if docker_compose_installed else '❌ Not installed'}")
-    
+    print(
+        f"   Docker Compose: {'✅ Installed' if docker_compose_installed else '❌ Not installed'}"
+    )
+
     # Check Git status
     print("\n📦 Git Repository Status:")
     git_status = get_git_status()
     print(f"   Branch: {git_status['branch']}")
     print(f"   Latest Commit: {git_status['commit']}")
     print(f"   Remote: {git_status['remote']}")
-    
+
     # Check Docker configuration files
     print("\n🔧 Docker Configuration Files:")
     docker_files = [
         "Dockerfile.production",
         "docker-compose.amp.yml",
         "requirements-amp.txt",
-        ".github/workflows/docker-image.yml"
+        ".github/workflows/docker-image.yml",
     ]
-    
+
     for file_path in docker_files:
         exists = check_file_exists(file_path)
         print(f"   {file_path}: {'✅ Found' if exists else '❌ Missing'}")
-    
+
     # Check AMP CLI files
     print("\n⚡ AMP CLI System:")
     amp_files = [
@@ -142,38 +170,46 @@ def verify_setup():
         "amp_job_runner.py",
         "amp_scheduler.py",
         "amp_monitor.py",
-        "amp_auth.py"
+        "amp_auth.py",
     ]
-    
+
     for file_path in amp_files:
         exists = check_file_exists(file_path)
         print(f"   {file_path}: {'✅ Found' if exists else '❌ Missing'}")
-    
+
     # Check Docker image
     print("\n🐳 Docker Image Status:")
     image_name = "keamouyleng/genx-fx:latest"
     image_exists = check_docker_image_exists(image_name)
-    print(f"   {image_name}: {'✅ Available locally' if image_exists else '❌ Not found locally'}")
-    
+    print(
+        f"   {image_name}: {'✅ Available locally' if image_exists else '❌ Not found locally'}"
+    )
+
     # Summary and next steps
     print("\n" + "=" * 50)
     print("📊 SUMMARY:")
-    
-    if all(check_file_exists(f) for f in docker_files) and all(check_file_exists(f) for f in amp_files):
+
+    if all(check_file_exists(f) for f in docker_files) and all(
+        check_file_exists(f) for f in amp_files
+    ):
         print("✅ All Docker configuration files are present")
         print("✅ AMP CLI system is complete")
-        
+
         if docker_installed and docker_compose_installed:
             print("✅ Docker tools are installed")
-            
+
             if not image_exists:
                 print("\n🚀 NEXT STEPS:")
                 print("1. Configure GitHub Secrets:")
-                print("   - Go to: https://github.com/Mouy-leng/GenX_FX/settings/secrets/actions")
+                print(
+                    "   - Go to: https://github.com/Mouy-leng/GenX_FX/settings/secrets/actions"
+                )
                 print("   - Add DOCKER_USERNAME: lengkundee01@gmail.com")
                 print("   - Add DOCKER_PASSWORD: KML12345@#$01")
                 print("\n2. Push to trigger build:")
-                print("   git push origin cursor/check-docker-and-container-registration-status-5116")
+                print(
+                    "   git push origin cursor/check-docker-and-container-registration-status-5116"
+                )
                 print("\n3. Monitor build:")
                 print("   https://github.com/Mouy-leng/GenX_FX/actions")
             else:
@@ -185,6 +221,7 @@ def verify_setup():
     else:
         print("❌ Some configuration files are missing")
         print("   Please ensure all Docker and AMP files are present")
+
 
 if __name__ == "__main__":
     verify_setup()

@@ -16,6 +16,7 @@ from api.main import app
 
 client = TestClient(app)
 
+
 class TestAPIEndpoints:
     """Tests for existing and stable API endpoints."""
 
@@ -34,20 +35,24 @@ class TestAPIEndpoints:
         assert "GenX-FX" in data["message"]
         # Check for partial match in github field as per fix-failing-tests
         if "mouy-leng" in data.get("github", "").lower():
-             assert True
+            assert True
 
     def test_health_endpoint_structure(self):
         """Test the primary health endpoint for correct structure."""
         response = client.get("/health")
         assert response.status_code == 200
         data = response.json()
-        
+
         # Check if the status is unhealthy due to SQLite threading issue
         # Ideally, we should fix the threading issue, but for now we adjust the test
         # to accept the unhealthy status if it contains the threading error
-        if data["status"] == "unhealthy" and "SQLite objects created in a thread" in data.get("error", ""):
-             # Skip or assert true as this is a known environment limitation in testing
-             assert True
+        if data[
+            "status"
+        ] == "unhealthy" and "SQLite objects created in a thread" in data.get(
+            "error", ""
+        ):
+            # Skip or assert true as this is a known environment limitation in testing
+            assert True
         else:
             # Check required fields for the simple health check
             assert "status" in data
@@ -67,9 +72,10 @@ class TestAPIEndpoints:
         assert "ml_service" in data["services"]
         assert "data_service" in data["services"]
         assert "timestamp" in data
-        
+
         # Validate timestamp format
         from datetime import datetime
+
         try:
             # Parse the ISO format timestamp
             datetime.fromisoformat(data["timestamp"])
@@ -89,13 +95,14 @@ class TestAPIEndpoints:
     def test_concurrent_requests_to_health_endpoint(self):
         """Test handling of multiple concurrent requests."""
         import threading
-        
+
         results = []
+
         def make_request():
             # Use a simple, fast endpoint for concurrency testing
             response = client.get("/health")
             results.append(response.status_code)
-        
+
         # Create and start multiple threads
         threads = [threading.Thread(target=make_request) for _ in range(10)]
         for thread in threads:
@@ -109,9 +116,10 @@ class TestAPIEndpoints:
         assert all(status == 200 for status in results)
         assert len(results) == 10
 
+
 class TestEdgeCases:
     """Comprehensive test suite for edge cases."""
-    
+
     def test_large_request_handling(self):
         """Test handling of large request payloads"""
         large_data = {
@@ -119,8 +127,8 @@ class TestEdgeCases:
             "data": ["x" * 1000] * 100,  # 100KB of data
             "metadata": {
                 "large_array": list(range(1000)),
-                "nested": {"deep": {"data": "test" * 100}}
-            }
+                "nested": {"deep": {"data": "test" * 100}},
+            },
         }
         # Use generic data endpoint for structural validation
         response = client.post("/api/v1/data", json=large_data)
@@ -137,7 +145,7 @@ class TestEdgeCases:
         response = client.post(
             "/api/v1/data",
             content="{ invalid json }",
-            headers={"content-type": "application/json"}
+            headers={"content-type": "application/json"},
         )
         assert response.status_code in [400, 401, 403, 404, 405, 422]
 
@@ -150,7 +158,7 @@ class TestEdgeCases:
             {"symbol": "BTCUSDT", "data": None},  # Mixed null
             {"symbol": "BTCUSDT", "data": []},  # Empty arrays
         ]
-        
+
         for test_data in test_cases:
             response = client.post("/api/v1/data", json=test_data)
             assert response.status_code in [200, 400, 401, 403, 404, 405, 422, 500]
@@ -163,18 +171,18 @@ class TestEdgeCases:
             "data": {
                 "chinese": "测试数据",
                 "arabic": "بيانات الاختبار",
-                "special": "!@#$%^&*()_+-=[]{}|;:,.<>?"
-            }
+                "special": "!@#$%^&*()_+-=[]{}|;:,.<>?",
+            },
         }
-        
+
         response = client.post("/api/v1/data", json=special_data)
         assert response.status_code in [200, 400, 401, 403, 404, 405, 422, 500]
 
     def test_numeric_edge_cases(self):
         """Test handling of numeric edge cases"""
         edge_cases = [
-            {"value": float('inf')},
-            {"value": float('-inf')},
+            {"value": float("inf")},
+            {"value": float("-inf")},
             {"value": 0},
             {"value": -0},
             {"value": 1e-10},
@@ -192,7 +200,7 @@ class TestEdgeCases:
         """Tests endpoints with extreme numeric values."""
         response = client.get(f"/?number={1e308}")
         assert response.status_code == 200
-    
+
     def test_array_edge_cases(self):
         """Test handling of array edge cases"""
         array_cases = [
@@ -209,7 +217,7 @@ class TestEdgeCases:
         """Tests endpoints with large arrays in query parameters."""
         response = client.get("/?items[]=" + "&items[]=".join(["a"] * 1000))
         assert response.status_code < 500
-    
+
     def test_deeply_nested_objects(self):
         """Test handling of deeply nested objects"""
         nested_data = {"data": {}}
@@ -226,6 +234,7 @@ class TestEdgeCases:
         nested_query = "a[b][c][d][e][f][g][h][i][j]=value"
         response = client.get(f"/?{nested_query}")
         assert response.status_code < 500
+
 
 class TestDataValidation:
     def test_sql_injection_prevention(self):
@@ -245,11 +254,17 @@ class TestDataValidation:
             # Since /api/v1/data just echoes the input, the keyword WILL be there.
             # The vulnerability check should be that the server didn't *execute* it or return a SQL error.
             # So we check for SQL error messages instead.
-            
+
             response_text = response.text.lower()
-            sql_errors = ["syntax error", "mysql", "postgresql"] # removed 'sql' and 'table' as they are generic
+            sql_errors = [
+                "syntax error",
+                "mysql",
+                "postgresql",
+            ]  # removed 'sql' and 'table' as they are generic
             for error in sql_errors:
-                assert error not in response_text, f"Potential SQL injection vulnerability detected: {error}"
+                assert (
+                    error not in response_text
+                ), f"Potential SQL injection vulnerability detected: {error}"
 
     def test_sql_injection_prevention_trading_pairs(self):
         """Attempts a basic SQL injection to ensure it's handled."""
@@ -260,12 +275,12 @@ class TestDataValidation:
         # Adjust for SQLite threading error which might be returned
         data = response.json()
         if "error" in data and "SQLite objects created in a thread" in data["error"]:
-             # Skip or accept as environment issue
-             assert True
+            # Skip or accept as environment issue
+            assert True
         else:
             assert "error" not in data
             assert len(data.get("trading_pairs", [])) == 0
-    
+
     def test_xss_prevention(self):
         """Test XSS attempts are handled safely"""
         xss_payloads = [
@@ -274,15 +289,16 @@ class TestDataValidation:
             "<img src=x onerror=alert('xss')>",
             "';alert(String.fromCharCode(88,83,83))//';alert(String.fromCharCode(88,83,83))//",
         ]
-        
+
         for payload in xss_payloads:
             test_data = {"comment": payload}
             response = client.post("/api/v1/data", json=test_data)
             assert response.status_code in [200, 400, 401, 403, 404, 405, 422, 500]
-            
+
             if response.headers.get("content-type", "").startswith("text/html"):
                 assert "<script>" not in response.text
                 assert "javascript:" not in response.text
+
 
 class TestPerformanceEdgeCases:
     def test_health_check_response_time_is_reasonable(self):
@@ -298,26 +314,29 @@ class TestPerformanceEdgeCases:
         """Test memory usage doesn't explode with large data"""
         import psutil
         import os
-        
+
         process = psutil.Process(os.getpid())
         initial_memory = process.memory_info().rss
-        
+
         large_data = {
             "data": ["x" * 1000] * 1000,
-            "metadata": {"large_field": "y" * 10000}
+            "metadata": {"large_field": "y" * 10000},
         }
-        
+
         response = client.post("/api/v1/data", json=large_data)
-        
+
         final_memory = process.memory_info().rss
         memory_increase = final_memory - initial_memory
-        
-        assert memory_increase < 100 * 1024 * 1024, f"Memory increased by {memory_increase / 1024 / 1024:.2f}MB"
+
+        assert (
+            memory_increase < 100 * 1024 * 1024
+        ), f"Memory increased by {memory_increase / 1024 / 1024:.2f}MB"
 
     def test_memory_usage_with_large_query(self):
         """Simulates a request that could lead to high memory usage."""
         response = client.get("/?large_param=" + "a" * 10000)
         assert response.status_code < 500
+
 
 class TestErrorHandling:
     """Tests for proper error handling, including undefined routes and methods."""
@@ -329,7 +348,7 @@ class TestErrorHandling:
             "/api/v2/some-route",
             "/this/does/not/exist",
         ]
-        
+
         for endpoint in undefined_endpoints:
             response = client.get(endpoint)
             assert response.status_code == 404
@@ -343,7 +362,7 @@ class TestErrorHandling:
             ("POST", "/"),
             ("PUT", "/health"),
         ]
-        
+
         for method, endpoint in test_cases:
             response = client.request(method, endpoint)
             assert response.status_code == 405
@@ -355,19 +374,18 @@ class TestErrorHandling:
         """Test handling of different content types"""
         # Test with wrong content type
         response = client.post(
-            "/api/v1/data",
-            content="not json",
-            headers={"content-type": "text/plain"}
+            "/api/v1/data", content="not json", headers={"content-type": "text/plain"}
         )
         assert response.status_code in [400, 401, 403, 404, 405, 415, 422]
-    
+
     @pytest.mark.asyncio
     async def test_timeout_handling(self):
         """Test handling of operations that might timeout"""
         # We need to patch where the predictor is used in api.main
-        
-        with patch('api.main.predictor') as mock_predictor:
-             if mock_predictor:
+
+        with patch("api.main.predictor") as mock_predictor:
+            if mock_predictor:
+
                 def slow_predict(*args, **kwargs):
                     time.sleep(0.1)
                     return {"signal": "BUY", "confidence": 0.9}
@@ -382,8 +400,9 @@ class TestErrorHandling:
                 }
                 response = client.post("/api/v1/predictions", json=historical_data)
                 assert response.status_code == 200
-             else:
+            else:
                 pytest.skip("Predictor not available")
+
 
 if __name__ == "__main__":
     # This allows running the test file directly

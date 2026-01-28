@@ -7,6 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.execution.bybit import BybitAPI
 
+
 def download_historical_data(symbol, interval, start_time, end_time):
     """
     Downloads historical market data from Bybit and saves it to a CSV file.
@@ -16,7 +17,9 @@ def download_historical_data(symbol, interval, start_time, end_time):
 
     current_time = start_time
     while current_time < end_time:
-        data = bybit_api.get_market_data(symbol, interval, limit=1000, startTime=current_time)
+        data = bybit_api.get_market_data(
+            symbol, interval, limit=1000, startTime=current_time
+        )
 
         if data and data.get("retCode") == 0 and data.get("result", {}).get("list"):
             kline_data = data["result"]["list"]
@@ -38,7 +41,10 @@ def download_historical_data(symbol, interval, start_time, end_time):
 
     if all_data:
         # Create a pandas DataFrame from the data.
-        df = pd.DataFrame(all_data, columns=["timestamp", "open", "high", "low", "close", "volume", "turnover"])
+        df = pd.DataFrame(
+            all_data,
+            columns=["timestamp", "open", "high", "low", "close", "volume", "turnover"],
+        )
 
         # Convert the timestamp to a datetime object.
         df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
@@ -53,6 +59,7 @@ def download_historical_data(symbol, interval, start_time, end_time):
         print(f"Data saved to {file_path}")
     else:
         print("No data downloaded.")
+
 
 if __name__ == "__main__":
     # Download 1-hour data for BTCUSDT from 2023-01-01 to 2024-01-01.

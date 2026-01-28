@@ -4,6 +4,7 @@ Agent 2: Deploys the platform to Vercel and Railway.
 This script generates the necessary configuration files for deploying
 the application to Vercel and Railway.
 """
+
 import subprocess
 import json
 
@@ -43,6 +44,7 @@ def deploy_to_vercel():
     print("Files created: vercel.json, requirements-vercel.txt")
     print("Run: vercel --prod")
 
+
 def deploy_to_railway():
     """
     Creates the 'railway.json' configuration file for deploying to Railway.
@@ -50,9 +52,7 @@ def deploy_to_railway():
     # Create railway.json
     railway_config = {
         "build": {"builder": "NIXPACKS"},
-        "deploy": {
-            "startCommand": "uvicorn api.main:app --host 0.0.0.0 --port $PORT"
-        },
+        "deploy": {"startCommand": "uvicorn api.main:app --host 0.0.0.0 --port $PORT"},
     }
 
     with open("railway.json", "w") as f:
@@ -60,6 +60,7 @@ def deploy_to_railway():
 
     print("Agent 2: Railway deployment configured")
     print("File created: railway.json")
+
 
 if __name__ == "__main__":
     deploy_to_vercel()

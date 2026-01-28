@@ -15,6 +15,7 @@ import finnhub
 
 logger = logging.getLogger(__name__)
 
+
 class NewsService:
     """
     A service for fetching and aggregating financial news from multiple sources.
@@ -60,18 +61,46 @@ class NewsService:
 
         # Keywords for categorization (currently not used but defined)
         self.crypto_keywords = [
-            "bitcoin", "ethereum", "cryptocurrency", "blockchain", "defi", "nft",
-            "crypto", "btc", "eth", "altcoin", "coinbase", "binance",
+            "bitcoin",
+            "ethereum",
+            "cryptocurrency",
+            "blockchain",
+            "defi",
+            "nft",
+            "crypto",
+            "btc",
+            "eth",
+            "altcoin",
+            "coinbase",
+            "binance",
         ]
         self.stock_keywords = [
-            "stock market", "nasdaq", "dow jones", "s&p 500", "earnings", "fed",
-            "inflation", "interest rates", "wall street", "trading", "investment",
+            "stock market",
+            "nasdaq",
+            "dow jones",
+            "s&p 500",
+            "earnings",
+            "fed",
+            "inflation",
+            "interest rates",
+            "wall street",
+            "trading",
+            "investment",
         ]
         self.forex_keywords = [
-            "forex", "currency", "usd", "eur", "gbp", "jpy", "exchange rate",
-            "federal reserve", "central bank", "dollar", "euro",
+            "forex",
+            "currency",
+            "usd",
+            "eur",
+            "gbp",
+            "jpy",
+            "exchange rate",
+            "federal reserve",
+            "central bank",
+            "dollar",
+            "euro",
         ]
-    
+
     async def initialize(self) -> bool:
         """
         Initializes the news service by testing connections to the APIs.
@@ -94,7 +123,7 @@ class NewsService:
         except Exception as e:
             logger.error(f"Failed to initialize news service: {e}")
             return False
-    
+
     async def get_crypto_news(self, limit: int = 50) -> List[Dict[str, Any]]:
         """
         Aggregates cryptocurrency news from multiple sources.
@@ -128,12 +157,10 @@ class NewsService:
 
         # Remove duplicates and sort by date
         unique_news = self._remove_duplicates(all_news)
-        sorted_news = sorted(
-            unique_news, key=lambda x: x["published_at"], reverse=True
-        )
+        sorted_news = sorted(unique_news, key=lambda x: x["published_at"], reverse=True)
 
         return sorted_news[:limit]
-    
+
     async def get_stock_news(
         self, symbol: Optional[str] = None, limit: int = 50
     ) -> List[Dict[str, Any]]:
@@ -159,7 +186,9 @@ class NewsService:
         # Finnhub
         if self.finnhub_client:
             if symbol:
-                finnhub_articles = await self._get_finnhub_company_news(symbol, limit=15)
+                finnhub_articles = await self._get_finnhub_company_news(
+                    symbol, limit=15
+                )
             else:
                 finnhub_articles = await self._get_finnhub_news("general", limit=15)
             all_news.extend(finnhub_articles)
@@ -171,12 +200,10 @@ class NewsService:
 
         # Remove duplicates and sort
         unique_news = self._remove_duplicates(all_news)
-        sorted_news = sorted(
-            unique_news, key=lambda x: x["published_at"], reverse=True
-        )
+        sorted_news = sorted(unique_news, key=lambda x: x["published_at"], reverse=True)
 
         return sorted_news[:limit]
-    
+
     async def get_forex_news(self, limit: int = 30) -> List[Dict[str, Any]]:
         """
         Aggregates forex and currency-related news.
@@ -191,7 +218,9 @@ class NewsService:
 
         # NewsAPI
         if self.newsapi_client:
-            newsapi_articles = await self._get_newsapi_articles("forex currency", limit=20)
+            newsapi_articles = await self._get_newsapi_articles(
+                "forex currency", limit=20
+            )
             all_news.extend(newsapi_articles)
 
         # Finnhub
@@ -201,12 +230,10 @@ class NewsService:
 
         # Remove duplicates and sort
         unique_news = self._remove_duplicates(all_news)
-        sorted_news = sorted(
-            unique_news, key=lambda x: x["published_at"], reverse=True
-        )
+        sorted_news = sorted(unique_news, key=lambda x: x["published_at"], reverse=True)
 
         return sorted_news[:limit]
-    
+
     async def get_market_sentiment_news(self) -> Dict[str, Any]:
         """
         Gathers a broad range of news for general market sentiment analysis.
@@ -251,7 +278,7 @@ class NewsService:
                 "articles": [],
                 "timestamp": datetime.now(),
             }
-    
+
     async def _get_newsapi_articles(
         self, query: str, limit: int = 20
     ) -> List[Dict[str, Any]]:
@@ -300,7 +327,7 @@ class NewsService:
         except Exception as e:
             logger.error(f"NewsAPI error: {e}")
             return []
-    
+
     async def _get_finnhub_news(
         self, category: str, limit: int = 15
     ) -> List[Dict[str, Any]]:
@@ -337,7 +364,7 @@ class NewsService:
         except Exception as e:
             logger.error(f"Finnhub news error: {e}")
             return []
-    
+
     async def _get_finnhub_company_news(
         self, symbol: str, limit: int = 15
     ) -> List[Dict[str, Any]]:
@@ -381,7 +408,7 @@ class NewsService:
         except Exception as e:
             logger.error(f"Finnhub company news error: {e}")
             return []
-    
+
     async def _get_newsdata_articles(
         self, query: str, limit: int = 15
     ) -> List[Dict[str, Any]]:
@@ -431,7 +458,7 @@ class NewsService:
         except Exception as e:
             logger.error(f"NewsData.io error: {e}")
             return []
-    
+
     async def _get_alphavantage_news(
         self, symbol: str, limit: int = 10
     ) -> List[Dict[str, Any]]:
@@ -474,7 +501,7 @@ class NewsService:
         except Exception as e:
             logger.error(f"Alpha Vantage news error: {e}")
             return []
-    
+
     def _remove_duplicates(
         self, articles: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
@@ -499,7 +526,7 @@ class NewsService:
                     seen_titles.add(title_lower)
 
         return unique_articles
-    
+
     async def _test_newsapi(self):
         """Tests the NewsAPI connection by fetching one headline."""
         try:
@@ -509,7 +536,7 @@ class NewsService:
             logger.info("NewsAPI connection test successful")
         except Exception as e:
             logger.warning(f"NewsAPI test failed: {e}")
-    
+
     async def _test_finnhub(self):
         """Tests the Finnhub connection by fetching one general news item."""
         try:
@@ -519,7 +546,7 @@ class NewsService:
             logger.info("Finnhub connection test successful")
         except Exception as e:
             logger.warning(f"Finnhub test failed: {e}")
-    
+
     async def health_check(self) -> bool:
         """
         Performs a health check on the news service.
@@ -541,7 +568,7 @@ class NewsService:
         except Exception as e:
             logger.error(f"News service health check failed: {e}")
             return False
-    
+
     async def shutdown(self):
         """Shuts down the news service."""
         logger.info("Shutting down news service...")

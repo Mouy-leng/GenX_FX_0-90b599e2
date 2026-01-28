@@ -6,7 +6,8 @@ Security note:
 - Do NOT write real secrets to `.env` in git. Use `.env.example` as a template.
 """
 
-ENV_TEMPLATE = """
+ENV_TEMPLATE = (
+    """
 # Copy to `.env` (this file is gitignored) and fill values.
 # Never commit real credentials.
 
@@ -26,7 +27,9 @@ FXCM_PASSWORD=
 GEMINI_API_KEY=
 TELEGRAM_BOT_TOKEN=
 DISCORD_BOT_TOKEN=
-""".strip() + "\n"
+""".strip()
+    + "\n"
+)
 
 with open(".env.example", "w", encoding="utf-8") as f:
     f.write(ENV_TEMPLATE)
