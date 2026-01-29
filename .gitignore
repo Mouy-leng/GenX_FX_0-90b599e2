@@ -266,3 +266,4 @@ $RECYCLE.BIN/
 *.rar
 !ta-lib_*.deb
 onedrive_token.json
+google-cloud-sdk/
