@@ -120,20 +120,19 @@ async def batch_predictions(
     )
 
     # --- Concurrently generate predictions ---
-    valid_symbols = [
-        s
-        for s in symbol_list
-        if s in market_data_batch and not market_data_batch[s].empty
-    ]
-
-    prediction_tasks = [
-        ml_service.predict(
-            symbol=symbol,
-            market_data=market_data_batch[symbol],
-            use_ensemble=use_ensemble,
-        )
-        for symbol in valid_symbols
-    ]
+    prediction_tasks = []
+    valid_symbols = []
+    for symbol in symbol_list:
+        if symbol in market_data_batch and not market_data_batch[symbol].empty:
+            task = ml_service.predict(
+                symbol=symbol,
+                market_data=market_data_batch[symbol],
+                use_ensemble=use_ensemble,
+            )
+            prediction_tasks.append(task)
+            valid_symbols.append(symbol)
+        else:
+            errors.append({"symbol": symbol, "error": "Market data not found"})
 
     results = await asyncio.gather(*prediction_tasks, return_exceptions=True)
 
@@ -157,16 +156,6 @@ async def batch_predictions(
                     model_version=result["model_version"],
                 )
             )
-
-    # Report errors for symbols where data could not be fetched
-    # --- Performance Optimization: Use a set for O(1) lookups ---
-    # Converting the list of valid symbols to a set reduces the time
-    # complexity of checking for a symbol's existence from O(N) to O(1)
-    # on average, which is more efficient for large numbers of symbols.
-    valid_symbols_set = set(valid_symbols)
-    for symbol in symbol_list:
-        if symbol not in valid_symbols_set:
-            errors.append({"symbol": symbol, "error": "Market data not found"})
 
     return {
         "predictions": predictions,
