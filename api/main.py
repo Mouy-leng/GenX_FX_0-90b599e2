@@ -33,6 +33,9 @@ except ImportError:
     logging.warning("Could not import ScalpingService.")
     has_scalping_service = False
 
+from api.routers import performance
+from api.database import get_db
+
 redis_client = None
 predictor = None
 scalping_service = None
@@ -85,7 +88,23 @@ async def lifespan(app: FastAPI):
                 cardholder_name TEXT,
                 masked_card_number TEXT
             )
-        """
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS account_performance (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                account_number TEXT NOT NULL,
+                balance REAL,
+                equity REAL,
+                total_profit REAL,
+                total_loss REAL,
+                pnl REAL,
+                profit_factor REAL,
+                currency TEXT DEFAULT 'USD',
+                timestamp TEXT
+            )
+            """
         )
         conn.commit()
         conn.close()
@@ -122,6 +141,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# Include Routers
+app.include_router(performance.router, prefix="/api/v1")
 
 # Add Trusted Host middleware
 app.add_middleware(
@@ -200,18 +222,6 @@ logging.basicConfig(
 # each request and closed when the request is complete. This is a safe and
 # standard pattern for managing resources in a web application.
 # --------------------------------------------------------------------------
-
-
-def get_db():
-    """
-    FastAPI dependency to get a database connection for each request.
-    """
-    db = sqlite3.connect("genxdb_fx.db")
-    db.row_factory = sqlite3.Row
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 def is_safe_string(input_string):
@@ -609,33 +619,34 @@ async def get_users(
 @app.get("/mt5-info")
 async def get_mt5_info():
     """
-    Provides hardcoded information about the MT5 connection.
+    Provides information about the MT5 connection.
+    Updated for account 411534497 on Exness-MT5Real8.
 
     Returns:
-        dict: A dictionary with static MT5 login and server details.
+        dict: A dictionary with MT5 login and server details.
     """
     # --- Performance: Use Redis cache for static data ---
-    # This endpoint returns static data. Caching it reduces the overhead of
-    # JSON serialization and request processing on every call.
     if redis_client:
         try:
-            cached_info = await redis_client.get("mt5_info_cache")
+            cached_info = await redis_client.get("mt5_info_cache_v2")
             if cached_info:
                 return json.loads(cached_info)
         except Exception as e:
             logging.error(f"Redis connection error: {e}. Serving live data.")
 
     response = {
-        "login": "279023502",
-        "server": "Exness-MT5Trial8",
+        "login": "411534497",
+        "server": "Exness-MT5Real8",
         "status": "configured",
+        "account_type": "real",
+        "broker": "Exness"
     }
 
     # --- Update Redis cache if available ---
     if redis_client:
         try:
             # Cache for 1 hour (3600 seconds)
-            await redis_client.setex("mt5_info_cache", 3600, json.dumps(response))
+            await redis_client.setex("mt5_info_cache_v2", 3600, json.dumps(response))
         except Exception as e:
             logging.error(f"Could not write to Redis cache: {e}.")
 

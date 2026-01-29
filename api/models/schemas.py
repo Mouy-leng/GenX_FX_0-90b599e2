@@ -183,6 +183,31 @@ class ModelRetraining(BaseModel):
     )
 
 
+# Account Performance Schemas
+class PerformanceUpdate(BaseModel):
+    """Schema for updating account performance data."""
+
+    account_number: str = Field(..., description="The MT5 account number.")
+    balance: float = Field(..., description="The current account balance.")
+    equity: float = Field(..., description="The current account equity.")
+    total_profit: float = Field(..., description="The total realized profit.")
+    total_loss: float = Field(..., description="The total realized loss.")
+    currency: str = Field("USD", description="The account currency.")
+    timestamp: Optional[datetime] = Field(
+        None, description="The timestamp of the update."
+    )
+
+
+class AccountPerformance(PerformanceUpdate):
+    """Schema for representing historical account performance."""
+
+    id: Optional[int] = Field(None, description="The unique identifier for the record.")
+    pnl: float = Field(..., description="The net profit or loss (profit - loss).")
+    profit_factor: Optional[float] = Field(
+        None, description="The ratio of total profit to total loss."
+    )
+
+
 # System Status
 class SystemStatus(BaseModel):
     """Schema for representing the overall status of the trading system."""
