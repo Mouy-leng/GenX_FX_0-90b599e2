@@ -528,11 +528,11 @@ class SpreadsheetManager:
     async def _update_mt4_mt5_files(self):
         """Updates the simplified CSV files intended for MT4 and MT5 EAs."""
         try:
-            # MT4 format
+            # MT4 format (Standardized GenX Format - 9 Columns)
             with open(self.mt4_file, "w", newline="") as f:
                 writer = csv.writer(f)
 
-                # Simplified headers for MT4 EA
+                # Standardized headers for MT4 EA
                 headers = [
                     "Magic",
                     "Symbol",
@@ -541,6 +541,7 @@ class SpreadsheetManager:
                     "StopLoss",
                     "TakeProfit",
                     "LotSize",
+                    "Confidence",
                     "Timestamp",
                 ]
                 writer.writerow(headers)
@@ -548,6 +549,7 @@ class SpreadsheetManager:
                 for signal in self.active_signals.values():
                     # Calculate lot size (simplified)
                     lot_size = round(signal.get("PositionSize", 0.01), 2)
+                    confidence = round(signal.get("Confidence", 0.85) * 100, 2)
 
                     row = [
                         signal.get("Magic", signal.get("ID", "")),
@@ -557,6 +559,7 @@ class SpreadsheetManager:
                         signal.get("StopLoss", 0),
                         signal.get("TakeProfit", 0),
                         lot_size,
+                        confidence,
                         signal.get("Timestamp", ""),
                     ]
                     writer.writerow(row)

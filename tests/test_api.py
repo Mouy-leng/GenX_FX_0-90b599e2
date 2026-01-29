@@ -58,7 +58,7 @@ async def test_ml_service():
 
     # Test prediction
     prediction = await service.predict("BTCUSDT", {})
-    assert "signal" in prediction
+    assert "prediction" in prediction
     assert "confidence" in prediction
 
     # Test health check

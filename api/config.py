@@ -52,10 +52,12 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # Exness Broker Configuration
-    EXNESS_LOGIN: str = Field(..., description="Exness account login")
-    EXNESS_PASSWORD: str = Field(..., description="Exness account password")
+    EXNESS_LOGIN: str = Field("default_login", description="Exness account login")
+    EXNESS_PASSWORD: str = Field(
+        "default_password", description="Exness account password"
+    )
     EXNESS_SERVER: str = Field(
-        ..., description="Exness server (e.g., Exness-MT5Trial8)"
+        "Exness-MT5Trial8", description="Exness server (e.g., Exness-MT5Trial8)"
     )
     EXNESS_ACCOUNT_TYPE: Literal["demo", "live"] = "demo"
     EXNESS_TERMINAL: Literal["MT4", "MT5"] = "MT5"
@@ -76,7 +78,9 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
 
     # Security
-    SECRET_KEY: str = Field(..., description="Secret key for JWT tokens")
+    SECRET_KEY: str = Field(
+        "default_secret_key", description="Secret key for JWT tokens"
+    )
     CRYPTION_KEY: Optional[str] = Field(
         None, description="Key for encrypting sensitive data"
     )

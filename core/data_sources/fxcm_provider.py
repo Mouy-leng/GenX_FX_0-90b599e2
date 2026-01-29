@@ -8,7 +8,7 @@ import logging
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Callable
 import aiohttp
 import websockets
 import json
@@ -40,6 +40,10 @@ class FXCMConfig:
     timeout: int = 30
     retry_attempts: int = 3
     rate_limit_delay: float = 0.1
+    use_mock: bool = False
+    refresh_interval: int = 60
+    reconnect_on_failure: bool = True
+    max_reconnect_attempts: int = 5
 
 
 class FXCMDataProvider:

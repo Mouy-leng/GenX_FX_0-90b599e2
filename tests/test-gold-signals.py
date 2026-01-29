@@ -74,13 +74,18 @@ def test_signal_generation() -> bool:
         "source": "test",
     }
 
-    # Save to CSV file
-    csv_data = f"timestamp,symbol,action,entry_price,stop_loss,take_profit,confidence,reasoning,source\n"
-    csv_data += (
-        f"{test_signal['timestamp']},{test_signal['symbol']},{test_signal['action']},"
-    )
+    # Save to CSV file (Standardized GenX Format - 9 Columns)
+    magic = hash(f"{test_signal['symbol']}_{test_signal['timestamp']}") % 2147483647
+    lot_size = round(test_signal["confidence"] / 1000.0, 2)
+    if lot_size < 0.01:
+        lot_size = 0.01
+
+    confidence = test_signal["confidence"]
+
+    csv_data = "Magic,Symbol,Signal,EntryPrice,StopLoss,TakeProfit,LotSize,Confidence,Timestamp\n"
+    csv_data += f"{magic},{test_signal['symbol']},{test_signal['action']},"
     csv_data += f"{test_signal['entry_price']},{test_signal['stop_loss']},{test_signal['take_profit']},"
-    csv_data += f"{test_signal['confidence']},{test_signal['reasoning']},{test_signal['source']}\n"
+    csv_data += f"{lot_size},{confidence},{test_signal['timestamp']}\n"
 
     with open("MT4_Signals.csv", "w") as f:
         f.write(csv_data)

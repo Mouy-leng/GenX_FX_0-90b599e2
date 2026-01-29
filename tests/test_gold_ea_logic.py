@@ -118,19 +118,33 @@ class GoldEASimulator:
                 if len(row) < 8:
                     continue
 
-                (
-                    magic,
-                    symbol,
-                    signal,
-                    entry_price,
-                    stop_loss,
-                    take_profit,
-                    lot_size,
-                    timestamp,
-                ) = row
-                confidence = float(
-                    lot_size
-                )  # Using lot_size field as confidence for demo
+                if len(row) >= 9:
+                    (
+                        magic,
+                        symbol,
+                        signal,
+                        entry_price,
+                        stop_loss,
+                        take_profit,
+                        lot_size,
+                        confidence_val,
+                        timestamp,
+                    ) = row
+                    # In standardized format, confidence is at index 7 (already percentage)
+                    confidence = float(confidence_val) / 100.0
+                else:
+                    (
+                        magic,
+                        symbol,
+                        signal,
+                        entry_price,
+                        stop_loss,
+                        take_profit,
+                        lot_size,
+                        timestamp,
+                    ) = row
+                    # Fallback for 8-column format
+                    confidence = float(lot_size)
 
                 # Check if it's a gold pair
                 if not self.is_gold_pair(symbol):

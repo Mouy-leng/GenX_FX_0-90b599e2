@@ -318,16 +318,26 @@ class GoldSignalGenerator:
             return True
 
         try:
-            # Format as CSV for EA consumption
+            # Format as CSV for EA consumption (Standardized GenX Format - 9 Columns)
             csv_lines = [
-                "timestamp,symbol,action,entry_price,stop_loss,take_profit,confidence,reasoning,source"
+                "Magic,Symbol,Signal,EntryPrice,StopLoss,TakeProfit,LotSize,Confidence,Timestamp"
             ]
 
             for signal in signals:
+                magic = hash(f"{signal['symbol']}_{signal['timestamp']}") % 2147483647
+                # Use confidence as a proxy for lot size if not specified
+                lot_size = round(
+                    signal.get("lot_size", signal["confidence"] / 1000.0), 2
+                )
+                if lot_size < 0.01:
+                    lot_size = 0.01
+
+                confidence = round(signal["confidence"], 2)
+
                 csv_lines.append(
-                    f"{signal['timestamp']},{signal['symbol']},{signal['action']},"
+                    f"{magic},{signal['symbol']},{signal['action']},"
                     f"{signal['entry_price']},{signal['stop_loss']},{signal['take_profit']},"
-                    f"{signal['confidence']},{signal['reasoning']},{signal['source']}"
+                    f"{lot_size},{confidence},{signal['timestamp']}"
                 )
 
             csv_data = "\n".join(csv_lines)

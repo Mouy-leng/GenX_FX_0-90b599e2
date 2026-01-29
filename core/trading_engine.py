@@ -137,13 +137,27 @@ class TradingEngine:
             config_path (str): The path to the main trading configuration file.
         """
         self.config = self._load_config(config_path)
+
+        # Flatten 'trading' config if it exists
+        if "trading" in self.config:
+            for key, value in self.config["trading"].items():
+                if key not in self.config:
+                    self.config[key] = value
+
         self.is_running = False
         self.last_signals: Dict[str, datetime] = {}
 
         # Initialize core components
         self.data_provider = FXCMDataProvider(self.config["fxcm"])
         self.ensemble_predictor = EnsemblePredictor(self.config["ai_models"])
-        self.position_sizer = PositionSizer(self.config["risk_management"])
+
+        rm_config = self.config.get("risk_management", {})
+        self.position_sizer = PositionSizer(
+            account_balance=self.config.get("account_balance", 100000),
+            max_risk_per_trade=rm_config.get("max_risk_per_trade", 0.02),
+            max_portfolio_risk=rm_config.get("max_total_risk", 0.06),
+        )
+
         self.signal_validator = MultiTimeframeValidator(self.config["validation"])
         self.spreadsheet_manager = SpreadsheetManager(self.config["spreadsheet"])
         self.technical_indicators = TechnicalIndicators()
@@ -480,16 +494,13 @@ class TradingEngine:
             return None
 
         # Calculate position size
-        position_size_pct = self.position_sizer.calculate_position_size(
-            account_balance=100000,  # This should come from broker
-            risk_amount=(
-                entry_price - stop_loss
-                if signal_type == SignalType.BUY
-                else stop_loss - entry_price
-            ),
+        position_info = self.position_sizer.calculate_position_size(
+            symbol=symbol,
             entry_price=entry_price,
-            max_risk_pct=self.config["risk_management"]["max_risk_per_trade"],
+            stop_loss=stop_loss,
+            confidence=prediction["confidence"],
         )
+        position_size_pct = position_info.position_size
 
         # Determine signal strength
         strength = self._calculate_signal_strength(

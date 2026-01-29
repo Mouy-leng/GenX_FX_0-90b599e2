@@ -75,7 +75,7 @@ async def create_prediction(
 
         return PredictionResponse(
             symbol=request.symbol,
-            prediction=SignalType(prediction_result["signal"]),
+            prediction=SignalType(prediction_result["prediction"]),
             confidence=prediction_result["confidence"],
             timestamp=datetime.now(),
             features_used=prediction_result["features"],
@@ -149,7 +149,7 @@ async def batch_predictions(
             predictions.append(
                 PredictionResponse(
                     symbol=symbol,
-                    prediction=SignalType(result["signal"]),
+                    prediction=SignalType(result["prediction"]),
                     confidence=result["confidence"],
                     timestamp=datetime.now(),
                     features_used=result["features"],

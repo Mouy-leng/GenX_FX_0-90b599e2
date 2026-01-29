@@ -35,7 +35,7 @@ class EnsemblePredictor:
         self.cnn_model = CNNModel(sequence_length)
         self.meta_learner = LogisticRegression(random_state=42)
         self.is_trained = False
-        self.class_names = ["SELL", "HOLD", "BUY"]
+        self.class_names = ["short", "neutral", "long"]
 
     def train(self, df: pd.DataFrame, optimize_hyperparameters: bool = False):
         """Trains the entire ensemble model pipeline."""
@@ -93,7 +93,7 @@ class EnsemblePredictor:
         probabilities = self.meta_learner.predict_proba(meta_feature)[0]
 
         return {
-            "signal": self.class_names[prediction_idx],
+            "prediction": self.class_names[prediction_idx],
             "confidence": np.max(probabilities),
             "timestamp": datetime.utcnow(),
             "probabilities": dict(zip(self.class_names, probabilities)),

@@ -52,7 +52,7 @@ class MLService:
 
         # Mock prediction for now
         return {
-            "signal": "long",
+            "prediction": "long",
             "confidence": 0.85,
             "features": ["rsi", "macd", "volume"],
             "model_version": "1.0.0",

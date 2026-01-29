@@ -94,14 +94,16 @@ void ProcessSignals(string csvData) {
         string fields[];
         int fieldCount = StringSplit(lines[i], ',', fields);
         
-        // Support new 9-field format: timestamp,symbol,action,entry,sl,tp,confidence,reasoning,source
-        if(fieldCount >= 7) {
+        // Support standardized 9-field format: Magic,Symbol,Signal,EntryPrice,StopLoss,TakeProfit,LotSize,Confidence,Timestamp
+        if(fieldCount >= 8) {
             string symbol = fields[1];
             string action = fields[2];
             double entry = StringToDouble(fields[3]);
             double sl = StringToDouble(fields[4]);
             double tp = StringToDouble(fields[5]);
-            double confidence = StringToDouble(fields[6]);
+            double confidence = StringToDouble(fields[7]);
+
+            if(confidence > 1.0) confidence /= 100.0; // Convert 85.0 to 0.85
             
             // Only trade current symbol with high confidence
             if(symbol == Symbol() && confidence >= 0.7) {
