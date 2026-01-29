@@ -35,6 +35,12 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | s
     sudo apt-get update && \
     sudo apt-get install -y gh
 
+# Install Google Cloud CLI
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    sudo apt-get update && \
+    sudo apt-get install -y google-cloud-cli
+
 # Copy the jules.sh script into the container
 COPY --chown=jules:jules jules.sh .
 RUN sudo chmod +x jules.sh
