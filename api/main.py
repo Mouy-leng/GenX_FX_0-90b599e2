@@ -146,6 +146,21 @@ app = FastAPI(
 # Include Routers
 app.include_router(performance.router, prefix="/api/v1")
 
+
+# --- Optimization: Define static root response as a constant ---
+# To prevent the dictionary from being recreated on every call to the
+# root endpoint, we define it once as a module-level constant. This is a
+# micro-optimization that reduces a small amount of overhead for a
+# frequently accessed endpoint (e.g., by health checkers).
+ROOT_RESPONSE = {
+    "message": "GenX-FX Trading Platform API",
+    "version": "1.0.0",
+    "status": "active",
+    "docs": "/docs",
+    "github": "Mouy-leng",
+    "repository": "https://github.com/Mouy-leng/GenX_FX.git",
+}
+
 # Add Trusted Host middleware
 app.add_middleware(
     TrustedHostMiddleware,
@@ -292,24 +307,15 @@ async def root():
         except Exception as e:
             logging.error(f"Redis connection error: {e}. Performing live query.")
 
-    response = {
-        "message": "GenX-FX Trading Platform API",
-        "version": "1.0.0",
-        "status": "active",
-        "docs": "/docs",
-        "github": "Mouy-leng",
-        "repository": "https://github.com/Mouy-leng/GenX_FX.git",
-    }
-
     # --- Update Redis cache if available ---
     if redis_client:
         try:
             # Cache for 1 minute (60 seconds)
-            await redis_client.setex("root_cache", 60, json.dumps(response))
+            await redis_client.setex("root_cache", 60, json.dumps(ROOT_RESPONSE))
         except Exception as e:
             logging.error(f"Could not write to Redis cache: {e}.")
 
-    return response
+    return ROOT_RESPONSE
 
 
 @app.get("/health")
