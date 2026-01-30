@@ -3,7 +3,10 @@ import json
 import argparse
 from datetime import datetime
 
-def track_account(api_url, account_number, balance, equity, profit, loss, currency="USD"):
+
+def track_account(
+    api_url, account_number, balance, equity, profit, loss, currency="USD"
+):
     """
     Sends account performance data to the GenX Trading Platform API.
     """
@@ -15,7 +18,7 @@ def track_account(api_url, account_number, balance, equity, profit, loss, curren
         "total_profit": profit,
         "total_loss": loss,
         "currency": currency,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }
 
     try:
@@ -25,8 +28,9 @@ def track_account(api_url, account_number, balance, equity, profit, loss, curren
         print(json.dumps(response.json(), indent=2))
     except Exception as e:
         print(f"Error tracking account: {e}")
-        if hasattr(e, 'response') and e.response is not None:
+        if hasattr(e, "response") and e.response is not None:
             print(e.response.text)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Track MT5 account performance")
@@ -39,4 +43,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    track_account(args.url, args.account, args.balance, args.equity, args.profit, args.loss)
+    track_account(
+        args.url, args.account, args.balance, args.equity, args.profit, args.loss
+    )

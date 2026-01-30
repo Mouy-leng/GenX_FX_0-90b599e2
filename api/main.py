@@ -681,7 +681,7 @@ async def get_mt5_info():
         "server": "Exness-MT5Real8",
         "status": "configured",
         "account_type": "real",
-        "broker": "Exness"
+        "broker": "Exness",
     }
 
     # --- Update Redis cache if available ---

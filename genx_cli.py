@@ -736,9 +736,7 @@ def verify_vps():
             console.print(result.stderr)
 
         if result.returncode == 0:
-            console.print(
-                "\n[bold green]✅ VPS verification completed![/bold green]"
-            )
+            console.print("\n[bold green]✅ VPS verification completed![/bold green]")
         else:
             console.print("\n[bold red]❌ VPS verification found issues![/bold red]")
 

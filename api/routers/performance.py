@@ -10,10 +10,10 @@ from ..database import get_db
 router = APIRouter(prefix="/performance", tags=["performance"])
 logger = logging.getLogger(__name__)
 
+
 @router.post("/update", response_model=AccountPerformance)
 async def update_performance(
-    update: PerformanceUpdate,
-    db: sqlite3.Connection = Depends(get_db)
+    update: PerformanceUpdate, db: sqlite3.Connection = Depends(get_db)
 ):
     """
     Updates the account performance data.
@@ -21,7 +21,11 @@ async def update_performance(
     try:
         timestamp = update.timestamp or datetime.now()
         pnl = update.total_profit - update.total_loss
-        profit_factor = update.total_profit / update.total_loss if update.total_loss > 0 else update.total_profit
+        profit_factor = (
+            update.total_profit / update.total_loss
+            if update.total_loss > 0
+            else update.total_profit
+        )
 
         cursor = db.cursor()
         cursor.execute(
@@ -39,8 +43,8 @@ async def update_performance(
                 pnl,
                 profit_factor,
                 update.currency,
-                timestamp.isoformat()
-            )
+                timestamp.isoformat(),
+            ),
         )
         db.commit()
 
@@ -56,17 +60,16 @@ async def update_performance(
             pnl=pnl,
             profit_factor=profit_factor,
             currency=update.currency,
-            timestamp=timestamp
+            timestamp=timestamp,
         )
     except Exception as e:
         logger.error(f"Failed to update performance: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/{account_number}", response_model=List[AccountPerformance])
 async def get_performance(
-    account_number: str,
-    limit: int = 100,
-    db: sqlite3.Connection = Depends(get_db)
+    account_number: str, limit: int = 100, db: sqlite3.Connection = Depends(get_db)
 ):
     """
     Retrieves performance history for a specific account.
@@ -80,24 +83,26 @@ async def get_performance(
             ORDER BY timestamp DESC
             LIMIT ?
             """,
-            (account_number, limit)
+            (account_number, limit),
         )
         rows = cursor.fetchall()
 
         results = []
         for row in rows:
-            results.append(AccountPerformance(
-                id=row["id"],
-                account_number=row["account_number"],
-                balance=row["balance"],
-                equity=row["equity"],
-                total_profit=row["total_profit"],
-                total_loss=row["total_loss"],
-                pnl=row["pnl"],
-                profit_factor=row["profit_factor"],
-                currency=row["currency"],
-                timestamp=datetime.fromisoformat(row["timestamp"])
-            ))
+            results.append(
+                AccountPerformance(
+                    id=row["id"],
+                    account_number=row["account_number"],
+                    balance=row["balance"],
+                    equity=row["equity"],
+                    total_profit=row["total_profit"],
+                    total_loss=row["total_loss"],
+                    pnl=row["pnl"],
+                    profit_factor=row["profit_factor"],
+                    currency=row["currency"],
+                    timestamp=datetime.fromisoformat(row["timestamp"]),
+                )
+            )
 
         return results
     except Exception as e:

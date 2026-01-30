@@ -6,12 +6,14 @@ import socket
 from datetime import datetime
 import subprocess
 
+
 def check_endpoint(url, timeout=5):
     try:
         response = requests.get(url, timeout=timeout)
         return response.status_code == 200, response.status_code
     except Exception as e:
         return False, str(e)
+
 
 def check_port(host, port, timeout=2):
     try:
@@ -22,15 +24,21 @@ def check_port(host, port, timeout=2):
     except Exception as e:
         return False
 
+
 def get_service_status(service_name):
     try:
-        result = subprocess.run(['systemctl', 'is-active', service_name], capture_output=True, text=True)
-        return result.stdout.strip() == 'active'
+        result = subprocess.run(
+            ["systemctl", "is-active", service_name], capture_output=True, text=True
+        )
+        return result.stdout.strip() == "active"
     except Exception:
         return None
 
+
 def main():
-    print(f"=== GenX FX VPS Verification Tool ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}) ===")
+    print(
+        f"=== GenX FX VPS Verification Tool ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}) ==="
+    )
 
     # 1. API Health Checks
     print("\n--- API Health ---")
@@ -49,7 +57,7 @@ def main():
         8080: "24/7 Backend / Monitoring",
         9090: "EA Communication Server",
         6379: "Redis Server",
-        5432: "PostgreSQL (optional)"
+        5432: "PostgreSQL (optional)",
     }
 
     for port, name in ports.items():
@@ -61,8 +69,12 @@ def main():
     # 3. Environment Variables
     print("\n--- Environment Variables ---")
     critical_vars = [
-        "FXCM_USERNAME", "FXCM_PASSWORD", "GEMINI_API_KEY",
-        "VPS_URL", "REDIS_HOST", "REDIS_PORT"
+        "FXCM_USERNAME",
+        "FXCM_PASSWORD",
+        "GEMINI_API_KEY",
+        "VPS_URL",
+        "REDIS_HOST",
+        "REDIS_PORT",
     ]
     for var in critical_vars:
         val = os.getenv(var)
@@ -79,7 +91,7 @@ def main():
         "genx_robust_backend.py",
         ".env",
         "requirements.txt",
-        "api/main.py"
+        "api/main.py",
     ]
     for f in files:
         exists = os.path.exists(f)
@@ -87,7 +99,7 @@ def main():
         print(f"{icon} {f}: {'Exists' if exists else 'Missing'}")
 
     # 5. Background Services (Systemd) - Only if on Linux
-    if sys.platform.startswith('linux'):
+    if sys.platform.startswith("linux"):
         print("\n--- Systemd Services ---")
         services = ["genx-trading", "act_runner", "redis-server", "postgresql"]
         for svc in services:
@@ -100,6 +112,7 @@ def main():
                 print(f"⚪ {svc}: Not found or systemctl unavailable")
 
     print("\n=== Verification Complete ===")
+
 
 if __name__ == "__main__":
     main()

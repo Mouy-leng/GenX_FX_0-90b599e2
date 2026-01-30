@@ -61,13 +61,8 @@ async def create_prediction(
                 status_code=404, detail=f"No data found for symbol {request.symbol}"
             )
 
-        # --- Performance Optimization: Offload CPU-bound task ---
-        # The ML prediction can be CPU-intensive. By running it in a separate
-        # thread with asyncio.to_thread, we prevent it from blocking the main
-        # asyncio event loop, allowing the server to remain responsive to
-        # other requests while the prediction is being calculated.
-        prediction_result = await asyncio.to_thread(
-            ml_service.predict,
+        # Generate prediction
+        prediction_result = await ml_service.predict(
             symbol=request.symbol,
             market_data=market_data,
             use_ensemble=request.use_ensemble,
