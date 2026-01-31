@@ -82,17 +82,14 @@ async def lifespan(app: FastAPI):
     try:
         conn = sqlite3.connect("genxdb_fx.db")
         cursor = conn.cursor()
-        cursor.execute(
-            """
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS payment_methods (
                 id INTEGER PRIMARY KEY,
                 cardholder_name TEXT,
                 masked_card_number TEXT
             )
-            """
-        )
-        cursor.execute(
-            """
+            """)
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS account_performance (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 account_number TEXT NOT NULL,
@@ -105,8 +102,7 @@ async def lifespan(app: FastAPI):
                 currency TEXT DEFAULT 'USD',
                 timestamp TEXT
             )
-            """
-        )
+            """)
         conn.commit()
         conn.close()
     except Exception as e:

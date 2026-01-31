@@ -60,12 +60,7 @@ class TechnicalIndicators:
                     # Weighted Moving Average (Optimized)
                     # The original pandas apply() method is slow. This implementation
                     # uses numpy.convolve for a significant performance boost.
-                    # ---
-                    # ⚡ Bolt Optimization: Corrected weight order for standard WMA.
-                    # np.convolve reverses weights internally; passing them reversed
-                    # ensures the latest price gets the maximum weight.
-                    # ---
-                    weights = np.arange(1, period + 1)[::-1]
+                    weights = np.arange(1, period + 1)
                     denominator = weights.sum()
                     wma_values = (
                         np.convolve(df["close"], weights, mode="valid") / denominator
@@ -471,13 +466,10 @@ class TechnicalIndicators:
             close = df["close"]
 
             # Calculate True Range
-            # ---
-            # ⚡ Bolt Optimization: Using np.maximum instead of pd.concat.max
-            # ---
             tr1 = high - low
             tr2 = abs(high - close.shift())
             tr3 = abs(low - close.shift())
-            tr = np.maximum(tr1, np.maximum(tr2, tr3))
+            tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
 
             # Calculate Directional Movement
             dm_plus = high - high.shift()

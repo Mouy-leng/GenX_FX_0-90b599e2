@@ -4,7 +4,6 @@ ForexConnect API Test Script
 This script tests the ForexConnect installation and shows basic usage examples.
 """
 
-
 import pytest
 
 

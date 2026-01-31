@@ -153,16 +153,14 @@ def test_v2_users_pagination():
     conn = sqlite3.connect(":memory:", check_same_thread=False)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute(
-        """
+    cursor.execute("""
     CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
         email TEXT NOT NULL,
         is_active INTEGER NOT NULL
     );
-    """
-    )
+    """)
     # Insert 20 users
     for i in range(20):
         cursor.execute(
