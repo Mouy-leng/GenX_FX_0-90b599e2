@@ -20,7 +20,8 @@ class DriveManager:
                     try:
                         # Try to get volume label
                         cmd = f"vol {letter}:"
-                        output = subprocess.check_output(cmd, shell=True)
+                        # shell=True is required for Windows internal command 'vol'
+                        output = subprocess.check_output(cmd, shell=True)  # nosec
                         label = output.decode().split()[-1]
                     except Exception:
                         label = "Unknown"
