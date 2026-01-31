@@ -1,10 +1,10 @@
-import os
-import requests
 import base64
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives import serialization
 import json
+import os
+
+import requests
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 
 # GitHub API setup
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")

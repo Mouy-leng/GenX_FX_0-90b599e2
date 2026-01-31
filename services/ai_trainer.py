@@ -4,23 +4,24 @@ Provides continuous learning and model improvement capabilities
 """
 
 import asyncio
+import json
 import logging
+import threading
+import time
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+import aiohttp
+import joblib
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-import joblib
-import json
-from pathlib import Path
-import websockets
-import aiohttp
-from sqlalchemy import create_engine, text
-from pymongo import MongoClient
 import redis
-from dataclasses import dataclass, asdict
 import schedule
-import time
-import threading
+import websockets
+from pymongo import MongoClient
+from sqlalchemy import create_engine, text
 
 from ai_models.ensemble_model import EnsembleModel
 from ai_models.market_predictor import MarketPredictor

@@ -1,8 +1,10 @@
 import unittest
+
 import numpy as np
-from ..indicators.rsi import calculate_rsi
+
 from ..indicators.macd import calculate_macd
-from ..indicators.moving_average import calculate_sma, calculate_ema
+from ..indicators.moving_average import calculate_ema, calculate_sma
+from ..indicators.rsi import calculate_rsi
 
 
 class TestIndicators(unittest.TestCase):

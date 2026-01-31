@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import patch, Mock
-from core.execution.bybit import BybitAPI
+from unittest.mock import Mock, patch
+
 import utils.config
+from core.execution.bybit import BybitAPI
 
 
 class TestBybitAPI(unittest.TestCase):

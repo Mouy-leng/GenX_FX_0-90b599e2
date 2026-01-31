@@ -4,13 +4,14 @@ GenX_FX Trading Platform - API Key Validation Script
 Validates all API keys and tests connections
 """
 
-import os
 import asyncio
-import sys
-from typing import Dict, List, Tuple
-import aiohttp
 import json
+import os
+import sys
 from datetime import datetime
+from typing import Dict, List, Tuple
+
+import aiohttp
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

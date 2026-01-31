@@ -1,7 +1,8 @@
 import asyncio
 import logging
 import random
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 import pandas as pd
 
 logger = logging.getLogger(__name__)

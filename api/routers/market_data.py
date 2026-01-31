@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List, Optional
 import logging
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException
 
 from ..models.schemas import MarketData
 from ..utils.auth import get_current_user

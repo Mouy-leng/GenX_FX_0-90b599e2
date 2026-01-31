@@ -6,10 +6,12 @@ Provides contextual intelligence for trading decisions and market understanding.
 import asyncio
 import json
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import google.generativeai as genai
+
 from ..config.settings import get_settings
 
 settings = get_settings()

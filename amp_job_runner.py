@@ -6,14 +6,14 @@ Connects with AMP and runs the configured trading pipeline
 
 import asyncio
 import json
-import os
-import sys
-from pathlib import Path
-from typing import Dict, List, Optional, Any
-from datetime import datetime
 import logging
+import os
 import shutil
 import subprocess
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logging.basicConfig(

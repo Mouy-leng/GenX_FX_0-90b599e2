@@ -3,8 +3,8 @@ Telegram Bot Service for GenX Trading Platform
 Sends trading signals and notifications to Telegram channels
 """
 
-import os
 import logging
+import os
 from typing import Dict
 
 logger = logging.getLogger(__name__)

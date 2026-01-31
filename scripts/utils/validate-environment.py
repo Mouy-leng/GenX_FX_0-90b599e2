@@ -5,10 +5,10 @@ GenX FX Environment Validation Script
 Checks for common issues after Google CLI installation
 """
 
-import sys
-import subprocess
 import importlib
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 

@@ -1,6 +1,8 @@
-import pytest
 import sqlite3
+
+import pytest
 from fastapi.testclient import TestClient
+
 from api.main import app, get_db
 
 
@@ -16,15 +18,13 @@ def db_override():
     cursor = conn.cursor()
 
     # Create the necessary table for the billing endpoint
-    cursor.execute(
-        """
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS payment_methods (
             id INTEGER PRIMARY KEY,
             cardholder_name TEXT,
             masked_card_number TEXT
         )
-    """
-    )
+    """)
     conn.commit()
 
     # Define the dependency override function

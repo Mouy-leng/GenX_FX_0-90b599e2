@@ -1,5 +1,6 @@
-import pytest
 import sys
+
+import pytest
 
 
 def test_python_version():
@@ -10,9 +11,9 @@ def test_python_version():
 def test_imports():
     """Test that basic imports work"""
     try:
-        import os
-        import json
         import asyncio
+        import json
+        import os
 
         assert True
     except ImportError as e:

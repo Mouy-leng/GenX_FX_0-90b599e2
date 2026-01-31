@@ -2,13 +2,14 @@
 Market prediction using machine learning and pattern analysis
 """
 
+import os
+from typing import Dict, List, Optional, Tuple
+
+import joblib
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Optional, Tuple
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
-import joblib
-import os
 
 
 class MarketPredictor:

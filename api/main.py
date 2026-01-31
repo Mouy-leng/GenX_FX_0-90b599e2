@@ -1,20 +1,21 @@
-from fastapi import FastAPI, Depends, Query, Request, HTTPException
+import asyncio
+import json
+import logging
+import os
+import re
+import sqlite3
+from contextlib import asynccontextmanager
+from datetime import datetime
+
+import pandas as pd
+import redis.asyncio as redis
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-import sqlite3
-import os
-from datetime import datetime
-import json
-import asyncio
-import redis.asyncio as redis
-import logging
-import re
-import pandas as pd
-from pydantic import BaseModel, field_validator, Field
-from contextlib import asynccontextmanager
+from pydantic import BaseModel, Field, field_validator
 
 # Check if ai_models module exists and can be imported
 try:
@@ -34,8 +35,8 @@ except ImportError:
     logging.warning("Could not import ScalpingService.")
     has_scalping_service = False
 
-from api.routers import performance
 from api.database import get_db
+from api.routers import performance
 
 redis_client = None
 predictor = None
@@ -82,17 +83,14 @@ async def lifespan(app: FastAPI):
     try:
         conn = sqlite3.connect("genxdb_fx.db")
         cursor = conn.cursor()
-        cursor.execute(
-            """
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS payment_methods (
                 id INTEGER PRIMARY KEY,
                 cardholder_name TEXT,
                 masked_card_number TEXT
             )
-            """
-        )
-        cursor.execute(
-            """
+            """)
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS account_performance (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 account_number TEXT NOT NULL,
@@ -105,8 +103,7 @@ async def lifespan(app: FastAPI):
                 currency TEXT DEFAULT 'USD',
                 timestamp TEXT
             )
-            """
-        )
+            """)
         conn.commit()
         conn.close()
     except Exception as e:

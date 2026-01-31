@@ -4,26 +4,26 @@ GenX FX Trading System - Main Entry Point
 Advanced AI-powered Forex trading signal generator for MT4/5 EAs
 """
 
-import asyncio
-import logging
 import argparse
-import sys
-from pathlib import Path
-from datetime import datetime
-import signal
+import asyncio
 import json
+import logging
 import os
+import signal
+import sys
+from datetime import datetime
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 from threading import Thread
-from http.server import HTTPServer, BaseHTTPRequestHandler
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent))
 
-from core.trading_engine import TradingEngine
-from core.data_sources.fxcm_provider import FXCMDataProvider, MockFXCMProvider
 from core.ai_models.ensemble_predictor import EnsemblePredictor
-from core.model_trainer import ModelTrainer
 from core.backtester import Backtester
+from core.data_sources.fxcm_provider import FXCMDataProvider, MockFXCMProvider
+from core.model_trainer import ModelTrainer
+from core.trading_engine import TradingEngine
 from utils.config_manager import ConfigManager
 from utils.logger_setup import setup_logging
 

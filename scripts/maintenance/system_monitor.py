@@ -1,10 +1,11 @@
-import psutil
 import json
+import logging
+import os
 import time
 from datetime import datetime
+
+import psutil
 import redis
-import os
-import logging
 
 
 def get_system_metrics():

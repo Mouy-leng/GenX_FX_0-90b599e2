@@ -6,9 +6,10 @@ This example demonstrates the correct ForexConnect API usage.
 Note: You need valid FXCM credentials to run this example.
 """
 
-import forexconnect as fx
-import time
 import sys
+import time
+
+import forexconnect as fx
 
 
 class ForexConnectExample:

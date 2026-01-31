@@ -3,12 +3,13 @@ Gemini AI Service for GenX Trading Platform
 """
 
 import asyncio
+import json
 import logging
-from typing import Dict, Any, List, Optional
-import google.generativeai as genai
 import os
 from datetime import datetime
-import json
+from typing import Any, Dict, List, Optional
+
+import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 

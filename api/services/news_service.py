@@ -3,15 +3,16 @@ News Integration Service for GenX Trading Platform
 """
 
 import asyncio
+import json
 import logging
-from typing import Dict, Any, List, Optional
-import aiohttp
 import os
 from datetime import datetime, timedelta
-import json
+from typing import Any, Dict, List, Optional
+
+import aiohttp
+import finnhub
 from alpha_vantage.fundamentaldata import FundamentalData
 from newsapi import NewsApiClient
-import finnhub
 
 logger = logging.getLogger(__name__)
 

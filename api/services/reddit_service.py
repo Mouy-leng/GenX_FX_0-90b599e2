@@ -4,11 +4,12 @@ Reddit Integration Service for GenX Trading Platform
 
 import asyncio
 import logging
-from typing import Dict, Any, List, Optional
-import praw
 import os
-from datetime import datetime, timedelta
 import re
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+import praw
 
 logger = logging.getLogger(__name__)
 

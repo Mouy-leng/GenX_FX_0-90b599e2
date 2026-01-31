@@ -4,12 +4,12 @@ AMP Monitoring Dashboard
 Real-time monitoring and analytics for the AMP system
 """
 
+import asyncio
 import json
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Any, Optional
-import asyncio
+from typing import Any, Dict, List, Optional
 
 from amp_auth import check_auth, get_user_info
 from amp_scheduler import get_scheduler_status

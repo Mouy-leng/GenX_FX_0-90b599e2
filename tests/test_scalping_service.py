@@ -1,8 +1,9 @@
-import unittest
-from unittest.mock import patch, MagicMock
-import pandas as pd
-import numpy as np
 import sys
+import unittest
+from unittest.mock import MagicMock, patch
+
+import numpy as np
+import pandas as pd
 
 # Mock talib if not installed
 if "talib" not in sys.modules:

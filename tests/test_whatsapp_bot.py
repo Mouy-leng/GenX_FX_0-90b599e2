@@ -2,6 +2,7 @@
 """
 Test script for WhatsApp bot integration
 """
+
 import os
 import sys
 from datetime import datetime

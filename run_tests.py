@@ -4,8 +4,8 @@ Test runner for GenX Trading Platform
 """
 
 import os
-import sys
 import subprocess
+import sys
 
 
 def run_tests() -> bool:

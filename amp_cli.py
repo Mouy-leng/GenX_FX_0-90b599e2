@@ -6,12 +6,12 @@ Enhanced CLI with Typer for better user experience
 
 import asyncio
 import json
+import logging
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
-from datetime import datetime
-import logging
 
 import typer
 from rich.console import Console
@@ -25,10 +25,10 @@ try:
 except Exception:
     pass
 os.environ.setdefault("PYTHONIOENCODING", "utf-8")
-from rich.table import Table
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.prompt import Confirm
+from rich.table import Table
 
 # Configure logging
 logging.basicConfig(
@@ -604,7 +604,7 @@ def auth(
 ):
     """Manage authentication"""
     try:
-        from amp_auth import authenticate_user, check_auth, logout_user, get_user_info
+        from amp_auth import authenticate_user, check_auth, get_user_info, logout_user
 
         if logout:
             logout_user()
@@ -644,9 +644,9 @@ def schedule(
     """Manage automated job scheduling"""
     try:
         from amp_scheduler import (
+            get_scheduler_status,
             start_scheduler,
             stop_scheduler,
-            get_scheduler_status,
             update_scheduler_config,
         )
 
@@ -699,7 +699,7 @@ def monitor(
 ):
     """Monitor system performance and status"""
     try:
-        from amp_monitor import get_system_status, generate_report, display_dashboard
+        from amp_monitor import display_dashboard, generate_report, get_system_status
 
         if dashboard:
             console.print("📊 [bold blue]Starting AMP Monitoring Dashboard...")

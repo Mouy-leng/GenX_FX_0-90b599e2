@@ -1,9 +1,10 @@
-import os
 import json
-import requests
-import msal
 import logging
+import os
 from pathlib import Path
+
+import msal
+import requests
 
 # Configure logging
 logging.basicConfig(

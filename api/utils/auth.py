@@ -1,5 +1,5 @@
-from fastapi import HTTPException, status, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 try:
     from jose import JWTError, jwt
@@ -11,10 +11,10 @@ except Exception:  # jose not installed in minimal/runtime builds
             return {}
 
     jwt = _DummyJWT()
-from datetime import datetime, timedelta
-from typing import Optional
 import logging
 import os
+from datetime import datetime, timedelta
+from typing import Optional
 
 from ..config import settings
 

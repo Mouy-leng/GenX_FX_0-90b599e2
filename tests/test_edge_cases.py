@@ -1,10 +1,11 @@
-import pytest
 import asyncio
-from unittest.mock import patch, AsyncMock
-from fastapi.testclient import TestClient
-import os
 import json
+import os
 import time
+from unittest.mock import AsyncMock, patch
+
+import pytest
+from fastapi.testclient import TestClient
 
 # Set test environment variables
 os.environ["SECRET_KEY"] = "test-secret-key"
@@ -312,8 +313,9 @@ class TestPerformanceEdgeCases:
 
     def test_memory_usage_with_large_data(self):
         """Test memory usage doesn't explode with large data"""
-        import psutil
         import os
+
+        import psutil
 
         process = psutil.Process(os.getpid())
         initial_memory = process.memory_info().rss

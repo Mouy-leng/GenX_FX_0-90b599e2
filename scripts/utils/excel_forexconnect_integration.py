@@ -5,14 +5,15 @@ Connects to real FXCM data via ForexConnect API using demo credentials
 Generates Excel dashboard with real market data and signals
 """
 
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-import openpyxl
-from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 import os
 import sys
 import time
+from datetime import datetime, timedelta
+
+import numpy as np
+import openpyxl
+import pandas as pd
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 # Add project root to path
 sys.path.append(str(os.path.dirname(__file__)))

@@ -1,7 +1,9 @@
-from cryptography.fernet import Fernet
-from api.config import settings
-from typing import Optional
 import logging
+from typing import Optional
+
+from cryptography.fernet import Fernet
+
+from api.config import settings
 
 logger = logging.getLogger(__name__)
 

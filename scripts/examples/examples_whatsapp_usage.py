@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Set up environment (in production, use .env file)
 os.environ["WHATSAPP_GROUP_URL"] = "https://chat.whatsapp.com/DYemXrBnMD63K55bjUMKYF"
 
-from services.notifier import send_signal, send_notification, send_status_update
+from services.notifier import send_notification, send_signal, send_status_update
 
 
 def example_send_trading_signal():

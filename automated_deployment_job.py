@@ -7,30 +7,30 @@ Integrated with Ali & Jules CLI contributions and Cursor AI assistance
 
 import asyncio
 import json
-import os
-import sys
-import subprocess
-import shutil
-from pathlib import Path
-from typing import Dict, List, Optional, Union, Any, Tuple
-from datetime import datetime, timedelta
 import logging
+import os
+import shutil
+import subprocess
+import sys
 import tempfile
 import time
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import typer
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
 from rich.progress import (
+    BarColumn,
     Progress,
     SpinnerColumn,
     TextColumn,
-    BarColumn,
     TimeElapsedColumn,
 )
-from rich.prompt import Confirm, Prompt, IntPrompt
+from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.syntax import Syntax
+from rich.table import Table
 
 # Configure logging
 logging.basicConfig(

@@ -1,6 +1,8 @@
 from typing import Dict, Tuple
+
 import numpy as np
 import pandas as pd
+
 from .moving_average import MovingAverage
 
 

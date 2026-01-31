@@ -1,9 +1,10 @@
+import os
+
+import joblib
 import numpy as np
 import pandas as pd
 import talib
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-import joblib
-import os
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
 class FeatureEngineer:

@@ -4,6 +4,7 @@ a measure of risk-adjusted return that focuses on downside volatility.
 """
 
 from typing import List, Union
+
 import numpy as np
 
 try:

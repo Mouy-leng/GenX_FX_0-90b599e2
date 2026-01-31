@@ -6,12 +6,14 @@ Provides WebSocket connections for live data streaming and REST API for historic
 import asyncio
 import json
 import logging
-import websockets
-import aiohttp
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Callable, Any
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Callable, Dict, List, Optional
+
+import aiohttp
 import pandas as pd
+import websockets
+
 from ..config.settings import get_settings
 
 settings = get_settings()

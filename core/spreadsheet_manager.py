@@ -4,18 +4,19 @@ Exports trading signals to Excel/CSV files for EA consumption
 """
 
 import asyncio
-import logging
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
-import os
-from pathlib import Path
-import json
-import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.formatting.rule import ColorScaleRule, DataBarRule
 import csv
+import json
+import logging
+import os
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import openpyxl
+import pandas as pd
+from openpyxl.formatting.rule import ColorScaleRule, DataBarRule
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 logger = logging.getLogger(__name__)
 

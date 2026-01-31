@@ -6,8 +6,9 @@ repository for the application to function correctly. It is intended to be
 used with the 'github-secrets-api.py' script.
 """
 
-import requests
 import os
+
+import requests
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 REPO = "Mouy-leng/GenX_FX"

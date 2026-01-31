@@ -1,9 +1,9 @@
+import numpy as np
 import optuna
 import xgboost as xgb
-import numpy as np
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.layers import LSTM, Conv1D, Dense, Dropout, Flatten, MaxPooling1D
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout, Conv1D, MaxPooling1D, Flatten
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 

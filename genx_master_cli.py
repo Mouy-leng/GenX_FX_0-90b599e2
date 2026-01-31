@@ -10,25 +10,25 @@ Master command-line interface that integrates all CLI components:
 
 import asyncio
 import json
-import os
-import sys
-import subprocess
-import shutil
-from pathlib import Path
-from typing import Dict, List, Optional, Union, Any
-from datetime import datetime
 import logging
+import os
+import shutil
+import subprocess
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 import typer
+from rich.columns import Columns
 from rich.console import Console
-from rich.table import Table
+from rich.layout import Layout
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.prompt import Confirm, Prompt
 from rich.syntax import Syntax
+from rich.table import Table
 from rich.tree import Tree
-from rich.columns import Columns
-from rich.layout import Layout
 
 # Configure logging
 logging.basicConfig(
@@ -582,7 +582,9 @@ def health_check():
     if overall_health:
         console.print("\n🎉 [bold green]Platform Health: EXCELLENT[/bold green]")
     else:
-        console.print("\n⚠️ [bold yellow]Platform Health: NEEDS ATTENTION[/bold yellow]")
+        console.print(
+            "\n⚠️ [bold yellow]Platform Health: NEEDS ATTENTION[/bold yellow]"
+        )
 
 
 if __name__ == "__main__":

@@ -4,8 +4,9 @@ GitHub Secrets Validation Script
 Validates that all required secrets and variables are properly set
 """
 
-import requests
 import os
+
+import requests
 
 # Configuration
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")

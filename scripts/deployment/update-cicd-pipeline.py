@@ -3,8 +3,9 @@
 Update CI/CD Pipeline with proper secrets and environment management
 """
 
-import yaml
 from pathlib import Path
+
+import yaml
 
 
 def create_enhanced_cicd() -> dict:

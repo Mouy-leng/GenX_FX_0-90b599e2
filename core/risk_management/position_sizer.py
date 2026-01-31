@@ -4,16 +4,17 @@ Manages position sizes, risk limits, and portfolio risk
 """
 
 import math
-from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
+
 from .sortino_ratio_analyzer import SortinoRatioAnalyzer
 
 # Try to import pandas and numpy, but provide fallbacks if not available
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
 
     PANDAS_AVAILABLE = True
     NUMPY_AVAILABLE = True

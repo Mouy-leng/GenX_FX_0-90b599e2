@@ -1,7 +1,8 @@
-import requests
-import json
 import argparse
+import json
 from datetime import datetime
+
+import requests
 
 
 def track_account(

@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List, Optional
-import sqlite3
 import logging
+import sqlite3
 from datetime import datetime
+from typing import List, Optional
 
-from ..models.schemas import PerformanceUpdate, AccountPerformance
+from fastapi import APIRouter, Depends, HTTPException
+
 from ..database import get_db
+from ..models.schemas import AccountPerformance, PerformanceUpdate
 
 router = APIRouter(prefix="/performance", tags=["performance"])
 logger = logging.getLogger(__name__)

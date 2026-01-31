@@ -1,23 +1,23 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from typing import List, Optional
-import joblib
 import asyncio
+import json
+import logging
 import time
 from datetime import datetime
-import logging
-import json
+from typing import List, Optional
 
+import joblib
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+
+from ..config import settings
 from ..main import redis_client
-
 from ..models.schemas import (
+    ModelMetrics,
     PredictionRequest,
     PredictionResponse,
     SignalType,
-    ModelMetrics,
 )
-from ..config import settings
-from ..services.ml_service import MLService
 from ..services.data_service import DataService
+from ..services.ml_service import MLService
 from ..utils.auth import get_current_user
 
 router = APIRouter(prefix="/predictions", tags=["predictions"])

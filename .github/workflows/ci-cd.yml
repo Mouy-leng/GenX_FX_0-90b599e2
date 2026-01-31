@@ -96,7 +96,7 @@ jobs:
     - name: Run Black formatter check
       run: black --check --diff .
     - name: Run Flake8 linter
-      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=forexconnect_env_37,venv,.venv,node_modules
     - name: Run import sorting check
       run: isort --check-only --diff .
     - name: Run Bandit security linter

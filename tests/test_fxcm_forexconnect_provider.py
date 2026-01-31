@@ -1,6 +1,8 @@
-import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pandas as pd
+import pytest
+
 import core.data_sources.fxcm_forexconnect_provider as provider_module
 
 # Create a mock for the 'fx' module and add it to the provider module
@@ -9,8 +11,8 @@ mock_fx = MagicMock()
 provider_module.fx = mock_fx
 
 from core.data_sources.fxcm_forexconnect_provider import (
-    FXCMForexConnectProvider,
     FXCMForexConnectConfig,
+    FXCMForexConnectProvider,
 )
 
 

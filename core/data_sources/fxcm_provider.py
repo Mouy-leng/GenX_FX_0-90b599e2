@@ -4,16 +4,17 @@ Handles connection to FXCM's REST API and WebSocket feeds
 """
 
 import asyncio
-import logging
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Callable
-import aiohttp
-import websockets
 import json
+import logging
 import time
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Callable, Dict, List, Optional
+
+import aiohttp
+import numpy as np
+import pandas as pd
+import websockets
 
 logger = logging.getLogger(__name__)
 

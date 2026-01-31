@@ -5,22 +5,24 @@ This script trains and improves the AMP (Automated Model Pipeline) system
 """
 
 import asyncio
+import json
 import logging
-import sys
 import os
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent))
 
+import joblib
+import numpy as np
+import pandas as pd
+
+from ai_models.ensemble_model import EnsembleModel
 from ai_models.ensemble_predictor import EnsemblePredictor, FeatureEngineer
 from ai_models.market_predictor import MarketPredictor
-from ai_models.ensemble_model import EnsembleModel
 from services.ai_trainer import AITrainingService, TrainingMetrics
-import pandas as pd
-import numpy as np
-import joblib
 
 # Configure logging
 logging.basicConfig(

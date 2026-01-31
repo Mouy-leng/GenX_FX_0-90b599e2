@@ -3,24 +3,26 @@ Advanced Ensemble Model for Trading Predictions
 Combines multiple ML models for better accuracy and robustness
 """
 
+import logging
+import warnings
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Tuple
+
+import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.svm import SVC
-from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import joblib
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Optional
-import warnings
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
 
 warnings.filterwarnings("ignore")
 
-from .model_utils import ModelUtils
 from core.indicators import TechnicalIndicators
 from core.patterns import PatternDetector
+
+from .model_utils import ModelUtils
 
 
 class EnsembleModel:

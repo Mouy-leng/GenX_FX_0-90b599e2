@@ -1,7 +1,8 @@
+import logging
+from typing import Any, Dict, List
+
 import pandas as pd
 import talib
-import logging
-from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 

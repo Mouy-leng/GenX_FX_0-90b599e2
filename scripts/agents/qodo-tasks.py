@@ -1,6 +1,6 @@
 # Qodo Task 3: Start backend and run tests
-import subprocess
 import os
+import subprocess
 
 print("Qodo: Starting backend server and running tests")
 

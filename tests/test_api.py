@@ -1,13 +1,15 @@
-import pytest
 import asyncio
-from unittest.mock import Mock, patch, MagicMock
+import json
 import os
 import sqlite3
-import json
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 # Skip tests if FastAPI is not available
 try:
     from fastapi.testclient import TestClient
+
     from api.main import app, get_db
 
     FASTAPI_AVAILABLE = True
@@ -90,6 +92,7 @@ async def test_data_service():
 def test_technical_indicators():
     """Test technical indicators"""
     import pandas as pd
+
     from core.indicators import TechnicalIndicators
 
     # Create sample data
@@ -115,6 +118,7 @@ def test_technical_indicators():
 def test_pattern_detector():
     """Test pattern detector"""
     import pandas as pd
+
     from core.patterns import PatternDetector
 
     # Create sample data
@@ -153,16 +157,14 @@ def test_v2_users_pagination():
     conn = sqlite3.connect(":memory:", check_same_thread=False)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute(
-        """
+    cursor.execute("""
     CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
         email TEXT NOT NULL,
         is_active INTEGER NOT NULL
     );
-    """
-    )
+    """)
     # Insert 20 users
     for i in range(20):
         cursor.execute(

@@ -7,9 +7,10 @@ from datetime import datetime
 # Add the project root to the path
 sys.path.append(os.getcwd())
 
-from core.trading_engine import TradingEngine
+from unittest.mock import MagicMock, patch
+
 from core.data_sources.fxcm_provider import MockFXCMProvider
-from unittest.mock import patch, MagicMock
+from core.trading_engine import TradingEngine
 
 
 async def dry_run():

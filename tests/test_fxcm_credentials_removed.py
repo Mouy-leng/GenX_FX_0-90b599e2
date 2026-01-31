@@ -4,9 +4,10 @@ FXCM Connection Test Script (Credentials Removed)
 This script tests the ForexConnect API connection - credentials should be set via environment variables
 """
 
-import time
-import sys
 import os
+import sys
+import time
+
 import pytest
 
 try:

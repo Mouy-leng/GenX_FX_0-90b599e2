@@ -4,8 +4,9 @@ Script to generate a valid Fernet encryption key.
 Users can run this script and add the output to their .env file as CRYPTION_KEY.
 """
 
-from cryptography.fernet import Fernet
 import sys
+
+from cryptography.fernet import Fernet
 
 
 def generate_key():

@@ -1,10 +1,11 @@
-import os
 import json
-import sys
-import requests
+import os
 import socket
-from datetime import datetime
 import subprocess
+import sys
+from datetime import datetime
+
+import requests
 
 
 def check_endpoint(url, timeout=5):

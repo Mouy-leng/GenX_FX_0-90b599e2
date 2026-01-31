@@ -3,10 +3,12 @@
 AMP Client - Simple client to communicate with AMP services
 """
 
-import requests
 import json
-from typing import Dict, Any, Optional
-from amp_auth import get_auth_headers, check_auth
+from typing import Any, Dict, Optional
+
+import requests
+
+from amp_auth import check_auth, get_auth_headers
 
 
 class AMPClient:

@@ -1,5 +1,5 @@
-from fastapi import Request, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 try:
     from jose import JWTError, jwt
@@ -14,9 +14,9 @@ except Exception:
             return ""
 
     jwt = _DummyJWT()
+import logging
 from datetime import datetime, timedelta
 from typing import Optional
-import logging
 
 from ..config import settings
 

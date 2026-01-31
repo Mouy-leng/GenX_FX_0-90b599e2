@@ -2,9 +2,9 @@
 Technical Indicators Module
 """
 
-from .rsi import RSI
 from .macd import MACD
 from .moving_average import MovingAverage
+from .rsi import RSI
 
 
 class TechnicalIndicators:

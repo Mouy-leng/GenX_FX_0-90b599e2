@@ -3,9 +3,9 @@ Model Trainer for GenX FX Trading System
 Handles AI model training and validation
 """
 
-import logging
 import asyncio
-from typing import List, Dict, Any
+import logging
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 

@@ -5,14 +5,14 @@ Tests all systems and performs repository cleanup
 """
 
 import asyncio
+import json
 import logging
-import subprocess
-import sys
 import os
 import shutil
-from pathlib import Path
+import subprocess
+import sys
 from datetime import datetime
-import json
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(

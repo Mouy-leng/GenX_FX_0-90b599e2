@@ -1,6 +1,7 @@
 import logging
-from typing import Dict, Any
-from ..models.schemas import SignalType, OrderRequest
+from typing import Any, Dict
+
+from ..models.schemas import OrderRequest, SignalType
 
 logger = logging.getLogger(__name__)
 

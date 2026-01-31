@@ -5,8 +5,8 @@ This script generates the necessary configuration files for deploying
 the application to Vercel and Railway.
 """
 
-import subprocess
 import json
+import subprocess
 
 
 def deploy_to_vercel():

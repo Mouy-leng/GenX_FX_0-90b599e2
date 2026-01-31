@@ -1,21 +1,22 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from typing import List, Optional
 import asyncio
-from datetime import datetime
 import logging
+from datetime import datetime
+from typing import List, Optional
 
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+
+from ..config import settings
 from ..models.schemas import (
-    TradeSignal,
     OrderRequest,
     OrderResponse,
-    PortfolioStatus,
-    OrderType,
     OrderStatus,
+    OrderType,
+    PortfolioStatus,
     SignalType,
+    TradeSignal,
 )
-from ..config import settings
-from ..services.trading_service import TradingService
 from ..services.risk_service import RiskService
+from ..services.trading_service import TradingService
 from ..utils.auth import get_current_user
 
 router = APIRouter(prefix="/trading", tags=["trading"])

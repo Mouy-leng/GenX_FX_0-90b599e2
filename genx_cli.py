@@ -6,22 +6,22 @@ Complete command-line interface for managing the GenX FX trading platform
 
 import asyncio
 import json
+import logging
 import os
+import shutil
+import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Union
-from datetime import datetime
-import logging
-import subprocess
-import shutil
 
 import typer
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.prompt import Confirm, Prompt
 from rich.syntax import Syntax
+from rich.table import Table
 from rich.tree import Tree
 
 # Configure logging

@@ -3,11 +3,12 @@ Multi-Timeframe Signal Validator for GenX FX Trading System
 Validates trading signals across multiple timeframes for confirmation
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Tuple, Any
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
 
 
 class ValidationResult(Enum):

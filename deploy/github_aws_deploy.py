@@ -4,17 +4,18 @@ GitHub Token AWS Deployment Script
 Uses GitHub API with token authentication for AWS deployment
 """
 
-import os
-import sys
-import json
-import time
 import argparse
+import json
+import os
 import subprocess
-import requests
-from typing import Optional, Dict, Any
+import sys
+import time
+from typing import Any, Dict, Optional
+
 import boto3
-from botocore.exceptions import ClientError, NoCredentialsError
 import docker
+import requests
+from botocore.exceptions import ClientError, NoCredentialsError
 from docker.errors import DockerException
 
 # GitHub token (provide via environment variable or --token argument)

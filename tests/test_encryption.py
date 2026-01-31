@@ -1,7 +1,8 @@
 import pytest
 from cryptography.fernet import Fernet
-from utils.encryption import EncryptionManager
+
 import api.config
+from utils.encryption import EncryptionManager
 
 
 def test_key_generation_and_init():

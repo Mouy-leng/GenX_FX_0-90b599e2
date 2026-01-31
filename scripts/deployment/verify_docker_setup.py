@@ -4,8 +4,8 @@ Docker Deployment Verification Script
 Checks the current state of your AMP system Docker setup
 """
 
-import os
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path

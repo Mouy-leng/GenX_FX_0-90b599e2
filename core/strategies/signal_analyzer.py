@@ -1,7 +1,8 @@
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional
+
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Optional
-from datetime import datetime, timedelta
 
 
 class SignalAnalyzer:

@@ -4,16 +4,17 @@ Script to create GitHub Gists from files.
 Usage: python scripts/create_gist.py [OPTIONS] FILE_PATH
 """
 
+import json
 import os
 import sys
-import json
 from pathlib import Path
 from typing import Optional
+
 import requests
 import typer
+from dotenv import load_dotenv
 from rich.console import Console
 from rich.panel import Panel
-from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()

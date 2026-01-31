@@ -3,10 +3,10 @@ WhatsApp Bot Service for GenX Trading Platform
 Sends trading signals and notifications to WhatsApp groups
 """
 
-import os
 import logging
-from typing import Dict, Optional
+import os
 from datetime import datetime
+from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 

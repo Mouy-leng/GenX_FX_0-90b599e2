@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import Dict, Any
 import logging
+from typing import Any, Dict
+
+from fastapi import APIRouter, Depends, HTTPException
 
 from ..models.schemas import SystemStatus
 from ..utils.auth import get_current_user

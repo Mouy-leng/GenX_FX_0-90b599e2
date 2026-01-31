@@ -5,8 +5,8 @@ This script creates configuration files for logging, a health monitor endpoint,
 and a mock monitoring dashboard.
 """
 
-import os
 import json
+import os
 
 
 def setup_monitoring():

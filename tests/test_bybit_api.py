@@ -1,10 +1,12 @@
-import pytest
 import os
+
+import pytest
 
 # Skip tests if dependencies are not available
 try:
-    from core.execution.bybit import BybitAPI
     from unittest.mock import Mock, patch
+
+    from core.execution.bybit import BybitAPI
 
     BYBIT_AVAILABLE = True
 except ImportError:

@@ -4,11 +4,12 @@ GenX FX GitHub Secrets Manager
 Comprehensive secrets and environment management for GitHub Actions
 """
 
-import os
-import requests
 import base64
 import json
+import os
 from pathlib import Path
+
+import requests
 from nacl import encoding, public
 
 # Configuration

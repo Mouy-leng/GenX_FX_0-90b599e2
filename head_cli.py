@@ -6,22 +6,22 @@ Wraps all existing CLI tools into a single, organized interface
 
 import asyncio
 import json
+import logging
 import os
-import sys
 import subprocess
+import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Union
-from datetime import datetime
-import logging
 
 import typer
+from rich.columns import Columns
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.prompt import Confirm
+from rich.table import Table
 from rich.tree import Tree
-from rich.columns import Columns
 
 # Configure logging
 logging.basicConfig(

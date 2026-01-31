@@ -5,13 +5,13 @@ Comprehensive test of the FXCM ForexConnect API integration with spreadsheet out
 """
 
 import asyncio
+import json
 import logging
 import os
 import sys
-import json
-from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent))

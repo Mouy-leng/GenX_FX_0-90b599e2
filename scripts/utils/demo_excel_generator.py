@@ -4,14 +4,15 @@ Demo Excel Signal Generator for GenX FX Trading System
 This script creates sample forex trading signals and exports them to Excel/CSV
 """
 
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-import openpyxl
-from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
-from openpyxl.utils.dataframe import dataframe_to_rows
-import random
 import os
+import random
+from datetime import datetime, timedelta
+
+import numpy as np
+import openpyxl
+import pandas as pd
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+from openpyxl.utils.dataframe import dataframe_to_rows
 
 
 class ForexSignalGenerator:

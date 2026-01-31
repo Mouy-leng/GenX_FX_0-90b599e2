@@ -3,14 +3,15 @@ Enhanced WebSocket Service for GenX Trading Platform
 """
 
 import asyncio
-import websockets
 import json
 import logging
-from typing import Dict, Any, List, Optional, Callable
 import os
-from datetime import datetime
-import aiohttp
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
+
+import aiohttp
+import websockets
 
 logger = logging.getLogger(__name__)
 

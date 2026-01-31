@@ -1,19 +1,20 @@
+import logging
+import os
+from datetime import datetime
+from typing import Any, Dict, List
+
+import joblib
 import numpy as np
 import pandas as pd
-import logging
-from datetime import datetime
-from typing import Dict, Any, List
+from sklearn.linear_model import LogisticRegression
+
+from .cnn_model import CNNModel
 
 # These modules will be created in subsequent steps
 from .feature_engineer import FeatureEngineer
-from .xgboost_model import XGBoostModel
-from .lstm_model import LSTMModel
-from .cnn_model import CNNModel
 from .hyperparameter_optimizer import HyperparameterOptimizer
-
-from sklearn.linear_model import LogisticRegression
-import joblib
-import os
+from .lstm_model import LSTMModel
+from .xgboost_model import XGBoostModel
 
 logger = logging.getLogger(__name__)
 

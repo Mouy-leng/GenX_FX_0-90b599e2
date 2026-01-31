@@ -1,6 +1,6 @@
-import sqlite3
 import json
 import os
+import sqlite3
 
 
 def setup_database():
@@ -12,20 +12,17 @@ def setup_database():
     cursor = conn.cursor()
 
     # Create users table
-    cursor.execute(
-        """
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
         username TEXT NOT NULL UNIQUE,
         email TEXT NOT NULL UNIQUE,
         is_active INTEGER DEFAULT 1
     )
-    """
-    )
+    """)
 
     # Create trading_pairs table
-    cursor.execute(
-        """
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS trading_pairs (
         id INTEGER PRIMARY KEY,
         symbol TEXT NOT NULL UNIQUE,
@@ -33,8 +30,7 @@ def setup_database():
         quote_currency TEXT NOT NULL,
         is_active INTEGER DEFAULT 1
     )
-    """
-    )
+    """)
 
     # Seed initial data (if tables are empty)
     cursor.execute("SELECT COUNT(*) FROM users")
