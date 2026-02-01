@@ -10,10 +10,14 @@ exclude_dirs:
   - venv
   - .venv
   - node_modules
+  - external
 
 # skippable tests
 # B101: assert_used
 # B102: exec_used
+# B103: set_bad_file_permissions (chmod 0o755 is often needed for scripts)
+# B104: hardcoded_bind_all_interfaces (needed for Docker/Cloud Run)
+# B113: request_without_timeout
 # B301: pickle
 # B403: import_pickle
-skips: ['B101']
+skips: ['B101', 'B103', 'B104', 'B113']
