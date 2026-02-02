@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 
 // Simple proxy for /api requests to Python backend
 app.use(['/api/v1', '/trading-pairs'], (req, res) => {
-  const targetUrl = `http://localhost:8000${req.originalUrl}`;
+  const targetUrl = `http://127.0.0.1:8000${req.originalUrl}`;
   const options = {
     method: req.method,
     headers: { ...req.headers },

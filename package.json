@@ -9,9 +9,9 @@
   "scripts": {
     "dev": "concurrently \"pnpm:client\" \"pnpm:server\" \"pnpm:python:dev\"",
     "client": "vite --host 0.0.0.0 --port 5173",
-    "server": "tsx watch services/server/index.ts",
+    "server": "tsx --watch --env-file=.env services/server/index.ts",
     "python:dev": "uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload",
-    "start": "concurrently \"tsx services/server/index.ts\" \"uvicorn api.main:app --host 0.0.0.0 --port 8000\"",
+    "start": "concurrently \"tsx --env-file=.env services/server/index.ts\" \"uvicorn api.main:app --host 0.0.0.0 --port 8000\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
