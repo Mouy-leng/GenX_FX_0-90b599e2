@@ -28,6 +28,10 @@ class TechnicalIndicators:
             # Make a copy to avoid modifying original data
             data = df.copy()
 
+            # Pre-calculate common intermediate results to avoid redundant work
+            # in sub-methods. Saving as a column for easy reuse across indicators.
+            data["typical_price"] = (data["high"] + data["low"] + data["close"]) / 3
+
             # Price-based indicators
             data = self.add_moving_averages(data)
             data = self.add_momentum_indicators(data)
@@ -61,10 +65,13 @@ class TechnicalIndicators:
                     # Weighted Moving Average (Optimized)
                     # The original pandas apply() method is slow. This implementation
                     # uses numpy.convolve for a significant performance boost.
+                    # Denominator is calculated as n*(n+1)/2.
                     weights = np.arange(1, period + 1)
-                    denominator = weights.sum()
+                    denominator = period * (period + 1) / 2
+                    # Reverse weights for convolution to correctly weigh recent prices
                     wma_values = (
-                        np.convolve(df["close"], weights, mode="valid") / denominator
+                        np.convolve(df["close"], weights[::-1], mode="valid")
+                        / denominator
                     )
 
                     # Align the convolution output with the DataFrame index
@@ -124,27 +131,30 @@ class TechnicalIndicators:
             # Commodity Channel Index (CCI)
             if len(df) >= 20:
                 window = 20
-                typical_price = (df["high"] + df["low"] + df["close"]) / 3
+                # Reuse pre-calculated typical_price
+                typical_price = (
+                    df["typical_price"]
+                    if "typical_price" in df.columns
+                    else (df["high"] + df["low"] + df["close"]) / 3
+                )
                 sma_tp = typical_price.rolling(window=window).mean()
 
                 # ---
                 # ⚡ Bolt Optimization: Vectorized Mean Deviation
-                # The original `rolling().apply()` is notoriously slow. This
-                # implementation uses a vectorized approach by creating a
-                # rolling view of the data with numpy strides. This avoids
-                # Python-level loops and is significantly faster.
+                # Reused sma_tp values instead of re-calculating rolling mean.
+                # Switched to sliding_window_view for safer memory access.
                 # ---
                 typical_price_np = typical_price.to_numpy()
-                shape = (typical_price_np.shape[0] - window + 1, window)
-                strides = (typical_price_np.strides[0], typical_price_np.strides[0])
-                rolling_windows = np.lib.stride_tricks.as_strided(
-                    typical_price_np, shape=shape, strides=strides
+                rolling_windows = np.lib.stride_tricks.sliding_window_view(
+                    typical_price_np, window
                 )
 
+                # Use pre-calculated sma_tp values for the windows
+                sma_tp_values = sma_tp.values[window - 1 :]
+
                 # Calculate rolling mean absolute deviation
-                rolling_mean = np.mean(rolling_windows, axis=1)
                 rolling_mad_values = np.mean(
-                    np.abs(rolling_windows - rolling_mean[:, np.newaxis]), axis=1
+                    np.abs(rolling_windows - sma_tp_values[:, np.newaxis]), axis=1
                 )
 
                 mean_dev = pd.Series(rolling_mad_values, index=df.index[window - 1 :])
@@ -255,12 +265,19 @@ class TechnicalIndicators:
                 price_change_pct = df["close"].pct_change()
                 df["vpt"] = (price_change_pct * df["volume"]).cumsum()
 
-            # Accumulation/Distribution Line
+            # Accumulation/Distribution Line (Optimized: Vectorized arithmetic)
             if len(df) >= 1:
-                money_flow_multiplier = (
-                    (df["close"] - df["low"]) - (df["high"] - df["close"])
-                ) / (df["high"] - df["low"])
-                money_flow_volume = money_flow_multiplier * df["volume"]
+                # Use raw numpy values for faster calculation
+                close_vals = df["close"].values
+                high_vals = df["high"].values
+                low_vals = df["low"].values
+                range_hl = high_vals - low_vals
+
+                # Handle potential division by zero
+                money_flow_multiplier = np.where(
+                    range_hl != 0, (2 * close_vals - low_vals - high_vals) / range_hl, 0
+                )
+                money_flow_volume = money_flow_multiplier * df["volume"].values
                 df["ad_line"] = money_flow_volume.cumsum()
 
             return df
@@ -341,7 +358,12 @@ class TechnicalIndicators:
         try:
             # Pivot Points
             if len(df) >= 1:
-                df["pivot"] = (df["high"] + df["low"] + df["close"]) / 3
+                # Reuse pre-calculated typical_price for pivot points
+                df["pivot"] = (
+                    df["typical_price"]
+                    if "typical_price" in df.columns
+                    else (df["high"] + df["low"] + df["close"]) / 3
+                )
                 df["r1"] = 2 * df["pivot"] - df["low"]
                 df["s1"] = 2 * df["pivot"] - df["high"]
                 df["r2"] = df["pivot"] + (df["high"] - df["low"])

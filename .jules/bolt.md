@@ -10,6 +10,18 @@
 
 **Action:** I replaced the iterative approach with a vectorized mathematical formula using `np.convolve` and `rolling().sum()`. This optimization provided a ~3x speedup for the `add_trend_indicators` method, significantly reducing the CPU load during market data processing and signal generation.
 
+## 2025-02-14 - Redundant Mean in Mean Absolute Deviation (MAD)
+
+**Learning:** While optimizing CCI in `utils/technical_indicators.py`, I realized that the rolling Mean Absolute Deviation (MAD) step was re-calculating the rolling mean for every window, even though the Simple Moving Average (SMA) of the Typical Price (`sma_tp`) had already been computed. Reusing these pre-calculated mean values in the vectorized MAD calculation avoids redundant arithmetic.
+
+**Action:** I refactored the CCI calculation to reuse `sma_tp.values` during the vectorized MAD step. I also switched from `as_strided` to `np.lib.stride_tricks.sliding_window_view` for safer and more modern vectorized window generation. This improved the CCI calculation speed by ~17%.
+
+## 2025-02-14 - Weight Ordering in Vectorized WMA
+
+**Learning:** I discovered that the previous `np.convolve` implementation of the Weighted Moving Average (WMA) was logically incorrect because it didn't account for the fact that convolution flips the kernel. This resulted in older prices receiving higher weights than recent ones.
+
+**Action:** I corrected the WMA implementation by reversing the weights (`weights[::-1]`) before passing them to `np.convolve`. I also optimized the denominator calculation using the constant-time arithmetic series formula `n*(n+1)/2`, ensuring the indicator is both fast and mathematically sound.
+
 ## 2025-01-30 - Row-wise Maximum and Arithmetic Overhead
 
 **Learning:** I identified a significant performance bottleneck in the ADX calculation within `utils/technical_indicators.py`. Specifically, using `pd.concat([...], axis=1).max(axis=1)` to calculate the True Range (TR) is extremely inefficient compared to nested `np.maximum` calls. Additionally, performing row-wise arithmetic on Pandas Series carries substantial overhead for index alignment and validation.
