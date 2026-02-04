@@ -1,98 +1,58 @@
-import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { Home } from './pages/Home'
+import { AIServices } from './pages/AIServices'
+import { MT45Signals } from './pages/MT45Signals'
+import { PatternRecognition } from './pages/PatternRecognition'
 
 /**
- * The main application component.
- * It fetches and displays the health status of the Node.js server and the Python API.
+ * The main application component with routing.
  * @returns {JSX.Element} The rendered application component.
  */
 function App() {
-  const [health, setHealth] = useState<any>(null)
-  const [apiHealth, setApiHealth] = useState<any>(null)
-
-  useEffect(() => {
-    const API = 'http://localhost:8081'
-
-    // Test Node.js server health
-    fetch(`${API}/health`)
-      .then(res => res.json())
-      .then(data => setHealth(data))
-      .catch(err => console.error('Node.js server error:', err))
-
-    // Test Python API health  
-    fetch(`${API}/api/v1/health`)
-      .then(res => res.json())
-      .then(data => setApiHealth(data))
-      .catch(err => console.error('Python API error:', err))
-  }, [])
-
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-900">
-          🚀 GenX FX Trading Platform
-        </h1>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-              Node.js Server Status
-            </h2>
-            {health ? (
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                  <span>Status: {health.status}</span>
-                </div>
-                <div>Environment: {health.environment}</div>
-                <div>Timestamp: {health.timestamp}</div>
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <nav className="bg-white shadow-lg">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex justify-between h-16">
+              <div className="flex space-x-8">
+                <Link
+                  to="/"
+                  className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-900 hover:border-blue-500 transition-colors"
+                >
+                  🏠 Home
+                </Link>
+                <Link
+                  to="/ai-services"
+                  className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-900 hover:border-blue-500 transition-colors"
+                >
+                  🤖 AI Services
+                </Link>
+                <Link
+                  to="/signals"
+                  className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-900 hover:border-blue-500 transition-colors"
+                >
+                  📡 MT4/MT5 Signals
+                </Link>
+                <Link
+                  to="/patterns"
+                  className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-900 hover:border-blue-500 transition-colors"
+                >
+                  🔍 Pattern Recognition
+                </Link>
               </div>
-            ) : (
-              <div className="flex items-center">
-                <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                <span>Server not responding</span>
-              </div>
-            )}
+            </div>
           </div>
+        </nav>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-              Python API Status
-            </h2>
-            {apiHealth ? (
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                  <span>Status: {apiHealth.status}</span>
-                </div>
-                <div>ML Service: {apiHealth.services?.ml_service}</div>
-                <div>Data Service: {apiHealth.services?.data_service}</div>
-                <div>Timestamp: {apiHealth.timestamp}</div>
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                <span>API not responding</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-            System Test Results
-          </h2>
-          <div className="space-y-2 text-sm">
-            <div>✅ Configuration system fixed (Pydantic settings)</div>
-            <div>✅ Python API tests: 27/27 passed</div>
-            <div>✅ Node.js server tests: 15/17 passed (2 minor issues)</div>
-            <div>✅ Edge case testing completed</div>
-            <div>✅ Security validation (XSS, SQL injection prevention)</div>
-            <div>✅ Performance testing passed</div>
-            <div>✅ Build system configured</div>
-          </div>
-        </div>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/ai-services" element={<AIServices />} />
+          <Route path="/signals" element={<MT45Signals />} />
+          <Route path="/patterns" element={<PatternRecognition />} />
+        </Routes>
       </div>
-    </div>
+    </Router>
   )
 }
 
