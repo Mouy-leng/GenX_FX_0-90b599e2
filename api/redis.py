@@ -23,6 +23,5 @@ async def init_redis():
 
 
 async def close_redis():
-    global redis_client
     if redis_client:
         await redis_client.aclose()
