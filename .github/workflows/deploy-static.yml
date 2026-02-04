@@ -2,8 +2,10 @@ name: Deploy Static Site to S3/CloudFront
 
 on:
   push:
-    branches: [main]
-    paths: ['client/**']
+    branches:
+      - main
+    paths:
+      - 'client/**'
   workflow_dispatch:
 
 env:
@@ -16,51 +18,51 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Build client application
-      run: |
-        if [ -d "client" ]; then
-          cd client
-          if [ -f "package.json" ]; then
-            npm install
-            npm run build
-            echo "Build completed"
-          else
-            echo "No build process needed, using static files as-is"
+      - name: Build client application
+        run: |
+          if [ -d "client" ]; then
+            cd client
+            if [ -f "package.json" ]; then
+              npm install
+              npm run build
+              echo "Build completed"
+            else
+              echo "No build process needed, using static files as-is"
+            fi
+            cd ..
           fi
-          cd ..
-        fi
 
-    - name: Deploy to S3
-      run: |
-        echo "📤 Uploading files to S3 bucket: $BUCKET_NAME"
-        aws s3 sync client/ s3://$BUCKET_NAME/ --delete --region us-east-1
+      - name: Deploy to S3
+        run: |
+          echo "📤 Uploading files to S3 bucket: $BUCKET_NAME"
+          aws s3 sync client/ s3://$BUCKET_NAME/ --delete --region us-east-1
 
-    - name: Invalidate CloudFront
-      run: |
-        echo "🔄 Invalidating CloudFront cache..."
-        aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" --region us-east-1
+      - name: Invalidate CloudFront
+        run: |
+          echo "🔄 Invalidating CloudFront cache..."
+          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" --region us-east-1
 
-    - name: Get CloudFront status
-      run: |
-        echo "📊 CloudFront distribution status:"
-        aws cloudfront get-distribution --id $DISTRIBUTION_ID --query "Distribution.{Status:Status,DomainName:DomainName}" --region us-east-1
+      - name: Get CloudFront status
+        run: |
+          echo "📊 CloudFront distribution status:"
+          aws cloudfront get-distribution --id $DISTRIBUTION_ID --query "Distribution.{Status:Status,DomainName:DomainName}" --region us-east-1
 
-    - name: Deployment Summary
-      run: |
-        echo "✅ Static site deployment completed!"
-        echo ""
-        echo "🌐 Your site is available at:"
-        echo "   CloudFront (HTTPS): $CLOUDFRONT_URL"
-        echo "   S3 Website (HTTP):  $S3_WEBSITE_URL"
-        echo ""
-        echo "🔗 CloudFront URL: $CLOUDFRONT_URL"
+      - name: Deployment Summary
+        run: |
+          echo "✅ Static site deployment completed!"
+          echo ""
+          echo "🌐 Your site is available at:"
+          echo "   CloudFront (HTTPS): $CLOUDFRONT_URL"
+          echo "   S3 Website (HTTP):  $S3_WEBSITE_URL"
+          echo ""
+          echo "🔗 CloudFront URL: $CLOUDFRONT_URL"

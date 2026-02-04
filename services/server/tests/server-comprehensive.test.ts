@@ -64,8 +64,9 @@ describe('GenX FX Server Comprehensive Tests', () => {
 
     // Generic error handling middleware
     app.use((err: any, req: any, res: any, next: any) => {
-      res.status(500).json({
-        error: 'Internal server error',
+      const statusCode = err.statusCode || 500;
+      res.status(statusCode).json({
+        error: err.name || 'Internal server error',
         message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
       });
     });
@@ -188,7 +189,7 @@ describe('GenX FX Server Comprehensive Tests', () => {
       const response = await request(app).get('/api/error');
       
       expect(response.status).toBe(500);
-      expect(response.body).toHaveProperty('error', 'Internal server error');
+      expect(response.body).toHaveProperty('error', 'Error');
       expect(response.body).toHaveProperty('message');
     });
 
