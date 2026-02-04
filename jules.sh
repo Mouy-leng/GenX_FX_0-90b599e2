@@ -7,7 +7,7 @@ set -euo pipefail
 DOMAIN="remote.genxfx.org"
 DUCKDNS_DOMAIN="your-duckdns-subdomain.duckdns.org" # Default, can be overridden
 DEVICE_IP="10.62.78.114"
-BUILD_NUMBER="15.1.1.109SP06(OP001PF001AZ)"
+BUILD_NUMBER="LI9-15.1.2.145SP08(OP001PF001AZ)"
 HASHED_ID=$(echo -n "$BUILD_NUMBER" | openssl dgst -sha256 | awk '{print $2}')
 FIREBASE_PROJECT="genxfx"
 PRIVACY_EMAIL="189807f4de4d86bd181553d72ab3f.protect@withheldforprivacy.com"
