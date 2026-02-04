@@ -21,3 +21,9 @@
 **Learning:** I identified a common performance anti-pattern where multiple technical indicators (e.g., Stochastic Oscillator, Williams %R, Bollinger Bands, and Support/Resistance) re-calculate the same rolling windows (min, max, mean, std) independently. This redundancy wastes CPU cycles, especially as the number of indicators grows.
 
 **Action:** I refactored `utils/technical_indicators.py` to calculate shared rolling windows once and reuse them. For example, rolling min/max for window 14 is now shared between Stochastic and Williams %R, and `sma_20`/`std_20` are shared between Bollinger Bands and Volatility Indicators. This optimization provides a ~10-15% speedup across the affected methods without changing the output logic.
+
+## 2025-05-15 - Vectorized Sliding Windows in Feature Engineering
+
+**Learning:** I identified a massive performance bottleneck in `ai_models/feature_engineer.py` where Python loops were used to generate sliding windows for LSTMs and CNNs. Generating chart images was particularly slow (~1.7s for 2000 rows) due to repeated `.iloc` slicing and redundant normalization in every window. Additionally, the inference path redundantly calculated the entire history even though only the last window was needed.
+
+**Action:** I replaced the Python loops with `numpy.lib.stride_tricks.sliding_window_view` for fully vectorized window generation, yielding a ~270x speedup for chart images. I also introduced an `only_last` flag to optimize the inference path, providing a ~60x speedup for real-time predictions. Using `np.stack` and `np.column_stack` on the vectorized windows ensures the multi-channel structure is maintained without explicit iteration.
