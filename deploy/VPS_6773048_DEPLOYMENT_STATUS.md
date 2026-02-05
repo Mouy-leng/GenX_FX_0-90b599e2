@@ -11,16 +11,18 @@
 - **Security Type:** WPA2-Personal
 - **Manufacturer:** Realtek Semiconductor Corp.
 - **Description:** Realtek RTL8188EU Wireless LAN 802.11n USB 2.0 Network Adapter
-- **Driver Version:** 1030.52.731.2025
-- **Network Band:** 2.4 GHz (Channel 7)
-- **Link Speed (Rx/Tx):** 43/43 Mbps
+- **Driver Version:** 1030.52.1216.2025
+- **Network Band:** 2.4 GHz (Channel 1)
+- **Link Speed (Rx/Tx):** 150/150 Mbps
+- **Aggregated Link Speed (Receive/Transmit):** 150/150 Mbps
 - **MAC Address:** 78:20:51:54:60:5C
 
 ### IP Configuration
 - **IPv4 Address:** 192.168.18.6
 - **IPv4 Gateway:** 192.168.18.1
-- **IPv4 DNS:** 192.168.18.1
-- **IPv6 Link-Local:** fe80::417b:4f29:7fd:caaa%13
+- **IPv4 DNS:** 8.8.8.8, 1.1.1.1
+- **IPv6 Link-Local:** fe80::417b:4f29:7fd:caaa%12
+- **IPv6 DNS:** 2001:4860:4860::8888 (Unencrypted), 2606:4700:4700::1111 (Unencrypted)
 
 ## SSL Certificate Details
 

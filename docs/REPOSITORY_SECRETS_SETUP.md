@@ -164,7 +164,8 @@ b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
 - **Security**: WPA2-Personal
 - **IPv4 Address**: 192.168.18.6
 - **Gateway**: 192.168.18.1
-- **DNS Servers**: 8.8.8.8, 1.1.1.1
+- **IPv4 DNS Servers**: 8.8.8.8, 1.1.1.1
+- **IPv6 Link-Local**: fe80::417b:4f29:7fd:caaa%12
 - **IPv6 DNS**: 2001:4860:4860::8888, 2606:4700:4700::1111
 - **MAC Address**: 78:20:51:54:60:5C
 
