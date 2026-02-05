@@ -20,7 +20,7 @@
 ### IP Configuration
 - **IPv4 Address:** 192.168.18.6
 - **IPv4 Gateway:** 192.168.18.1
-- **IPv4 DNS:** 8.8.8.8, 1.1.1.1
+- **IPv4 DNS:** 8.8.8.8 (Unencrypted), 1.1.1.1 (Unencrypted)
 - **IPv6 Link-Local:** fe80::417b:4f29:7fd:caaa%12
 - **IPv6 DNS:** 2001:4860:4860::8888 (Unencrypted), 2606:4700:4700::1111 (Unencrypted)
 
