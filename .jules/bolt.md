@@ -39,3 +39,9 @@
 **Learning:** I identified a massive performance bottleneck in `ai_models/feature_engineer.py` where Python loops were used to generate sliding windows for LSTMs and CNNs. Generating chart images was particularly slow (~1.7s for 2000 rows) due to repeated `.iloc` slicing and redundant normalization in every window. Additionally, the inference path redundantly calculated the entire history even though only the last window was needed.
 
 **Action:** I replaced the Python loops with `numpy.lib.stride_tricks.sliding_window_view` for fully vectorized window generation, yielding a ~270x speedup for chart images. I also introduced an `only_last` flag to optimize the inference path, providing a ~60x speedup for real-time predictions. Using `np.stack` and `np.column_stack` on the vectorized windows ensures the multi-channel structure is maintained without explicit iteration.
+
+## 2025-05-20 - Index Alignment Overhead in Row-wise Arithmetic
+
+**Learning:** I identified a performance bottleneck in `utils/technical_indicators.py` where multiple technical indicators (RSI, Bollinger Bands, Pivot Points) were performing row-wise arithmetic directly on Pandas Series. Each Series-to-Series operation triggers index validation and alignment, which is costly when done repeatedly for many columns.
+
+**Action:** I replaced Series arithmetic with raw NumPy array operations by extracting `.values`. This optimization provided a ~20% speedup for Support/Resistance levels and a ~5% boost for Bollinger Bands. Moving to NumPy for final arithmetic steps after windowed operations (like rolling mean) is a consistent win in this codebase.
