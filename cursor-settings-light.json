@@ -1,0 +1,133 @@
+{
+  "workbench.colorTheme": "Default Light+",
+  "workbench.preferredLightColorTheme": "Default Light+",
+  "workbench.preferredDarkColorTheme": "Default Dark+",
+  "workbench.iconTheme": "vs-seti",
+  
+  "editor.background": "#FFFFFF",
+  "editor.foreground": "#000000",
+  "editor.lineHighlightBackground": "#F5F5F5",
+  "editor.selectionBackground": "#ADD6FF",
+  "editor.inactiveSelectionBackground": "#E5EBF1",
+  "editorCursor.foreground": "#000000",
+  "editorWhitespace.foreground": "#BFBFBF",
+  "editorIndentGuide.background": "#D3D3D3",
+  "editorIndentGuide.activeBackground": "#939393",
+  
+  "sideBar.background": "#F3F3F3",
+  "sideBar.foreground": "#000000",
+  "sideBarTitle.foreground": "#000000",
+  "sideBarSectionHeader.background": "#E8E8E8",
+  "sideBarSectionHeader.foreground": "#000000",
+  
+  "activityBar.background": "#2C2C2C",
+  "activityBar.foreground": "#FFFFFF",
+  "activityBar.inactiveForeground": "#8C8C8C",
+  "activityBarBadge.background": "#007ACC",
+  "activityBarBadge.foreground": "#FFFFFF",
+  
+  "statusBar.background": "#007ACC",
+  "statusBar.foreground": "#FFFFFF",
+  "statusBar.noFolderBackground": "#007ACC",
+  "statusBar.debuggingBackground": "#CC6633",
+  
+  "titleBar.activeBackground": "#DDDDDD",
+  "titleBar.activeForeground": "#000000",
+  "titleBar.inactiveBackground": "#E8E8E8",
+  "titleBar.inactiveForeground": "#6E6E6E",
+  
+  "panel.background": "#FFFFFF",
+  "panel.border": "#808080",
+  "panelTitle.activeForeground": "#000000",
+  "panelTitle.inactiveForeground": "#6E6E6E",
+  
+  "terminal.background": "#FFFFFF",
+  "terminal.foreground": "#000000",
+  "terminal.ansiBlack": "#000000",
+  "terminal.ansiRed": "#CD3131",
+  "terminal.ansiGreen": "#0DBC79",
+  "terminal.ansiYellow": "#E5E510",
+  "terminal.ansiBlue": "#2472C8",
+  "terminal.ansiMagenta": "#BC3FBC",
+  "terminal.ansiCyan": "#11A8CD",
+  "terminal.ansiWhite": "#E5E5E5",
+  
+  "gitDecoration.modifiedResourceForeground": "#0066BF",
+  "gitDecoration.deletedResourceForeground": "#C72E0E",
+  "gitDecoration.untrackedResourceForeground": "#007100",
+  "gitDecoration.ignoredResourceForeground": "#8C8C8C",
+  
+  "editorGroupHeader.tabsBackground": "#F3F3F3",
+  "tab.activeBackground": "#FFFFFF",
+  "tab.activeForeground": "#000000",
+  "tab.inactiveBackground": "#F3F3F3",
+  "tab.inactiveForeground": "#6E6E6E",
+  "tab.border": "#E8E8E8",
+  
+  "breadcrumb.foreground": "#6E6E6E",
+  "breadcrumb.focusForeground": "#000000",
+  "breadcrumb.activeSelectionForeground": "#000000",
+  "breadcrumbPicker.background": "#FFFFFF",
+  
+  "list.activeSelectionBackground": "#0060C0",
+  "list.activeSelectionForeground": "#FFFFFF",
+  "list.inactiveSelectionBackground": "#E5EBF1",
+  "list.hoverBackground": "#F0F0F0",
+  "list.focusBackground": "#E5EBF1",
+  
+  "input.background": "#FFFFFF",
+  "input.foreground": "#000000",
+  "input.border": "#CECECE",
+  "inputOption.activeBorder": "#007ACC",
+  
+  "dropdown.background": "#FFFFFF",
+  "dropdown.foreground": "#000000",
+  "dropdown.border": "#CECECE",
+  
+  "button.background": "#007ACC",
+  "button.foreground": "#FFFFFF",
+  "button.hoverBackground": "#005A9E",
+  
+  "scrollbar.shadow": "#00000022",
+  "scrollbarSlider.background": "#00000040",
+  "scrollbarSlider.hoverBackground": "#00000050",
+  "scrollbarSlider.activeBackground": "#00000060",
+  
+  "editor.fontSize": 14,
+  "editor.fontFamily": "'Cascadia Code', 'Consolas', 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "editor.lineHeight": 1.5,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.wordWrap": "on",
+  "editor.minimap.enabled": true,
+  "editor.smoothScrolling": true,
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorSmoothCaretAnimation": "on",
+  
+  "window.zoomLevel": 0,
+  "window.titleBarStyle": "custom",
+  
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/__pycache__": true
+  },
+  
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/.git": true
+  },
+  
+  "extensions.ignoreRecommendations": false
+}
+
+
+
+
+
+
