@@ -48,6 +48,7 @@ venv/
 ENV/
 env/
 .venv
+forexconnect_env_37/
 *.egg-info/
 
 # Node.js
