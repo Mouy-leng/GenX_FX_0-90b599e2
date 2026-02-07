@@ -4,7 +4,7 @@ Comprehensive technical analysis indicators for forex trading
 """
 
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -656,10 +656,6 @@ class TechnicalIndicators:
             dm_plus_vals = np.where((up > down) & (up > 0), up, 0)
             dm_minus_vals = np.where((down > up) & (down > 0), down, 0)
 
-            # Convert to Series for rolling calculations
-            dm_plus = pd.Series(dm_plus_vals, index=df.index)
-            dm_minus = pd.Series(dm_minus_vals, index=df.index)
-
             # Calculate smoothed averages
             if atr_series is not None:
                 atr_vals = atr_series.values
@@ -683,7 +679,9 @@ class TechnicalIndicators:
             # ⚡ Bolt Optimization: Vectorize final ADX steps using raw NumPy arithmetic
             # Bypassing Series arithmetic avoids index alignment overhead.
             dm_plus_rolling_valid = np.convolve(dm_plus_vals, kernel_adx, mode="valid")
-            dm_minus_rolling_valid = np.convolve(dm_minus_vals, kernel_adx, mode="valid")
+            dm_minus_rolling_valid = np.convolve(
+                dm_minus_vals, kernel_adx, mode="valid"
+            )
 
             dm_plus_rolling = np.full(len(df), np.nan)
             dm_minus_rolling = np.full(len(df), np.nan)
