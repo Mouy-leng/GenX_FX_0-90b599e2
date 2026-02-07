@@ -7,9 +7,9 @@ fastapi==0.104.1
 uvicorn[standard]==0.24.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
-cryptography==41.0.7
-aiohttp==3.9.1
-TA-Lib==0.4.28
+cryptography==43.0.1
+aiohttp==3.13.3
+TA-Lib==0.4.32
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
 redis==5.0.1
