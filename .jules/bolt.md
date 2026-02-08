@@ -75,3 +75,9 @@
 **Learning:** I discovered that legacy versions of machine learning libraries (like `scikit-learn==1.3.2`) fail to build from source on newer Python versions (like 3.13) when `numpy>=2.0` is present. The error `'int_t' is not a type identifier` occurs because NumPy 2.0 removed several deprecated type aliases used in older Cython files.
 
 **Action:** I pinned `numpy<2.0.0` in `requirements.txt` to ensure compatibility across all supported Python versions (3.11-3.13) and to maintain stable builds for the AI prediction pipeline. When working with older ML stacks on modern runtimes, pinning the major version of core numerical libraries is essential for CI stability.
+
+## 2026-02-14 - Scikit-Learn Upgrade for Python 3.13 and CI Speed
+
+**Learning:** Using legacy library versions (like `scikit-learn==1.3.2`) on modern Python runtimes (like 3.13) forces `pip` to build from source because pre-built wheels don't exist for that combination. This not only makes CI runs significantly slower but also risks build-time failures if the library's Cython files are incompatible with the latest version of build-time dependencies like NumPy.
+
+**Action:** I upgraded `scikit-learn` to `>=1.5.2` in `requirements.txt`. This allows `pip` to install pre-built wheels on all supported Python versions (3.11-3.13), resolving the CI build error and drastically reducing installation time. Favoring libraries with modern wheel support is a key performance strategy for CI/CD pipelines.
