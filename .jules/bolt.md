@@ -63,3 +63,9 @@
 **Learning:** I identified that while many technical indicators had been partially optimized, several still relied on Pandas-level `rolling().mean()` and `shift()` operations (ATR, Volume SMA, RSI smoothing, Stochastic D, and ADX). While Pandas is efficient, it still carries significant overhead for index alignment and validation compared to raw NumPy operations, especially when these operations are nested or called repeatedly.
 
 **Action:** I replaced all remaining simple rolling means and sums with `np.convolve` and replaced Pandas `shift()` with raw NumPy array slicing. This broad application of "dropping down" to NumPy across multiple indicators provided a cumulative ~28% speedup for the `add_all_indicators` method (reducing execution time from ~0.75s to ~0.54s for 100k rows), confirming that eliminating even minor Pandas overhead in hot code paths yields significant measurable gains.
+
+## 2026-02-14 - Redundant TA-Lib Calls and Inference Slicing
+
+**Learning:** I identified two major performance bottlenecks in `ai_models/feature_engineer.py`. First, multi-output indicators (MACD, BBANDS) were called three times each to extract individual components, tripling the C-level execution time. Second, the inference path (`engineer_features_for_prediction`) was calculating indicators and patterns for the entire historical dataset even though only the last window was required for model input.
+
+**Action:** I consolidated multi-output library calls to execute once and unpack results. I also implemented a "safe lookback" slicing logic (500 bars) in the prediction path, ensuring that indicators have sufficient history to converge while preventing performance degradation on large input datasets. Consistently reusing library results and slicing before heavy computation are critical patterns for high-frequency prediction pipelines.
