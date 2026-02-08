@@ -101,6 +101,7 @@ class TestFeatureEngineerOptimized(unittest.TestCase):
 
     def test_generate_labels_matching(self):
         """Test that optimized label generation matches original logic."""
+
         # Original logic implementation for comparison
         def original_labels(df, future_horizon=10, threshold=0.001):
             future_price = df["close"].shift(-future_horizon)
