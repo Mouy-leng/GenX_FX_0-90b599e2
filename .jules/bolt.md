@@ -69,3 +69,9 @@
 **Learning:** I identified two major performance bottlenecks in `ai_models/feature_engineer.py`. First, multi-output indicators (MACD, BBANDS) were called three times each to extract individual components, tripling the C-level execution time. Second, the inference path (`engineer_features_for_prediction`) was calculating indicators and patterns for the entire historical dataset even though only the last window was required for model input.
 
 **Action:** I consolidated multi-output library calls to execute once and unpack results. I also implemented a "safe lookback" slicing logic (500 bars) in the prediction path, ensuring that indicators have sufficient history to converge while preventing performance degradation on large input datasets. Consistently reusing library results and slicing before heavy computation are critical patterns for high-frequency prediction pipelines.
+
+## 2026-02-14 - NumPy 2.0 Compatibility with Legacy ML Libraries
+
+**Learning:** I discovered that legacy versions of machine learning libraries (like `scikit-learn==1.3.2`) fail to build from source on newer Python versions (like 3.13) when `numpy>=2.0` is present. The error `'int_t' is not a type identifier` occurs because NumPy 2.0 removed several deprecated type aliases used in older Cython files.
+
+**Action:** I pinned `numpy<2.0.0` in `requirements.txt` to ensure compatibility across all supported Python versions (3.11-3.13) and to maintain stable builds for the AI prediction pipeline. When working with older ML stacks on modern runtimes, pinning the major version of core numerical libraries is essential for CI stability.
