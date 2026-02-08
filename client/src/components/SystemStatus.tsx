@@ -17,7 +17,13 @@ interface SystemMetrics {
   accuracy: number;
 }
 
-const SystemStatus: React.FC = () => {
+/**
+ * SystemStatus component displays real-time health and performance metrics.
+ * ⚡ Bolt: Wrapped in React.memo to prevent unnecessary re-renders when the
+ * parent component (Home) updates, as this component manages its own state
+ * and doesn't rely on parent props.
+ */
+const SystemStatusComponent: React.FC = () => {
   const [status, setStatus] = useState<SystemStatusData | null>(null);
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -156,5 +162,7 @@ const SystemStatus: React.FC = () => {
     </div>
   );
 };
+
+const SystemStatus = React.memo(SystemStatusComponent);
 
 export default SystemStatus;

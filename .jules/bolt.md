@@ -91,3 +91,7 @@
 ## 2026-02-14 - TA-Lib Vectorization and Label Optimization
 **Learning:** I identified that passing Pandas Series to TA-Lib functions (especially candlestick patterns) triggers repeated index alignment and validation overhead. Extracting NumPy values once and passing them to 60+ pattern calls provides a massive speedup. Additionally, I found that `talib.SMA` is ~10x faster than `np.convolve` for moving averages, and NumPy-based slicing for labels is ~4x faster than `pd.Series.shift`.
 **Action:** Always extract `.values` before multiple TA-Lib calls in a loop. Prefer `talib.SMA` over manual convolution when the library is available. Use NumPy slicing for future-looking label generation to avoid Pandas overhead in training data preparation.
+
+## 2026-02-08 - Redis Caching for Static Constants
+**Learning:** I discovered that several static API endpoints (like `/` and `/mt5-info`) were using Redis to cache hardcoded dictionary constants. This is an anti-pattern because the overhead of a Redis network round-trip and JSON serialization/deserialization is significantly higher than simply returning the in-memory constant.
+**Action:** I removed the redundant Redis caching logic for static data and refactored the endpoints to return constants directly. In the future, I will only use Redis for dynamic data that is expensive to compute or retrieve from a primary database.
