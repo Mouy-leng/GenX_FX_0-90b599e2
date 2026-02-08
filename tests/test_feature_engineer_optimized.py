@@ -99,6 +99,30 @@ class TestFeatureEngineerOptimized(unittest.TestCase):
         res_chart = self.fe._create_chart_images(short_df, self.sequence_length)
         self.assertEqual(res_chart.shape, (0, self.sequence_length, 4))
 
+    def test_generate_labels_matching(self):
+        """Test that optimized label generation matches original logic."""
+
+        # Original logic implementation for comparison
+        def original_labels(df, future_horizon=10, threshold=0.001):
+            future_price = df["close"].shift(-future_horizon)
+            price_change = (future_price - df["close"]) / df["close"]
+            labels = np.ones(len(df), dtype=int)
+            labels[price_change > threshold] = 2
+            labels[price_change < -threshold] = 0
+            return labels
+
+        expected = original_labels(self.df)
+        actual = self.fe._generate_labels(self.df)
+
+        np.testing.assert_array_equal(actual, expected)
+
+    def test_calculate_technical_indicators_completeness(self):
+        """Test that technical indicators calculation returns correct shape."""
+        indicators = self.fe._calculate_technical_indicators(self.df)
+        # 4 price features + 5 SMAs + 13 TA-Lib features + 2 Stochastic + 2 Volume = 26
+        self.assertEqual(indicators.shape, (len(self.df), 26))
+        self.assertFalse(np.isnan(indicators[100:]).any())
+
 
 if __name__ == "__main__":
     unittest.main()

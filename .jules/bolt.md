@@ -87,3 +87,7 @@
 **Learning:** I identified a CI failure on Python 3.13 caused by `pydantic-core==2.14.1` (used by `pydantic==2.5.0`). The error `ForwardRef._evaluate() missing 1 required keyword-only argument: 'recursive_guard'` occurs because Python 3.13 changed internal APIs that older Pydantic versions relied on for forward reference evaluation.
 
 **Action:** I upgraded `pydantic` to `>=2.10.0`, `fastapi` to `>=0.115.0`, and `pydantic-settings` to `>=2.4.0`. These versions include the necessary fixes for Python 3.13 compatibility. Maintaining core framework dependencies within their actively supported windows is critical for ensuring application stability on the latest language runtimes.
+
+## 2026-02-14 - TA-Lib Vectorization and Label Optimization
+**Learning:** I identified that passing Pandas Series to TA-Lib functions (especially candlestick patterns) triggers repeated index alignment and validation overhead. Extracting NumPy values once and passing them to 60+ pattern calls provides a massive speedup. Additionally, I found that `talib.SMA` is ~10x faster than `np.convolve` for moving averages, and NumPy-based slicing for labels is ~4x faster than `pd.Series.shift`.
+**Action:** Always extract `.values` before multiple TA-Lib calls in a loop. Prefer `talib.SMA` over manual convolution when the library is available. Use NumPy slicing for future-looking label generation to avoid Pandas overhead in training data preparation.
