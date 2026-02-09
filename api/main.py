@@ -154,11 +154,10 @@ app.include_router(system.router, prefix="/api/v1")
 app.include_router(trading.router, prefix="/api/v1")
 
 
-# --- Optimization: Define static root response as a constant ---
-# To prevent the dictionary from being recreated on every call to the
-# root endpoint, we define it once as a module-level constant. This is a
-# micro-optimization that reduces a small amount of overhead for a
-# frequently accessed endpoint (e.g., by health checkers).
+# --- Optimization: Define static API responses as constants ---
+# To prevent dictionaries from being recreated on every call, and to bypass
+# redundant Redis caching for truly static data, we define these as constants.
+# This eliminates network round-trips and serialization overhead.
 ROOT_RESPONSE = {
     "message": "GenX-FX Trading Platform API",
     "version": "1.0.0",
@@ -166,6 +165,14 @@ ROOT_RESPONSE = {
     "docs": "/docs",
     "github": "Mouy-leng",
     "repository": "https://github.com/Mouy-leng/GenX_FX.git",
+}
+
+MT5_INFO_RESPONSE = {
+    "login": "411534497",
+    "server": "Exness-MT5Real8",
+    "status": "configured",
+    "account_type": "real",
+    "broker": "Exness",
 }
 
 # Add Trusted Host middleware
@@ -303,27 +310,9 @@ async def root():
     Returns:
         dict: A dictionary containing API information.
     """
-    # --- Performance: Use Redis cache if available ---
-    # This endpoint returns a static JSON response. Caching it reduces
-    # processing time for frequent requests, such as from health checkers.
-    redis_client = api.redis.redis_client
-
-    if redis_client:
-        try:
-            cached_root = await redis_client.get("root_cache")
-            if cached_root:
-                return json.loads(cached_root)
-        except Exception as e:
-            logging.error(f"Redis connection error: {e}. Performing live query.")
-
-    # --- Update Redis cache if available ---
-    if redis_client:
-        try:
-            # Cache for 1 minute (60 seconds)
-            await redis_client.setex("root_cache", 60, json.dumps(ROOT_RESPONSE))
-        except Exception as e:
-            logging.error(f"Could not write to Redis cache: {e}.")
-
+    # ⚡ Bolt Optimization: Directly return the constant.
+    # Using Redis for a small in-memory constant is an anti-pattern that
+    # adds unnecessary network latency and serialization overhead.
     return ROOT_RESPONSE
 
 
@@ -680,34 +669,10 @@ async def get_mt5_info():
     Returns:
         dict: A dictionary with MT5 login and server details.
     """
-    # --- Performance: Use Redis cache for static data ---
-    redis_client = api.redis.redis_client
-
-    if redis_client:
-        try:
-            cached_info = await redis_client.get("mt5_info_cache_v2")
-            if cached_info:
-                return json.loads(cached_info)
-        except Exception as e:
-            logging.error(f"Redis connection error: {e}. Serving live data.")
-
-    response = {
-        "login": "411534497",
-        "server": "Exness-MT5Real8",
-        "status": "configured",
-        "account_type": "real",
-        "broker": "Exness",
-    }
-
-    # --- Update Redis cache if available ---
-    if redis_client:
-        try:
-            # Cache for 1 hour (3600 seconds)
-            await redis_client.setex("mt5_info_cache_v2", 3600, json.dumps(response))
-        except Exception as e:
-            logging.error(f"Could not write to Redis cache: {e}.")
-
-    return response
+    # ⚡ Bolt Optimization: Directly return the constant.
+    # Using Redis for static, hardcoded data is less efficient than returning
+    # an in-memory dictionary constant.
+    return MT5_INFO_RESPONSE
 
 
 @app.get("/api/v1/monitor")
