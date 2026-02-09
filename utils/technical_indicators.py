@@ -141,12 +141,26 @@ class TechnicalIndicators:
 
             # Stochastic Oscillator & Williams %R (Optimized)
             if len(df) >= 14:
-                # Calculate rolling min/max once for both indicators
-                low_min_14 = df["low"].rolling(window=14).min()
-                high_max_14 = df["high"].rolling(window=14).max()
+                # ---
+                # ⚡ Bolt Optimization: Vectorized rolling min/max
+                # Replaces slow pd.Series.rolling().min/max() with sliding_window_view.
+                # ---
+                low_vals_14 = df["low"].values
+                high_vals_14 = df["high"].values
+
+                low_windows = np.lib.stride_tricks.sliding_window_view(low_vals_14, 14)
+                high_windows = np.lib.stride_tricks.sliding_window_view(high_vals_14, 14)
+
+                low_min_vals_valid = np.min(low_windows, axis=1)
+                high_max_vals_valid = np.max(high_windows, axis=1)
+
+                low_min_vals = np.full(len(df), np.nan)
+                high_max_vals = np.full(len(df), np.nan)
+
+                low_min_vals[14 - 1 :] = low_min_vals_valid
+                high_max_vals[14 - 1 :] = high_max_vals_valid
+
                 # ⚡ Bolt: Use .values for row-wise arithmetic to avoid series overhead
-                low_min_vals = low_min_14.values
-                high_max_vals = high_max_14.values
                 range_vals = high_max_vals - low_min_vals
 
                 # Stochastic Oscillator
@@ -230,11 +244,11 @@ class TechnicalIndicators:
             if len(df) >= 14:
                 # ⚡ Bolt Optimization: Fully vectorized ATR
                 # Using NumPy for shifting and convolution to bypass Pandas overhead.
-                high_vals = df["high"].values
-                low_vals = df["low"].values
-                close_vals = df["close"].values
+                high_vals = df["high"].values.astype(float)
+                low_vals = df["low"].values.astype(float)
+                close_vals = df["close"].values.astype(float)
 
-                prev_close = np.empty_like(close_vals)
+                prev_close = np.empty_like(close_vals, dtype=float)
                 prev_close[0] = np.nan
                 prev_close[1:] = close_vals[:-1]
 
@@ -256,21 +270,36 @@ class TechnicalIndicators:
             # Bollinger Bands (Optimized: Reuse pre-calculated indicators)
             if len(df) >= 20:
                 # Reuse SMA20 if it was already calculated in add_moving_averages
-                sma_20 = (
-                    df["sma_20"]
-                    if "sma_20" in df.columns
-                    else df["close"].rolling(window=20).mean()
-                )
-                # Calculate standard deviation once
-                std_20 = df["close"].rolling(window=20).std()
+                if "sma_20" in df.columns:
+                    sma_vals = df["sma_20"].values
+                else:
+                    # ⚡ Bolt Optimization: Vectorized SMA calculation
+                    close_vals_20 = df["close"].values
+                    kernel20 = np.ones(20) / 20
+                    sma_valid = np.convolve(close_vals_20, kernel20, mode="valid")
+                    sma_vals = np.full(len(df), np.nan)
+                    sma_vals[20 - 1 :] = sma_valid
+
+                # ---
+                # ⚡ Bolt Optimization: Vectorized rolling std
+                # Replaces slow pd.Series.rolling().std() with vectorized variance formula.
+                # ---
+                close_vals_20 = df["close"].values
+                kernel20 = np.ones(20)
+                s20 = np.convolve(close_vals_20, kernel20, mode="valid")
+                s2_20 = np.convolve(close_vals_20**2, kernel20, mode="valid")
+                var20 = (s2_20 - (s20**2 / 20)) / 19
+                std_20_vals = np.sqrt(np.maximum(var20, 0))
+
+                std_20 = np.full(len(df), np.nan)
+                std_20[20 - 1 :] = std_20_vals
 
                 # ---
                 # ⚡ Bolt Optimization: Use raw numpy values for band arithmetic
                 # Bypassing Series arithmetic significantly reduces overhead from
                 # index validation and alignment for these row-wise operations.
                 # ---
-                sma_vals = sma_20.values
-                std_vals = std_20.values
+                std_vals = std_20  # already a numpy array
                 close_vals = df["close"].values
 
                 upper = sma_vals + (2 * std_vals)
@@ -285,31 +314,54 @@ class TechnicalIndicators:
             else:
                 std_20 = None
 
-            # Volatility indicators (Optimized: Reuse std_20)
+            # Volatility indicators (Optimized: Reuse std_20 and vectorize others)
             periods = [10, 20, 50, 100]
             close_vals = df["close"].values
             for period in periods:
                 if len(df) >= period:
                     col_name = f"volatility_{period}"
                     if period == 20 and std_20 is not None:
-                        vol = std_20
+                        vol_vals = std_20
                     else:
-                        vol = df["close"].rolling(window=period).std()
+                        # ⚡ Bolt Optimization: Vectorized rolling std for all periods
+                        kernel = np.ones(period)
+                        s = np.convolve(close_vals, kernel, mode="valid")
+                        s2 = np.convolve(close_vals**2, kernel, mode="valid")
+                        var = (s2 - (s**2 / period)) / (period - 1)
+                        vol_vals = np.full(len(df), np.nan)
+                        vol_vals[period - 1 :] = np.sqrt(np.maximum(var, 0))
 
-                    df[col_name] = vol
-                    # ⚡ Bolt: Use .values for ratio calculation
-                    df[f"volatility_ratio_{period}"] = vol.values / close_vals
+                    df[col_name] = vol_vals
+                    # ⚡ Bolt: Use raw values for ratio calculation
+                    df[f"volatility_ratio_{period}"] = vol_vals / close_vals
 
             # Donchian Channels
             if len(df) >= 20:
-                d_upper = df["high"].rolling(window=20).max()
-                d_lower = df["low"].rolling(window=20).min()
-                df["donchian_upper"] = d_upper
-                df["donchian_lower"] = d_lower
+                # ---
+                # ⚡ Bolt Optimization: Vectorized rolling min/max for Donchian
+                # ---
+                high_vals_20 = df["high"].values
+                low_vals_20 = df["low"].values
+
+                high_windows_20 = np.lib.stride_tricks.sliding_window_view(
+                    high_vals_20, 20
+                )
+                low_windows_20 = np.lib.stride_tricks.sliding_window_view(
+                    low_vals_20, 20
+                )
+
+                d_upper_vals = np.full(len(df), np.nan)
+                d_lower_vals = np.full(len(df), np.nan)
+
+                d_upper_vals[20 - 1 :] = np.max(high_windows_20, axis=1)
+                d_lower_vals[20 - 1 :] = np.min(low_windows_20, axis=1)
+
+                df["donchian_upper"] = d_upper_vals
+                df["donchian_lower"] = d_lower_vals
 
                 # ⚡ Bolt: Use .values for row-wise arithmetic
-                upper_vals = d_upper.values
-                lower_vals = d_lower.values
+                upper_vals = d_upper_vals
+                lower_vals = d_lower_vals
                 range_vals = upper_vals - lower_vals
 
                 df["donchian_middle"] = (upper_vals + lower_vals) / 2
@@ -490,17 +542,28 @@ class TechnicalIndicators:
                 if len(df) >= period:
                     # Reuse Donchian channels for period 20 if available
                     if period == 20 and "donchian_upper" in df.columns:
-                        high_max = df["donchian_upper"]
-                        low_min = df["donchian_lower"]
+                        high_max_vals = df["donchian_upper"].values
+                        low_min_vals = df["donchian_lower"].values
                     else:
-                        high_max = df["high"].rolling(window=period).max()
-                        low_min = df["low"].rolling(window=period).min()
+                        # ⚡ Bolt Optimization: Vectorized rolling min/max
+                        h_vals = df["high"].values
+                        l_vals = df["low"].values
+                        h_windows = np.lib.stride_tricks.sliding_window_view(
+                            h_vals, period
+                        )
+                        l_windows = np.lib.stride_tricks.sliding_window_view(
+                            l_vals, period
+                        )
+
+                        high_max_vals = np.full(len(df), np.nan)
+                        low_min_vals = np.full(len(df), np.nan)
+
+                        high_max_vals[period - 1 :] = np.max(h_windows, axis=1)
+                        low_min_vals[period - 1 :] = np.min(l_windows, axis=1)
 
                     # ---
                     # ⚡ Bolt Optimization: Use raw numpy values for position arithmetic
                     # ---
-                    high_max_vals = high_max.values
-                    low_min_vals = low_min.values
                     close_vals = df["close"].values
                     range_val = high_max_vals - low_min_vals
 
@@ -637,15 +700,15 @@ class TechnicalIndicators:
             # ---
 
             # Calculate Directional Movement
-            high_vals = df["high"].values
-            low_vals = df["low"].values
+            high_vals = df["high"].values.astype(float)
+            low_vals = df["low"].values.astype(float)
 
             # ⚡ Bolt Optimization: Use NumPy for shifting to avoid Series overhead (~3.5x faster)
-            prev_high_vals = np.empty_like(high_vals)
+            prev_high_vals = np.empty_like(high_vals, dtype=float)
             prev_high_vals[0] = np.nan
             prev_high_vals[1:] = high_vals[:-1]
 
-            prev_low_vals = np.empty_like(low_vals)
+            prev_low_vals = np.empty_like(low_vals, dtype=float)
             prev_low_vals[0] = np.nan
             prev_low_vals[1:] = low_vals[:-1]
 
@@ -657,6 +720,7 @@ class TechnicalIndicators:
             dm_minus_vals = np.where((down > up) & (down > 0), down, 0)
 
             # Calculate smoothed averages
+            kernel_adx = np.ones(period) / period
             if atr_series is not None:
                 atr_vals = atr_series.values
             else:
@@ -671,7 +735,6 @@ class TechnicalIndicators:
                 tr = np.maximum(tr1, np.maximum(tr2, tr3))
 
                 # ⚡ Bolt Optimization: Use np.convolve for TR smoothing
-                kernel_adx = np.ones(period) / period
                 atr_vals_valid = np.convolve(tr, kernel_adx, mode="valid")
                 atr_vals = np.full(len(df), np.nan)
                 atr_vals[period - 1 :] = atr_vals_valid
