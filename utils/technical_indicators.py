@@ -149,7 +149,9 @@ class TechnicalIndicators:
                 high_vals_14 = df["high"].values
 
                 low_windows = np.lib.stride_tricks.sliding_window_view(low_vals_14, 14)
-                high_windows = np.lib.stride_tricks.sliding_window_view(high_vals_14, 14)
+                high_windows = np.lib.stride_tricks.sliding_window_view(
+                    high_vals_14, 14
+                )
 
                 low_min_vals_valid = np.min(low_windows, axis=1)
                 high_max_vals_valid = np.max(high_windows, axis=1)
