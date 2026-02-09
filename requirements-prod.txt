@@ -9,7 +9,7 @@ xgboost==3.0.3
 lightgbm==4.6.0
 
 # Technical Analysis and Financial Data
-ta-lib==0.6.5
+ta-lib==0.6.8
 yfinance==0.2.65
 
 # Essential Libraries
