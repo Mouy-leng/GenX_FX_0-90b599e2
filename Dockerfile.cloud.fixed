@@ -1,7 +1,7 @@
 # Cloud Build Optimized Dockerfile for GenX Trading Platform
 # This version includes all necessary build tools and uses wheels
 
-FROM python:3.9-slim
+FROM python:3.14-slim
 
 # Set working directory
 WORKDIR /app
