@@ -1,5 +1,10 @@
 # 🚀 GenX FX Trading Platform
 
+## 📓 Knowledge Base
+- **NotebookLM**: [Access here](https://notebooklm.google.com/notebook/e8f4c29d-9aec-4d5f-8f51-2ca168687616)
+- **Note**: This notebook is available for reading and writing. AI agents must read it before starting work.
+
+
 **An advanced, AI-powered platform for Forex, Cryptocurrency, and Gold trading.**
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
