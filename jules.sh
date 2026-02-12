@@ -4,7 +4,7 @@ set -euo pipefail
 # === CONFIG ===
 # These variables are used throughout the script.
 # Some, like DUCKDNS_TOKEN, should be handled securely (e.g., as environment variables).
-DOMAIN="remote.genxfx.org"
+DOMAIN="genxfx.org"
 DUCKDNS_DOMAIN="your-duckdns-subdomain.duckdns.org" # Default, can be overridden
 DEVICE_IP="10.62.78.114"
 BUILD_NUMBER="LI9-15.1.2.145SP08(OP001PF001AZ)"
