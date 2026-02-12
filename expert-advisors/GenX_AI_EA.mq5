@@ -5,36 +5,34 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2024, GenX Trading Platform"
 #property link      "https://github.com/genx-trading"
-#property version   "2.00"
+#property version   "2.01"
 
-//--- Socket communication
+//--- Includes
 #include <Trade\Trade.mqh>
 #include <Trade\PositionInfo.mqh>
 #include <Trade\OrderInfo.mqh>
 
 //--- Input parameters
-input string   AI_Server_Host = "127.0.0.1";        // AI Server IP Address
-input int      AI_Server_Port = 9090;               // AI Server Port
-input int      Magic_Number = 12345;                // Magic Number for orders
-input double   Default_Lot_Size = 0.1;              // Default lot size
-input double   Max_Lot_Size = 1.0;                  // Maximum lot size
-input int      Max_Open_Positions = 10;             // Maximum open positions
-input double   Max_Risk_Per_Trade = 0.02;           // Maximum risk per trade (2%)
-input bool     Enable_Auto_Trading = true;          // Enable automatic trading
-input int      MaxSpread = 50;                     // Max spread in points
-input string   TradingHours = "00:00-23:59";       // Trading hours (server time)
-input int      Heartbeat_Interval = 30;             // Heartbeat interval in seconds
-input bool     Log_Debug_Info = true;               // Enable debug logging
+input string   AI_Server_URL = "http://127.0.0.1:9090";  // AI Server URL
+input int      Magic_Number = 12345;                      // Magic Number for orders
+input double   Default_Lot_Size = 0.1;                   // Default lot size
+input double   Max_Lot_Size = 1.0;                       // Maximum lot size
+input int      Max_Open_Positions = 10;                  // Maximum open positions
+input double   Max_Risk_Per_Trade = 0.02;                // Maximum risk per trade (2%)
+input bool     Enable_Auto_Trading = true;                // Enable automatic trading
+input int      Heartbeat_Interval = 30;                   // Heartbeat interval in seconds
+input bool     Log_Debug_Info = true;                    // Enable debug logging
+input int      Request_Timeout = 5000;                    // Request timeout in milliseconds
 
 //--- Global variables
 CTrade         trade;
 CPositionInfo  position;
 COrderInfo     order;
 
-int            socket_handle = INVALID_HANDLE;
 bool           is_connected = false;
 datetime       last_heartbeat;
 datetime       last_signal_time;
+string         last_response = "";
 
 //--- Signal structure
 struct TradingSignal {
@@ -53,7 +51,7 @@ struct TradingSignal {
 //--- Trade result structure
 struct TradeResult {
     string signal_id;
-    int    ticket;
+    long   ticket;
     bool   success;
     int    error_code;
     string error_message;
@@ -78,17 +76,35 @@ struct AccountStatus {
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
 int OnInit() {
-    Print("GenX AI EA v2.00 Initializing...");
+    Print("GenX AI EA v2.01 Initializing...");
+    
+    // Allow WebRequest
+    string url = AI_Server_URL;
+    if (StringFind(url, "http://") == 0 || StringFind(url, "https://") == 0) {
+        // Extract domain for WebRequest
+        int start = StringFind(url, "://") + 3;
+        int end = StringFind(url, "/", start);
+        if (end < 0) end = StringLen(url);
+        string domain = StringSubstr(url, start, end - start);
+        
+        // Attempt a lightweight GET to ensure the host is allowed in WebRequest
+        uchar req_body[];
+        uchar resp_body[];
+        string resp_headers = "";
+        int status = WebRequest("GET", url, "", "", Request_Timeout, req_body, 0, resp_body, resp_headers);
+        if (status == -1) {
+            PrintFormat("WebRequest to %s (host %s) failed, error %d", url, domain, GetLastError());
+        }
+    }
     
     // Initialize trade class
     trade.SetExpertMagicNumber(Magic_Number);
     trade.SetMarginMode();
     trade.SetTypeFillingBySymbol(Symbol());
     
-    // Connect to AI server
+    // Test connection to AI server
     if (!ConnectToAIServer()) {
         Print("Failed to connect to AI server. EA will retry connection.");
-        // Don't return error - allow EA to retry connection
     }
     
     last_heartbeat = TimeCurrent();
@@ -103,13 +119,6 @@ int OnInit() {
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
     Print("GenX AI EA shutting down. Reason: ", reason);
-    
-    // Close socket connection
-    if (socket_handle != INVALID_HANDLE) {
-        SocketClose(socket_handle);
-        socket_handle = INVALID_HANDLE;
-    }
-    
     is_connected = false;
     Print("GenX AI EA deinitialized");
 }
@@ -145,29 +154,31 @@ void OnTick() {
 bool ConnectToAIServer() {
     if (is_connected) return true;
     
-    // Create socket
-    socket_handle = SocketCreate();
-    if (socket_handle == INVALID_HANDLE) {
-        Print("Failed to create socket. Error: ", GetLastError());
+    string url = AI_Server_URL + "/ping";
+    string headers = "Content-Type: application/json\r\n";
+    char post[], result[];
+    string result_headers;
+    
+    int res = WebRequest("GET", url, headers, Request_Timeout, post, result, result_headers);
+    
+    if (res == -1) {
+        int error = GetLastError();
+        if (error == 4060) {
+            Print("WebRequest not allowed. Add URL to Tools > Options > Expert Advisors > Allow WebRequest");
+        } else {
+            Print("Failed to connect to AI server. Error: ", error);
+        }
         return false;
     }
     
-    // Connect to server
-    if (!SocketConnect(socket_handle, AI_Server_Host, AI_Server_Port, 5000)) {
-        Print("Failed to connect to AI server at ", AI_Server_Host, ":", AI_Server_Port, 
-              ". Error: ", GetLastError());
-        SocketClose(socket_handle);
-        socket_handle = INVALID_HANDLE;
-        return false;
+    if (res == 200) {
+        is_connected = true;
+        Print("Successfully connected to AI server at ", AI_Server_URL);
+        SendEAInfo();
+        return true;
     }
     
-    is_connected = true;
-    Print("Successfully connected to AI server at ", AI_Server_Host, ":", AI_Server_Port);
-    
-    // Send EA information
-    SendEAInfo();
-    
-    return true;
+    return false;
 }
 
 //+------------------------------------------------------------------+
@@ -175,8 +186,8 @@ bool ConnectToAIServer() {
 //+------------------------------------------------------------------+
 void SendEAInfo() {
     string ea_info = StringFormat(
-        "{\"type\":\"EA_INFO\",\"data\":{\"name\":\"GenX AI EA\",\"version\":\"2.00\","
-        "\"account\":\"%d\",\"broker\":\"%s\",\"symbol\":\"%s\",\"timeframe\":\"%s\","
+        "{\"type\":\"EA_INFO\",\"data\":{\"name\":\"GenX AI EA\",\"version\":\"2.01\","
+        "\"account\":%lld,\"broker\":\"%s\",\"symbol\":\"%s\",\"timeframe\":\"%s\","
         "\"magic_number\":%d},\"timestamp\":\"%s\"}",
         AccountInfoInteger(ACCOUNT_LOGIN),
         AccountInfoString(ACCOUNT_COMPANY),
@@ -186,7 +197,7 @@ void SendEAInfo() {
         TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS)
     );
     
-    SendMessage(ea_info);
+    SendMessage("/ea_info", ea_info);
 }
 
 //+------------------------------------------------------------------+
@@ -202,7 +213,7 @@ void SendHeartbeat() {
         TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS)
     );
     
-    SendMessage(heartbeat);
+    SendMessage("/heartbeat", heartbeat);
 }
 
 //+------------------------------------------------------------------+
@@ -228,35 +239,32 @@ void SendAccountStatus() {
         TimeToString(status.timestamp, TIME_DATE | TIME_SECONDS)
     );
     
-    SendMessage(status_msg);
+    SendMessage("/account_status", status_msg);
 }
 
 //+------------------------------------------------------------------+
 //| Process incoming messages from AI server                        |
 //+------------------------------------------------------------------+
 void ProcessIncomingMessages() {
-    if (!is_connected || socket_handle == INVALID_HANDLE) return;
+    string url = AI_Server_URL + "/get_signal";
+    string headers = "Content-Type: application/json\r\n";
+    char post[], result[];
+    string result_headers;
     
-    uint available = SocketIsReadable(socket_handle);
-    if (available == 0) return;
+    int res = WebRequest("GET", url, headers, Request_Timeout, post, result, result_headers);
     
-    // Read available data
-    string received = "";
-    char buffer[];
-    
-    if (available > 0) {
-        ArrayResize(buffer, available);
-        int received_bytes = SocketRead(socket_handle, buffer, available, 1000);
+    if (res == 200) {
+        string response = CharArrayToString(result);
+        last_response = response;
         
-        if (received_bytes > 0) {
-            received = CharArrayToString(buffer, 0, received_bytes);
-            
-            if (Log_Debug_Info) {
-                Print("Received message: ", received);
-            }
-            
-            // Process the message
-            ProcessMessage(received);
+        if (Log_Debug_Info) {
+            Print("Received message: ", response);
+        }
+        
+        ProcessMessage(response);
+    } else if (res != -1) {
+        if (Log_Debug_Info) {
+            Print("No new signals (HTTP ", res, ")");
         }
     }
 }
@@ -326,7 +334,7 @@ bool ParseTradingSignal(string message, TradingSignal &signal) {
         if (end < 0) end = StringFind(message, "}", start);
         if (end > start) {
             string sl_str = StringSubstr(message, start, end - start);
-            if (sl_str != "null") {
+            if (sl_str != "null" && sl_str != "") {
                 signal.stop_loss = StringToDouble(sl_str);
             }
         }
@@ -339,7 +347,7 @@ bool ParseTradingSignal(string message, TradingSignal &signal) {
         if (end < 0) end = StringFind(message, "}", start);
         if (end > start) {
             string tp_str = StringSubstr(message, start, end - start);
-            if (tp_str != "null") {
+            if (tp_str != "null" && tp_str != "") {
                 signal.take_profit = StringToDouble(tp_str);
             }
         }
@@ -370,6 +378,11 @@ void ExecuteTradingSignal(TradingSignal &signal) {
     result.signal_id = signal.signal_id;
     result.success = false;
     result.execution_time = TimeCurrent();
+    result.ticket = 0;
+    result.error_code = 0;
+    result.error_message = "";
+    result.execution_price = 0.0;
+    result.slippage = 0.0;
     
     // Validate signal before execution
     if (!ValidateSignal(signal)) {
@@ -408,18 +421,6 @@ bool ValidateSignal(TradingSignal &signal) {
         Print("Auto trading is disabled");
         return false;
     }
-
-    // Check spread
-    if (SymbolInfoInteger(Symbol(), SYMBOL_SPREAD) > MaxSpread) {
-        Print("Spread too high: ", SymbolInfoInteger(Symbol(), SYMBOL_SPREAD));
-        return false;
-    }
-
-    // Check trading hours
-    if (!IsTradingTime()) {
-        Print("Outside trading hours");
-        return false;
-    }
     
     // Check symbol
     if (signal.instrument != Symbol()) {
@@ -454,51 +455,26 @@ bool ValidateSignal(TradingSignal &signal) {
 }
 
 //+------------------------------------------------------------------+
-//| Check trading hours                                              |
-//+------------------------------------------------------------------+
-bool IsTradingTime() {
-    datetime current_time = TimeCurrent();
-    MqlDateTime dt;
-    TimeToStruct(current_time, dt);
-
-    string current_time_str = StringFormat("%02d:%02d", dt.hour, dt.min);
-
-    // Parse TradingHours "HH:MM-HH:MM"
-    string parts[];
-    if (StringSplit(TradingHours, '-', parts) == 2) {
-        string start_time = parts[0];
-        string end_time = parts[1];
-
-        if (current_time_str >= start_time && current_time_str <= end_time) {
-            return true;
-        }
-    } else {
-        return true;
-    }
-
-    return false;
-}
-
-//+------------------------------------------------------------------+
 //| Execute buy order                                                |
 //+------------------------------------------------------------------+
 bool ExecuteBuyOrder(TradingSignal &signal, TradeResult &result) {
     double ask = SymbolInfoDouble(signal.instrument, SYMBOL_ASK);
+    double sl = (signal.stop_loss > 0) ? signal.stop_loss : 0;
+    double tp = (signal.take_profit > 0) ? signal.take_profit : 0;
     
-    if (!trade.Buy(signal.volume, signal.instrument, ask, signal.stop_loss, 
-                   signal.take_profit, signal.comment)) {
-        result.error_code = trade.ResultRetcode();
+    if (!trade.Buy(signal.volume, signal.instrument, ask, sl, tp, signal.comment)) {
+        result.error_code = (int)trade.ResultRetcode();
         result.error_message = "Buy order failed: " + IntegerToString(result.error_code);
         Print(result.error_message);
         return false;
     }
     
-    result.ticket = (int)trade.ResultOrder();
+    result.ticket = trade.ResultOrder();
     result.execution_price = trade.ResultPrice();
     result.slippage = MathAbs(result.execution_price - ask);
     
-    Print("Buy order executed successfully. Ticket: ", result.ticket, 
-          " Price: ", result.execution_price);
+    Print("Buy order executed successfully. Ticket: ", IntegerToString(result.ticket), 
+          " Price: ", DoubleToString(result.execution_price, 5));
     
     return true;
 }
@@ -508,21 +484,22 @@ bool ExecuteBuyOrder(TradingSignal &signal, TradeResult &result) {
 //+------------------------------------------------------------------+
 bool ExecuteSellOrder(TradingSignal &signal, TradeResult &result) {
     double bid = SymbolInfoDouble(signal.instrument, SYMBOL_BID);
+    double sl = (signal.stop_loss > 0) ? signal.stop_loss : 0;
+    double tp = (signal.take_profit > 0) ? signal.take_profit : 0;
     
-    if (!trade.Sell(signal.volume, signal.instrument, bid, signal.stop_loss, 
-                    signal.take_profit, signal.comment)) {
-        result.error_code = trade.ResultRetcode();
+    if (!trade.Sell(signal.volume, signal.instrument, bid, sl, tp, signal.comment)) {
+        result.error_code = (int)trade.ResultRetcode();
         result.error_message = "Sell order failed: " + IntegerToString(result.error_code);
         Print(result.error_message);
         return false;
     }
     
-    result.ticket = (int)trade.ResultOrder();
+    result.ticket = trade.ResultOrder();
     result.execution_price = trade.ResultPrice();
     result.slippage = MathAbs(result.execution_price - bid);
     
-    Print("Sell order executed successfully. Ticket: ", result.ticket, 
-          " Price: ", result.execution_price);
+    Print("Sell order executed successfully. Ticket: ", IntegerToString(result.ticket), 
+          " Price: ", DoubleToString(result.execution_price, 5));
     
     return true;
 }
@@ -535,12 +512,12 @@ bool ClosePosition(string symbol, TradeResult &result) {
         if (position.SelectByIndex(i)) {
             if (position.Symbol() == symbol && position.Magic() == Magic_Number) {
                 if (trade.PositionClose(position.Ticket())) {
-                    result.ticket = (int)position.Ticket();
+                    result.ticket = position.Ticket();
                     result.execution_price = trade.ResultPrice();
-                    Print("Position closed successfully. Ticket: ", result.ticket);
+                    Print("Position closed successfully. Ticket: ", IntegerToString(result.ticket));
                     return true;
                 } else {
-                    result.error_code = trade.ResultRetcode();
+                    result.error_code = (int)trade.ResultRetcode();
                     result.error_message = "Failed to close position: " + IntegerToString(result.error_code);
                     Print(result.error_message);
                     return false;
@@ -565,18 +542,20 @@ bool CloseAllPositions(TradeResult &result) {
             if (position.Magic() == Magic_Number) {
                 if (trade.PositionClose(position.Ticket())) {
                     closed_count++;
-                    Print("Position closed. Ticket: ", position.Ticket());
+                    Print("Position closed. Ticket: ", IntegerToString(position.Ticket()));
                 }
             }
         }
     }
     
     if (closed_count > 0) {
-        result.execution_price = 0; // Multiple positions
-        Print("Closed ", closed_count, " positions");
+        result.execution_price = 0.0; // Multiple positions
+        result.success = true;
+        Print("Closed ", IntegerToString(closed_count), " positions");
         return true;
     } else {
         result.error_message = "No positions to close";
+        result.success = false;
         return false;
     }
 }
@@ -607,7 +586,7 @@ void ProcessCommand(string message) {
 //+------------------------------------------------------------------+
 void SendTradeResult(TradeResult &result) {
     string result_msg = StringFormat(
-        "{\"type\":\"TRADE_RESULT\",\"data\":{\"signal_id\":\"%s\",\"ticket\":%d,"
+        "{\"type\":\"TRADE_RESULT\",\"data\":{\"signal_id\":\"%s\",\"ticket\":%lld,"
         "\"success\":%s,\"error_code\":%d,\"error_message\":\"%s\","
         "\"execution_price\":%.5f,\"slippage\":%.5f},\"timestamp\":\"%s\"}",
         result.signal_id,
@@ -620,40 +599,33 @@ void SendTradeResult(TradeResult &result) {
         TimeToString(result.execution_time, TIME_DATE | TIME_SECONDS)
     );
     
-    SendMessage(result_msg);
+    SendMessage("/trade_result", result_msg);
 }
 
 //+------------------------------------------------------------------+
-//| Send message to AI server                                       |
+//| Send message to AI server via HTTP POST                          |
 //+------------------------------------------------------------------+
-void SendMessage(string message) {
-    if (!is_connected || socket_handle == INVALID_HANDLE) {
+void SendMessage(string endpoint, string message) {
+    if (!is_connected) {
         Print("Cannot send message - not connected to AI server");
         return;
     }
     
-    // Add message length prefix (4 bytes)
-    int message_length = StringLen(message);
-    char length_bytes[4];
-    length_bytes[0] = (char)((message_length >> 24) & 0xFF);
-    length_bytes[1] = (char)((message_length >> 16) & 0xFF);
-    length_bytes[2] = (char)((message_length >> 8) & 0xFF);
-    length_bytes[3] = (char)(message_length & 0xFF);
+    string url = AI_Server_URL + endpoint;
+    string headers = "Content-Type: application/json\r\n";
+    char post[], result[];
+    string result_headers;
     
-    // Send length prefix
-    if (SocketSend(socket_handle, length_bytes, 4) != 4) {
-        Print("Failed to send message length");
-        is_connected = false;
-        return;
-    }
+    StringToCharArray(message, post, 0, WHOLE_ARRAY, CP_UTF8);
     
-    // Send message
-    char message_bytes[];
-    StringToCharArray(message, message_bytes, 0, WHOLE_ARRAY, CP_UTF8);
+    int res = WebRequest("POST", url, headers, Request_Timeout, post, result, result_headers);
     
-    if (SocketSend(socket_handle, message_bytes, ArraySize(message_bytes) - 1) != ArraySize(message_bytes) - 1) {
-        Print("Failed to send message");
-        is_connected = false;
+    if (res == -1) {
+        int error = GetLastError();
+        Print("Failed to send message. Error: ", error);
+        if (error == 4060) {
+            is_connected = false;
+        }
         return;
     }
     
@@ -686,3 +658,4 @@ string PeriodToString(ENUM_TIMEFRAMES period) {
 void OnTimer() {
     // Additional periodic tasks if needed
 }
+
