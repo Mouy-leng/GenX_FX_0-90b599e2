@@ -213,6 +213,11 @@ awscliv2.zip
 *.pem
 *.ppk
 deploy_keys/
+lengkundee01.key
+new_key
+new_key.pub
+amp-trading-key
+amp-trading-key.pub
 
 # MacOS
 .DS_Store
