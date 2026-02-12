@@ -131,7 +131,7 @@ import { Sandbox } from "@vercel/sandbox";
 async function trainModel() {
   const sandbox = await Sandbox.create({
     source: {
-      url: "https://github.com/A6-9V/A6..9V-GenX_FX.main.git",
+      url: "https://github.com/A6-9V/GenX_FX.git",
       type: "git",
     },
     runtime: "python3.13",
