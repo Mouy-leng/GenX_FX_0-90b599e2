@@ -73,14 +73,14 @@ async def validate_ea_api_key(api_key: Optional[str] = Security(api_key_header))
     
     # Validate the provided key
     if api_key not in valid_keys:
-        logger.warning(f"Invalid EA API key attempt: {api_key[:10]}...")
+        logger.warning(f"Invalid EA API key attempt (length: {len(api_key)})")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid API key",
             headers={"WWW-Authenticate": "ApiKey"},
         )
     
-    logger.debug(f"EA API key validated successfully: {api_key[:10]}...")
+    logger.debug("EA API key validated successfully")
     return api_key
 
 
@@ -110,12 +110,12 @@ async def validate_ea_api_key_optional(
         return None
     
     if api_key not in valid_keys:
-        logger.warning(f"Invalid EA API key attempt: {api_key[:10]}...")
+        logger.warning(f"Invalid EA API key attempt (length: {len(api_key)})")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid API key",
             headers={"WWW-Authenticate": "ApiKey"},
         )
     
-    logger.debug(f"EA API key validated successfully: {api_key[:10]}...")
+    logger.debug("EA API key validated successfully")
     return api_key
