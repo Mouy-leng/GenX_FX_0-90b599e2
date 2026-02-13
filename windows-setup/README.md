@@ -91,6 +91,7 @@ Detailed documentation is available in the `docs/` directory:
 - [Security Guide](docs/security-guide.md) - Security best practices and hardening
 - [Profile Setup](docs/profile-setup.md) - User profile configuration
 - [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
+- [GenX FX Scripts Integration](docs/genx-fx-scripts-integration.md) - Integration with OneNote scripts
 
 ## Integration with GenZ Trading Platform
 
@@ -114,6 +115,7 @@ When adding new Windows configurations:
 - [Windows Scripts](../scripts/windows/)
 - [Deployment Guide](../DEPLOYMENT_SETUP_INSTRUCTIONS.md)
 - [Quick Start Guide](../QUICK-START.md)
+- [OneNote: GenX FX Scripts](https://onedrive.live.com/view.aspx?resid=C2A387A2E5F8E82F%21s46a641de030b454da4f3527bf2985073) - Script documentation and examples
 
 ## Support
 
