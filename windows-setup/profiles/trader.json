@@ -1,0 +1,139 @@
+{
+  "profileName": "Trader Profile",
+  "profileType": "trading",
+  "version": "1.0.0",
+  "description": "Configuration profile for trading operations with GenZ Trading Platform",
+  "applications": {
+    "required": [
+      {
+        "name": "MetaTrader 4",
+        "path": "C:\\Program Files\\MetaTrader 4\\terminal.exe",
+        "autoStart": false
+      },
+      {
+        "name": "MetaTrader 5",
+        "path": "C:\\Program Files\\MetaTrader 5\\terminal64.exe",
+        "autoStart": false
+      }
+    ],
+    "optional": [
+      {
+        "name": "Docker Desktop",
+        "path": "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe",
+        "autoStart": true
+      }
+    ]
+  },
+  "services": {
+    "docker": [
+      "trading-bridge",
+      "postgresql",
+      "redis",
+      "influxdb",
+      "grafana"
+    ],
+    "windows": []
+  },
+  "environmentVariables": {
+    "TRADING_MODE": "LIVE",
+    "BROKER_API_URL": "https://api.broker.com",
+    "LOG_LEVEL": "INFO",
+    "MT4_PATH": "C:\\Program Files\\MetaTrader 4",
+    "MT5_PATH": "C:\\Program Files\\MetaTrader 5",
+    "TRADING_LOGS": "D:\\Dropbox (Personal)\\logs",
+    "SIGNAL_OUTPUT": "D:\\Dropbox (Personal)\\signal_output"
+  },
+  "firewallRules": [
+    {
+      "name": "MetaTrader 4",
+      "protocol": "TCP",
+      "ports": [443],
+      "direction": "Inbound",
+      "action": "Allow"
+    },
+    {
+      "name": "MetaTrader 5",
+      "protocol": "TCP",
+      "ports": [443, 8080],
+      "direction": "Inbound",
+      "action": "Allow"
+    },
+    {
+      "name": "Trading Bridge API",
+      "protocol": "TCP",
+      "ports": [8000],
+      "direction": "Inbound",
+      "action": "Allow"
+    },
+    {
+      "name": "Trading Bridge Port",
+      "protocol": "TCP",
+      "ports": [5555],
+      "direction": "Inbound",
+      "action": "Allow"
+    }
+  ],
+  "directories": {
+    "mt4Data": "C:\\Users\\%USERNAME%\\AppData\\Roaming\\MetaQuotes\\Terminal",
+    "mt5Data": "C:\\Program Files\\MetaTrader 5\\MQL5",
+    "expertAdvisors": "D:\\Dropbox (Personal)\\expert-advisors",
+    "logs": "D:\\Dropbox (Personal)\\logs",
+    "signalOutput": "D:\\Dropbox (Personal)\\signal_output",
+    "backups": "D:\\Backups\\Trading"
+  },
+  "scheduledTasks": [
+    {
+      "name": "DailyTradingBackup",
+      "script": "D:\\Dropbox (Personal)\\scripts\\windows\\backup_to_usb.bat",
+      "trigger": "Daily",
+      "time": "02:00",
+      "enabled": true
+    },
+    {
+      "name": "SystemMonitoring",
+      "script": "D:\\Dropbox (Personal)\\scripts\\monitoring\\system-monitor.ps1",
+      "trigger": "Repeating",
+      "interval": "15m",
+      "enabled": true
+    }
+  ],
+  "securitySettings": {
+    "windowsDefender": {
+      "realtimeProtection": true,
+      "exclusions": [
+        "C:\\Program Files\\MetaTrader 4",
+        "C:\\Program Files\\MetaTrader 5",
+        "C:\\Users\\%USERNAME%\\AppData\\Roaming\\MetaQuotes",
+        "D:\\Dropbox (Personal)"
+      ]
+    },
+    "controlledFolderAccess": {
+      "enabled": true,
+      "protectedFolders": [
+        "D:\\Dropbox (Personal)",
+        "C:\\Trading"
+      ],
+      "allowedApplications": [
+        "C:\\Program Files\\MetaTrader 4\\terminal.exe",
+        "C:\\Program Files\\MetaTrader 5\\terminal64.exe"
+      ]
+    }
+  },
+  "monitoringEndpoints": [
+    {
+      "name": "Trading Bridge Health",
+      "url": "http://localhost:8000/health",
+      "interval": "60s"
+    },
+    {
+      "name": "Trading Signals API",
+      "url": "http://localhost:8000/api/signals",
+      "interval": "300s"
+    },
+    {
+      "name": "Grafana Dashboard",
+      "url": "http://localhost:3000",
+      "interval": "300s"
+    }
+  ]
+}

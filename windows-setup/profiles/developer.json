@@ -1,0 +1,100 @@
+{
+  "profileName": "Developer Profile",
+  "profileType": "development",
+  "version": "1.0.0",
+  "description": "Configuration profile for software development with GenZ Trading Platform",
+  "tools": {
+    "required": [
+      {
+        "name": "Git",
+        "version": ">=2.40.0",
+        "installCommand": "winget install Git.Git"
+      },
+      {
+        "name": "Node.js",
+        "version": ">=18.0.0",
+        "installCommand": "winget install OpenJS.NodeJS.LTS"
+      },
+      {
+        "name": "Python",
+        "version": ">=3.11.0",
+        "installCommand": "winget install Python.Python.3.11"
+      },
+      {
+        "name": "Docker Desktop",
+        "version": ">=4.0.0",
+        "installCommand": "winget install Docker.DockerDesktop"
+      },
+      {
+        "name": "Visual Studio Code",
+        "version": ">=1.80.0",
+        "installCommand": "winget install Microsoft.VisualStudioCode"
+      }
+    ],
+    "optional": [
+      {
+        "name": "Windows Terminal",
+        "installCommand": "winget install Microsoft.WindowsTerminal"
+      },
+      {
+        "name": "PowerShell 7",
+        "installCommand": "winget install Microsoft.PowerShell"
+      }
+    ]
+  },
+  "vscodeExtensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.black-formatter",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+    "eamodio.gitlens",
+    "github.copilot",
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-wsl"
+  ],
+  "npmPackages": [
+    "yarn",
+    "pnpm",
+    "pm2",
+    "@google/jules"
+  ],
+  "pipPackages": [
+    "black",
+    "pylint",
+    "pytest",
+    "requests",
+    "pandas",
+    "numpy"
+  ],
+  "environmentVariables": {
+    "NODE_ENV": "development",
+    "PYTHON_ENV": "development",
+    "EDITOR": "code",
+    "GIT_EDITOR": "code --wait"
+  },
+  "gitConfig": {
+    "core.autocrlf": "true",
+    "init.defaultBranch": "main",
+    "pull.rebase": "false",
+    "fetch.prune": "true"
+  },
+  "directories": {
+    "projects": "D:\\Dropbox (Personal)",
+    "logs": "D:\\Dropbox (Personal)\\logs",
+    "backups": "D:\\Backups"
+  },
+  "startupApplications": [
+    {
+      "name": "Docker Desktop",
+      "path": "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe",
+      "enabled": true
+    },
+    {
+      "name": "VS Code",
+      "path": "code",
+      "enabled": false
+    }
+  ]
+}

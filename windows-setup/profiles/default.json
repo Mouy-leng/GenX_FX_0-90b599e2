@@ -1,0 +1,53 @@
+{
+  "profileName": "Default Profile",
+  "profileType": "default",
+  "version": "1.0.0",
+  "description": "Default configuration profile for Windows setup",
+  "basicTools": [
+    {
+      "name": "Git",
+      "installCommand": "winget install Git.Git"
+    },
+    {
+      "name": "Windows Terminal",
+      "installCommand": "winget install Microsoft.WindowsTerminal"
+    },
+    {
+      "name": "PowerShell 7",
+      "installCommand": "winget install Microsoft.PowerShell"
+    }
+  ],
+  "environmentVariables": {
+    "EDITOR": "notepad",
+    "HOME": "%USERPROFILE%"
+  },
+  "directories": {
+    "documents": "%USERPROFILE%\\Documents",
+    "downloads": "%USERPROFILE%\\Downloads",
+    "desktop": "%USERPROFILE%\\Desktop"
+  },
+  "securitySettings": {
+    "windowsDefender": {
+      "realtimeProtection": true,
+      "cloudProtection": true,
+      "automaticSampleSubmission": true
+    },
+    "firewall": {
+      "enabled": true,
+      "profile": "Private"
+    },
+    "uac": {
+      "level": 2,
+      "description": "Notify only when apps try to make changes (default)"
+    }
+  },
+  "privacySettings": {
+    "telemetry": 0,
+    "activityHistory": false,
+    "locationTracking": false
+  },
+  "performanceSettings": {
+    "visualEffects": "BestPerformance",
+    "powerPlan": "Balanced"
+  }
+}
