@@ -41,7 +41,7 @@ aiofiles==23.2.0
 scipy==1.16.1
 
 # Monitoring
-psutil==7.0.0
+psutil==7.1.2
 
 # Web server
 gunicorn==23.0.0
