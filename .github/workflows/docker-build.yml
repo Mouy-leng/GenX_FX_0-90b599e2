@@ -1,0 +1,96 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+    paths:
+      - 'Dockerfile.*'
+      - 'api/**'
+      - 'client/**'
+      - 'core/**'
+      - 'services/**'
+      - 'requirements.txt'
+      - 'package.json'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  DOCKER_USERNAME: genxdbx
+  REGISTRY: docker.io
+
+jobs:
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - dockerfile: Dockerfile.api
+            image: genxdbx/genxdbxfx1
+            tag: api-latest
+            context: .
+          - dockerfile: Dockerfile.frontend
+            image: genxdbx/genxdbxfx1
+            tag: frontend-latest
+            context: .
+          - dockerfile: Dockerfile.trading
+            image: genxdbx/genxdbxfx1
+            tag: trading-latest
+            context: .
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=raw,value=${{ matrix.tag }}
+            type=sha,prefix=${{ matrix.tag }}-
+            type=ref,event=branch,prefix=${{ matrix.tag }}-
+            type=ref,event=pr,prefix=${{ matrix.tag }}-pr-
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  notify:
+    name: Notify on completion
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: always()
+    steps:
+      - name: Workflow conclusion
+        run: |
+          if [ "${{ needs.build-and-push.result }}" == "success" ]; then
+            echo "✅ All Docker images built and pushed successfully!"
+          else
+            echo "❌ Docker image build failed!"
+            exit 1
+          fi
