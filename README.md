@@ -9,6 +9,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-blue.svg)](https://kubernetes.io/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/Mouy-leng/GenX_FX)
 
@@ -88,6 +89,31 @@ This option allows you to run the entire backend, API, and AI models for develop
     ```
     This command will start the FastAPI backend and the React frontend simultaneously. You can then access the platform at `http://localhost:3000`.
 
+### For Production: Kubernetes Deployment
+
+Deploy the platform on Kubernetes for production-ready, scalable infrastructure.
+
+1.  **Prerequisites**:
+    -   Kubernetes cluster (local or cloud)
+    -   kubectl installed and configured
+    -   Docker images built and pushed to a registry
+
+2.  **Deploy to Kubernetes**:
+    ```bash
+    cd k8s
+    ./deploy.sh
+    ```
+
+3.  **Access Services**:
+    ```bash
+    # Using port-forward for local access
+    kubectl port-forward svc/frontend-service 3000:3000 -n genx-fx
+    kubectl port-forward svc/api-service 8080:8080 -n genx-fx
+    kubectl port-forward svc/grafana-service 3001:3001 -n genx-fx
+    ```
+
+For detailed Kubernetes deployment instructions, see the [Kubernetes Deployment Guide](k8s/README.md).
+
 ---
 
 ## 🏗️ System Architecture
@@ -139,6 +165,7 @@ For more detailed information, please refer to the following guides in the repos
 -   **[SYSTEM_ARCHITECTURE_GUIDE.md](SYSTEM_ARCHITECTURE_GUIDE.md)**: An in-depth look at the system's design and architecture.
 -   **[API_KEY_SETUP.md](API_KEY_SETUP.md)**: Instructions for configuring the necessary API keys for all services.
 -   **[AWS_DEPLOYMENT_GUIDE.md](AWS_DEPLOYMENT_GUIDE.md)**: A step-by-step guide to deploying the platform on AWS.
+-   **[k8s/README.md](k8s/README.md)**: Complete Kubernetes deployment guide with production best practices.
 
 ---
 

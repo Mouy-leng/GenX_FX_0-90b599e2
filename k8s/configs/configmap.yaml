@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: genx-fx-config
+  namespace: genx-fx
+data:
+  # Database Configuration
+  MYSQL_DATABASE: "genxdb_fx_db"
+  MYSQL_USER: "genx_user"
+  DATABASE_HOST: "mysql-service"
+  DATABASE_PORT: "3306"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  
+  # Application Configuration
+  ENV: "production"
+  PORT: "8080"
+  DEBUG: "false"
+  
+  # MT5 Configuration
+  MT5_SERVER: "Exness-MT5Trial8"
+  
+  # API URLs
+  API_URL: "http://api-service:8080"
+  FRONTEND_URL: "http://frontend-service:3000"

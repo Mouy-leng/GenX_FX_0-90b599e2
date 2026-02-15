@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: genx-fx
+  labels:
+    app: genx-fx-trading
+    environment: production
