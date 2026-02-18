@@ -1,6 +1,11 @@
-# Dropbox.code-workspace-Workspace-
+# Snapshots Directory
 
-## 📓 Knowledge Base
-- **NotebookLM**: [Access here](https://notebooklm.google.com/notebook/e8f4c29d-9aec-4d5f-8f51-2ca168687616)
-- **Note**: This notebook is available for reading and writing. AI agents must read it before starting work.
+This directory contains snapshots of your code for AI interactions. Each snapshot is a markdown file that includes relevant code context and project structure information.
 
+## What's included in snapshots?
+- Selected code files and their contents
+- Project structure (if enabled)
+- Your prompt/question for the AI
+
+## Configuration
+You can customize snapshot behavior in `config.json`.
